@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,6 +43,11 @@ public class User implements UserDetails {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ElementCollection
+    private List<String> documents = new ArrayList<>();
+
+    private boolean validated = false;
     
     // Constructeurs
     public User() {}
@@ -118,6 +124,31 @@ public class User implements UserDetails {
         this.updatedAt = updatedAt; 
     }
     
+    public List<String> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<String> documents) {
+        this.documents = documents;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated = validated;
+    }
+
+
+    public void checkValidation() {
+        if (documents.contains("passeport") && documents.contains("certificat_medical")) {
+            this.validated = true;
+        } else {
+            this.validated = false;
+        }
+    }
+    
     // UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -153,4 +184,7 @@ public class User implements UserDetails {
     public boolean isEnabled() { 
         return true; 
     }
+
+
+
 }
