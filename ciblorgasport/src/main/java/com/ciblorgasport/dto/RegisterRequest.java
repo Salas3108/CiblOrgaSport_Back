@@ -20,7 +20,7 @@ public class RegisterRequest {
     @Size(min = 6, max = 120)
     private String password;
     
-    private Role role = Role.USER;
+    private Role role;
     
     // Getters et Setters
     public String getUsername() { return username; }
@@ -32,6 +32,8 @@ public class RegisterRequest {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     
-    public Role getRole() { return role; }
+    public Role getRole() {
+        return role != null ? role : Role.USER; // si null, mettre USER par défaut
+    }
     public void setRole(Role role) { this.role = role; }
 }

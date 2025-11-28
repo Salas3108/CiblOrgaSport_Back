@@ -52,13 +52,19 @@ public class AuthService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return "Error: Email is already in use!";
         }
-        
-        User user = new User(registerRequest.getUsername(), 
-                           registerRequest.getEmail(),
-                           passwordEncoder.encode(registerRequest.getPassword()),
-                           registerRequest.getRole());
-        
+
+        // Définir le rôle, USER par défaut
+        Role role = registerRequest.getRole() != null ? registerRequest.getRole() : Role.USER;
+
+        User user = new User(
+            registerRequest.getUsername(),
+            registerRequest.getEmail(),
+            passwordEncoder.encode(registerRequest.getPassword()),
+            role
+        );
+
         userRepository.save(user);
         return "User registered successfully!";
     }
+
 }
