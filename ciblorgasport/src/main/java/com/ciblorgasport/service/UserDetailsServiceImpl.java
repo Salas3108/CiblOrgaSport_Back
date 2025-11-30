@@ -2,6 +2,8 @@ package com.ciblorgasport.service;
 
 import com.ciblorgasport.entity.User;
 import com.ciblorgasport.repository.UserRepository;
+import java.util.List;
+
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
@@ -37,4 +39,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public boolean existsByEmail(String email) {
 	    return userRepository.existsByEmail(email);
 	}
+	public User getUserById(Long id) {
+	    return userRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+	}
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
+
 }

@@ -3,5 +3,7 @@ package com.ciblorgasport.entity;
 public enum Role {
     USER,
     ATHLETE,
-    ADMIN
+    ADMIN,
+    COMMISSAIRE,
+    VOLONTAIRE
 }
