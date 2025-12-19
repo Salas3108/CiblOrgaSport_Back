@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AuthServiceApplication",
+            "request": "launch",
+            "mainClass": "com.ciblorgasport.authservice.AuthServiceApplication",
+            "projectName": "auth-service"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
