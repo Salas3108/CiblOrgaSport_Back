@@ -142,6 +142,58 @@ services:
       - "5432:5432"
 ```
 
+## Microservice Billetterie (Spring Boot)
+- Port: 8081
+- Objectif: permettre à Suzanne (spectatrice) de consulter et stocker ses billets.
+- Endpoints:
+  - GET /api/tickets?spectatorId={id} — liste des billets du spectateur
+  - POST /api/tickets — crée et stocke un billet
+    - body: { spectatorId, eventId, seat? }
+
+### Démarrage
+```bash
+cd billetterie
+./mvnw spring-boot:run
+# Astuces:
+# - Utiliser le wrapper Maven (./mvnw) pour éviter les écarts de version
+# - Pour logs détaillés: ./mvnw -X spring-boot:run
+# - Pour stacktrace: ./mvnw -e spring-boot:run
+```
+
+### Config
+Variables (via application.yml ou env):
+- BILL_DB_URL, BILL_DB_USER, BILL_DB_PASS
+
+### Dépannage (billetterie)
+En cas d'échec "spring-boot-maven-plugin ... Process terminated with exit code: 1":
+- Vérifier la version Java:
+  ```bash
+  java -version
+  ./mvnw -v
+  ```
+  Utiliser une JDK compatible avec Spring Boot (Java 17+ recommandé).
+- Nettoyer et recompiler:
+  ```bash
+  cd billetterie
+  ./mvnw clean package
+  ```
+- Lancer avec logs détaillés pour identifier la cause:
+  ```bash
+  ./mvnw -X spring-boot:run
+  ```
+- Ports et configuration:
+  - Assurer que le port 8081 est libre.
+  - Vérifier application.yml et variables: BILL_DB_URL, BILL_DB_USER, BILL_DB_PASS.
+  - Si la DB n’est pas accessible, tester une URL locale ou dockerisée.
+- Dépendances et plugin:
+  - Vérifier dans pom.xml la version du plugin spring-boot:
+    - org.springframework.boot:spring-boot-maven-plugin aligné avec la version Spring Boot du projet.
+- Tests/env:
+  - Essayer sans tests au run (si applicable): `./mvnw spring-boot:run -DskipTests`
+- Logs d’erreur courants:
+  - Bean creation failure: vérifier les @Configuration/@ComponentScan.
+  - Profile manquant: définir `SPRING_PROFILES_ACTIVE=dev` si nécessaire.
+
 ## Roadmap & Avancement
 - Fondations
   - [x] Initialisation repo

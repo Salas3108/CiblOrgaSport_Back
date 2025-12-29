@@ -1,0 +1,13 @@
+{
+  // Recognize Maven-style source roots
+  "java.project.sourcePaths": [
+    "billetterie/src/main/java"
+  ],
+  // Optional: if VS Code Java is excluding folders incorrectly
+  "java.configuration.checkProjectSettingsExclusions": false,
+  // Add custom dictionary entries
+  "cSpell.words": [
+    "ciblorgasport",
+    "Billetterie"
+  ]
+}
