@@ -56,60 +56,52 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // 🔹 Désactiver CSRF pour API REST
             .csrf(csrf -> csrf.disable())
-            
-            // 🔹 Sessions stateless pour JWT
+
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
-            // 🔹 CONFIGURATION DES AUTORISATIONS CORRIGÉE
+
             .authorizeHttpRequests(auth -> auth
-                // 🔓 Endpoints publics (sans authentification)
+
                 .requestMatchers("/api/auth/**").permitAll()
                 
-                // 🔓 Endpoints de test pour debugging
                 .requestMatchers("/api/test/**").permitAll()
                 
-                // 👑 ADMIN endpoints (tous sous /api/admin/)
-                // IMPORTANT: Utiliser hasAuthority() au lieu de hasRole() si vos tokens n'ont pas "ROLE_" prefix
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/competitions").authenticated()
+                .requestMatchers("/api/competitions/*/sabonner").authenticated()
+                .requestMatchers("/api/competitions/*/desabonner").authenticated()
+                .requestMatchers("/api/mes-abonnements").authenticated()
                 
-                // 👤 USER endpoints (authentifiés)
+                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+               
                 .requestMatchers("/api/user/**").authenticated()
                 
-                // 🔐 Tout le reste nécessite une authentification
                 .anyRequest().authenticated()
             )
             
-            // 🔹 Configuration CORS
+
             .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-        // 🔹 Ajouter le provider d'authentification
+
         http.authenticationProvider(authenticationProvider());
         
-        // 🔹 Ajouter le filtre JWT avant le filtre d'authentification par défaut
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // 🔹 Configuration CORS pour autoriser le frontend React
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Origines autorisées
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",      // React dev server
-            "http://localhost:3001"       // Alternative port
+            "http://localhost:3000",      
+            "http://localhost:3001"       
         ));
         
-        // Méthodes HTTP autorisées
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
         ));
         
-        // Headers autorisés
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",
             "Content-Type",
@@ -119,16 +111,13 @@ public class SecurityConfig {
             "Cache-Control"
         ));
         
-        // Headers exposés
         configuration.setExposedHeaders(Arrays.asList(
             "Authorization",
             "Content-Disposition"
         ));
         
-        // Autoriser les credentials (cookies, auth headers)
         configuration.setAllowCredentials(true);
-        
-        // Cache des pré-vérifications CORS (en secondes)
+
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
