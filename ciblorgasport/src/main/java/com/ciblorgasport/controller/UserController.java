@@ -34,22 +34,18 @@ public class UserController {
         String username = authentication.getName();
         User user = userService.getUserByUsername(username);
 
-        // Crée le répertoire de l'utilisateur si nécessaire
         Path userDir = Paths.get("uploads").resolve(String.valueOf(user.getId()));
         Files.createDirectories(userDir);
 
-        // Supprimer les anciennes versions
         user.getDocuments().removeIf(doc -> doc.startsWith("passeport:"));
         user.getDocuments().removeIf(doc -> doc.startsWith("certificat:"));
 
-        // Upload du passeport
         if (!passeport.isEmpty()) {
             Path filePath = userDir.resolve(passeport.getOriginalFilename());
             passeport.transferTo(filePath);
             user.addDocument("passeport: " + passeport.getOriginalFilename());
         }
 
-        // Upload du certificat
         if (!certificat.isEmpty()) {
             Path filePath = userDir.resolve(certificat.getOriginalFilename());
             certificat.transferTo(filePath);
@@ -71,7 +67,6 @@ public class UserController {
 
         String docPath = body.get("document");
         if (docPath != null && user.getDocuments().contains(docPath)) {
-            // Récupère le nom du fichier réel
             String[] parts = docPath.split(": ");
             if (parts.length == 2) {
                 String fileName = parts[1];
@@ -117,7 +112,6 @@ public class UserController {
         String newUsername = body.get("username");
         String newEmail = body.get("email");
 
-        // Vérifie les doublons de username
         if (newUsername != null && !newUsername.equals(user.getUsername())) {
             if (userService.existsByUsername(newUsername)) {
                 return ResponseEntity.status(409).body(Map.of("error", "Nom d'utilisateur déjà utilisé"));
@@ -125,7 +119,6 @@ public class UserController {
             user.setUsername(newUsername);
         }
 
-        // Vérifie les doublons d'email
         if (newEmail != null && !newEmail.equals(user.getEmail())) {
             if (userService.existsByEmail(newEmail)) {
                 return ResponseEntity.status(409).body(Map.of("error", "Email déjà utilisé"));

@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:3000") // frontend exact
+@CrossOrigin(origins = "http://localhost:3000") 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -26,7 +26,7 @@ public class AuthController {
     }
     
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         String result = authService.registerUser(registerRequest);
         
         if (result.startsWith("Error:")) {
