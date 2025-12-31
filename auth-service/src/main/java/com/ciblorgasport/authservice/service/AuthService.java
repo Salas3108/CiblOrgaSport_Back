@@ -45,7 +45,23 @@ public class AuthService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return "Error: Email is already in use!";
         }
-        // ...existing code for registration logic...
+
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        if (registerRequest.getRole() != null) {
+            user.setRole(registerRequest.getRole());
+        } else {
+            user.setRole(Role.USER);
+        }
+        // Valider automatiquement les utilisateurs normaux
+        if (user.getRole() == Role.USER) {
+            user.setValidated(true);
+        }
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        user.setUpdatedAt(java.time.LocalDateTime.now());
+        userRepository.save(user);
         return "User registered successfully!";
     }
 }

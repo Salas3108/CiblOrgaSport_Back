@@ -58,11 +58,11 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
-            auth.requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/user/upload-documents").authenticated()
-                .requestMatchers("/api/user/**").authenticated()
+            auth.requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/test/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/upload-documents").authenticated()
+                .requestMatchers("/user/**").authenticated()
                 .anyRequest().authenticated()
         )
 
