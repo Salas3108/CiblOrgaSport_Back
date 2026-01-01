@@ -7,21 +7,21 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.0)
 
-2026-01-01T21:20:28.342+01:00  INFO 35421 --- [event-service] [           main] c.c.e.EventServiceApplication            : Starting EventServiceApplication v0.0.1-SNAPSHOT using Java 21.0.6 with PID 35421 (/Users/salimtitouche/CiblOrgaSport_Back/event-service/target/event-service-0.0.1-SNAPSHOT.jar started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/event-service)
-2026-01-01T21:20:28.346+01:00  INFO 35421 --- [event-service] [           main] c.c.e.EventServiceApplication            : No active profile set, falling back to 1 default profile: "default"
-2026-01-01T21:20:29.539+01:00  INFO 35421 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-01-01T21:20:29.635+01:00  INFO 35421 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 79 ms. Found 3 JPA repository interfaces.
-2026-01-01T21:20:30.606+01:00  INFO 35421 --- [event-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8084 (http)
-2026-01-01T21:20:30.624+01:00  INFO 35421 --- [event-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-01-01T21:20:30.624+01:00  INFO 35421 --- [event-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
-2026-01-01T21:20:30.690+01:00  INFO 35421 --- [event-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-01-01T21:20:30.692+01:00  INFO 35421 --- [event-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2216 ms
-2026-01-01T21:20:30.950+01:00  INFO 35421 --- [event-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-01-01T21:20:31.069+01:00  INFO 35421 --- [event-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
-2026-01-01T21:20:31.123+01:00  INFO 35421 --- [event-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-01-01T21:20:31.538+01:00  INFO 35421 --- [event-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-01-01T21:20:31.590+01:00  INFO 35421 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-01-01T21:20:32.845+01:00 ERROR 35421 --- [event-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Exception during pool initialization.
+2026-01-02T00:02:07.065+01:00  INFO 49489 --- [event-service] [           main] c.c.e.EventServiceApplication            : Starting EventServiceApplication v0.0.1-SNAPSHOT using Java 21.0.6 with PID 49489 (/Users/salimtitouche/CiblOrgaSport_Back/event-service/target/event-service-0.0.1-SNAPSHOT.jar started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/event-service)
+2026-01-02T00:02:07.075+01:00  INFO 49489 --- [event-service] [           main] c.c.e.EventServiceApplication            : No active profile set, falling back to 1 default profile: "default"
+2026-01-02T00:02:08.718+01:00  INFO 49489 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-02T00:02:08.868+01:00  INFO 49489 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 133 ms. Found 3 JPA repository interfaces.
+2026-01-02T00:02:09.936+01:00  INFO 49489 --- [event-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8084 (http)
+2026-01-02T00:02:09.950+01:00  INFO 49489 --- [event-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-02T00:02:09.950+01:00  INFO 49489 --- [event-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-01-02T00:02:10.020+01:00  INFO 49489 --- [event-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-02T00:02:10.021+01:00  INFO 49489 --- [event-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2699 ms
+2026-01-02T00:02:10.399+01:00  INFO 49489 --- [event-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-02T00:02:10.516+01:00  INFO 49489 --- [event-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
+2026-01-02T00:02:10.578+01:00  INFO 49489 --- [event-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-02T00:02:11.006+01:00  INFO 49489 --- [event-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-02T00:02:11.059+01:00  INFO 49489 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-02T00:02:12.332+01:00 ERROR 49489 --- [event-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Exception during pool initialization.
 
 org.postgresql.util.PSQLException: FATAL: password authentication failed for user "admin"
 	at org.postgresql.core.v3.ConnectionFactoryImpl.doAuthentication(ConnectionFactoryImpl.java:693) ~[postgresql-42.6.0.jar!/:42.6.0]
@@ -83,7 +83,7 @@ org.postgresql.util.PSQLException: FATAL: password authentication failed for use
 	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 
-2026-01-01T21:20:32.850+01:00  WARN 35421 --- [event-service] [           main] o.h.e.j.e.i.JdbcEnvironmentInitiator     : HHH000342: Could not obtain connection to query metadata
+2026-01-02T00:02:12.338+01:00  WARN 49489 --- [event-service] [           main] o.h.e.j.e.i.JdbcEnvironmentInitiator     : HHH000342: Could not obtain connection to query metadata
 
 java.lang.NullPointerException: Cannot invoke "org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(java.sql.SQLException, String)" because the return value of "org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.sqlExceptionHelper()" is null
 	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:116) ~[hibernate-core-6.3.1.Final.jar!/:6.3.1.Final]
@@ -129,10 +129,10 @@ java.lang.NullPointerException: Cannot invoke "org.hibernate.engine.jdbc.spi.Sql
 	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 
-2026-01-01T21:20:32.882+01:00  WARN 35421 --- [event-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-01-01T21:20:33.944+01:00  INFO 35421 --- [event-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-01-01T21:20:33.968+01:00  INFO 35421 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-01-01T21:20:35.007+01:00 ERROR 35421 --- [event-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Exception during pool initialization.
+2026-01-02T00:02:12.369+01:00  WARN 49489 --- [event-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-02T00:02:13.283+01:00  INFO 49489 --- [event-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-02T00:02:13.306+01:00  INFO 49489 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-02T00:02:14.357+01:00 ERROR 49489 --- [event-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Exception during pool initialization.
 
 org.postgresql.util.PSQLException: FATAL: password authentication failed for user "admin"
 	at org.postgresql.core.v3.ConnectionFactoryImpl.doAuthentication(ConnectionFactoryImpl.java:693) ~[postgresql-42.6.0.jar!/:42.6.0]
@@ -198,15 +198,15 @@ org.postgresql.util.PSQLException: FATAL: password authentication failed for use
 	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58) ~[event-service-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
 
-2026-01-01T21:20:35.011+01:00  WARN 35421 --- [event-service] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 28P01
-2026-01-01T21:20:35.011+01:00 ERROR 35421 --- [event-service] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : FATAL: password authentication failed for user "admin"
-2026-01-01T21:20:35.018+01:00 ERROR 35421 --- [event-service] [           main] j.LocalContainerEntityManagerFactoryBean : Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [FATAL: password authentication failed for user "admin"] [n/a]
-2026-01-01T21:20:35.019+01:00  WARN 35421 --- [event-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [FATAL: password authentication failed for user "admin"] [n/a]
-2026-01-01T21:20:35.021+01:00  INFO 35421 --- [event-service] [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
-2026-01-01T21:20:35.031+01:00  INFO 35421 --- [event-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+2026-01-02T00:02:14.362+01:00  WARN 49489 --- [event-service] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 28P01
+2026-01-02T00:02:14.363+01:00 ERROR 49489 --- [event-service] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : FATAL: password authentication failed for user "admin"
+2026-01-02T00:02:14.368+01:00 ERROR 49489 --- [event-service] [           main] j.LocalContainerEntityManagerFactoryBean : Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [FATAL: password authentication failed for user "admin"] [n/a]
+2026-01-02T00:02:14.368+01:00  WARN 49489 --- [event-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [FATAL: password authentication failed for user "admin"] [n/a]
+2026-01-02T00:02:14.370+01:00  INFO 49489 --- [event-service] [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-01-02T00:02:14.381+01:00  INFO 49489 --- [event-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2026-01-01T21:20:35.048+01:00 ERROR 35421 --- [event-service] [           main] o.s.boot.SpringApplication               : Application run failed
+2026-01-02T00:02:14.396+01:00 ERROR 49489 --- [event-service] [           main] o.s.boot.SpringApplication               : Application run failed
 
 org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.GenericJDBCException: Unable to open JDBC Connection for DDL execution [FATAL: password authentication failed for user "admin"] [n/a]
 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1775) ~[spring-beans-6.1.1.jar!/:6.1.1]

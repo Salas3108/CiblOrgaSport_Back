@@ -1,41 +1,35 @@
 #!/bin/bash
 
-# Colors for output
 GREEN='\033[0;32m'
-BLUE='\033[0;34m'
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-echo -e "${BLUE}📊 État des services CiblOrgaSport${NC}"
-echo "=================================="
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LOG_DIR="${ROOT_DIR}/logs"
 
-# Function to check service status
-check_service() {
-    local service_name=$1
-    local pid_file="logs/${service_name}.pid"
-    
-    if [ -f "$pid_file" ]; then
-        local pid=$(cat $pid_file)
-        if kill -0 $pid 2>/dev/null; then
-            echo -e "${GREEN}✅ ${service_name}: En cours (PID: $pid)${NC}"
-        else
-            echo -e "${RED}❌ ${service_name}: Arrêté (PID obsolète)${NC}"
-            rm -f $pid_file
-        fi
+services=("auth-service" "event-service" "billetterie" "incident-service" "gateway")
+
+echo -e "${BLUE}📊 État des services CiblOrgaSport:${NC}\n"
+
+for service in "${services[@]}"; do
+  pid_file="${LOG_DIR}/${service}.pid"
+  if [ -f "$pid_file" ]; then
+    pid=$(cat "$pid_file")
+    if ps -p "$pid" > /dev/null 2>&1; then
+      echo -e "${GREEN}✅ $service: En cours (PID: $pid)${NC}"
     else
-        echo -e "${RED}❌ ${service_name}: Non démarré${NC}"
+      echo -e "${RED}❌ $service: Arrêté${NC}"
     fi
-}
+  else
+    echo -e "${RED}❌ $service: Non démarré${NC}"
+  fi
+done
 
-# Check all services
-check_service "database"
-check_service "api-server"
-check_service "auth-service"
-check_service "notification-service"
-check_service "upload-service"
-check_service "background-jobs"
-
+# Check database
 echo ""
-echo -e "${YELLOW}📋 Processus Node.js actifs:${NC}"
-ps aux | grep -E "(npm|node)" | grep -v grep || echo -e "${RED}Aucun processus Node.js trouvé${NC}"
+if docker ps | grep -q postgres; then
+  echo -e "${GREEN}✅ Database: En cours${NC}"
+else
+  echo -e "${RED}❌ Database: Arrêtée${NC}"
+fi

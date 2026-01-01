@@ -1,0 +1,10 @@
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/IncidentServiceApplication.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/controller/IncidentController.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/model/ImpactLevel.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/model/Incident.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/model/IncidentStatus.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/model/IncidentType.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/repository/IncidentRepository.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/service/IncidentService.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/service/IncidentServiceImpl.java
+/Users/salimtitouche/CiblOrgaSport_Back/incident-service/src/main/java/com/ciblorgasport/incidentservice/service/impl/IncidentServiceImpl.java
