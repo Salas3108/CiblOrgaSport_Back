@@ -42,6 +42,65 @@ npm run dev
 npm run build && npm run start
 ```
 
+## 🚀 Démarrage des Services
+
+### Démarrage automatique de tous les services
+
+Pour lancer tous les services CiblOrgaSport en une seule commande :
+
+```bash
+# Rendre le script exécutable (première fois uniquement)
+chmod +x scripts/start-all-services.sh
+
+# Lancer tous les services
+./scripts/start-all-services.sh
+```
+
+### Arrêt de tous les services
+
+```bash
+# Rendre le script exécutable (première fois uniquement)
+chmod +x scripts/stop-all-services.sh
+
+# Arrêter tous les services
+./scripts/stop-all-services.sh
+```
+
+### Surveillance des logs
+
+Les logs de chaque service sont automatiquement sauvegardés dans le dossier `logs/` :
+
+```bash
+# Voir les logs en temps réel
+tail -f logs/api-server.log
+tail -f logs/auth-service.log
+tail -f logs/notification-service.log
+```
+
+### Démarrage manuel des services individuels
+
+Si vous préférez démarrer les services individuellement :
+
+```bash
+# Base de données
+npm run db:start
+
+# Serveur API principal
+npm run start:dev
+
+# Service d'authentification
+npm run auth:start
+
+# Service de notifications
+npm run notifications:start
+
+# Service de téléchargement
+npm run upload:start
+
+# Tâches en arrière-plan
+npm run jobs:start
+```
+
 ## Scripts utiles
 - npm run dev: démarrage en mode développement
 - npm run build: build de production
