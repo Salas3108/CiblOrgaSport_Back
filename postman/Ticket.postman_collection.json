@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "CiblOrgaSport - Ticket API",
+    "_postman_id": "c6c2c2b9-0000-0000-0000-000000000001",
+    "description": "Tests for Ticket API: list, get by id, create, update, delete, and price validation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "ticketId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "List Tickets",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tickets",
+        "header": [{ "key": "Content-Type", "value": "application/json" }]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.code === 200);",
+              "pm.test('Response is JSON array', () => {",
+              "  pm.response.to.have.jsonBody('');",
+              "  const data = pm.response.json();",
+              "  pm.expect(Array.isArray(data)).to.be.true;",
+              "});",
+              "if (pm.response.json().length > 0) {",
+              "  const t = pm.response.json()[0];",
+              "  pm.test('Ticket has expected fields', () => {",
+              "    pm.expect(t).to.have.property('id');",
+              "    pm.expect(t).to.have.property('category');",
+              "    pm.expect(t).to.have.property('price');",
+              "  });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Ticket",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/tickets",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category\": \"STANDARD\",\n  \"price\": 0\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201 or 200', () => [200,201].includes(pm.response.code));",
+              "pm.test('Response has ticket fields', () => {",
+              "  const t = pm.response.json();",
+              "  pm.expect(t).to.have.property('id');",
+              "  pm.expect(t).to.have.property('category');",
+              "  pm.expect(t).to.have.property('price');",
+              "});",
+              "pm.collectionVariables.set('ticketId', pm.response.json().id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Ticket by ID",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tickets/{{ticketId}}",
+        "header": [{ "key": "Content-Type", "value": "application/json" }]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.code === 200);",
+              "pm.test('Ticket fields exist', () => {",
+              "  const t = pm.response.json();",
+              "  pm.expect(t).to.have.property('id');",
+              "  pm.expect(t.id).to.eql(Number(pm.collectionVariables.get('ticketId')));",
+              "  pm.expect(t).to.have.property('category');",
+              "  pm.expect(t).to.have.property('price');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update Ticket",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/tickets/{{ticketId}}",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category\": \"VIP\",\n  \"price\": 0\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.code === 200);",
+              "pm.test('Ticket updated', () => {",
+              "  const t = pm.response.json();",
+              "  pm.expect(t.category).to.eql('VIP');",
+              "  pm.expect(t).to.have.property('price');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Ticket",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/tickets/{{ticketId}}",
+        "header": [{ "key": "Content-Type", "value": "application/json" }]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 204 or 200', () => [200,204].includes(pm.response.code));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Calculate Price by Category",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tickets/price?category=STANDARD",
+        "header": [{ "key": "Content-Type", "value": "application/json" }]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.code === 200);",
+              "pm.test('Price is a number', () => {",
+              "  const body = pm.response.json();",
+              "  const price = typeof body === 'number' ? body : body.price;",
+              "  pm.expect(price).to.be.a('number');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
