@@ -1,2 +1,4 @@
-C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\test\java\com\ciblorgasport\billetterie\BilletterieApplicationTests.java
-C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\test\java\com\ciblorgasport\billetterie\service\TicketServiceTest.java
+/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/test/java/com/ciblorgasport/billetterie/BilletterieApplicationTests.java
+/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/test/java/com/ciblorgasport/billetterie/controller/TicketControllerTest.java
+/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/test/java/com/ciblorgasport/billetterie/service/TicketServiceTest.java
+/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/test/java/com/ciblorgasport/billetterie/service/impl/TicketServiceImplTest.java

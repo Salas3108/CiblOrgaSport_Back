@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BilletterieApplication",
+            "request": "launch",
+            "mainClass": "com.ciblorgasport.billetterie.BilletterieApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
             "name": "AuthServiceApplication",
             "request": "launch",
             "mainClass": "com.ciblorgasport.authservice.AuthServiceApplication",
