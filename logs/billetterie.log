@@ -1,0 +1,38 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-01-01T21:20:29.876+01:00  INFO 35430 --- [billetterie] [           main] c.c.billetterie.BilletterieApplication   : Starting BilletterieApplication using Java 21.0.6 with PID 35430 (/Users/salimtitouche/CiblOrgaSport_Back/billetterie/target/billetterie-0.0.1-SNAPSHOT.jar started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/billetterie)
+2026-01-01T21:20:29.892+01:00  INFO 35430 --- [billetterie] [           main] c.c.billetterie.BilletterieApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-01-01T21:20:30.648+01:00  INFO 35430 --- [billetterie] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-01T21:20:30.716+01:00  INFO 35430 --- [billetterie] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 1 JPA repository interface.
+2026-01-01T21:20:31.774+01:00  INFO 35430 --- [billetterie] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2026-01-01T21:20:31.797+01:00  INFO 35430 --- [billetterie] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-01T21:20:31.797+01:00  INFO 35430 --- [billetterie] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-01-01T21:20:31.835+01:00  INFO 35430 --- [billetterie] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-01T21:20:31.837+01:00  INFO 35430 --- [billetterie] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1770 ms
+2026-01-01T21:20:32.013+01:00  INFO 35430 --- [billetterie] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-01T21:20:32.078+01:00  INFO 35430 --- [billetterie] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-01-01T21:20:32.118+01:00  INFO 35430 --- [billetterie] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-01T21:20:32.484+01:00  INFO 35430 --- [billetterie] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-01T21:20:32.521+01:00  INFO 35430 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-01T21:20:32.771+01:00  INFO 35430 --- [billetterie] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1109730f
+2026-01-01T21:20:32.772+01:00  INFO 35430 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-01T21:20:33.708+01:00  INFO 35430 --- [billetterie] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-01T21:20:33.756+01:00  INFO 35430 --- [billetterie] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-01T21:20:33.996+01:00  INFO 35430 --- [billetterie] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-01T21:20:34.791+01:00  INFO 35430 --- [billetterie] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
+2026-01-01T21:20:34.800+01:00  INFO 35430 --- [billetterie] [           main] c.c.billetterie.BilletterieApplication   : Started BilletterieApplication in 5.642 seconds (process running for 6.468)
+2026-01-01T22:01:26.843+01:00  WARN 35430 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=30m23s889ms).
+2026-01-01T22:17:44.906+01:00  WARN 33141 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m56s205ms).
+2026-01-01T22:33:28.578+01:00  WARN 35430 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m34s970ms).
+2026-01-01T22:57:13.667+01:00  WARN 35430 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=23m15s79ms).
+2026-01-01T23:24:19.560+01:00  WARN 35430 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m5s893ms).
+eeper delta=23m15s117ms).
+2026-01-01T23:24:40.906+01:00  WARN 33141 --- [billetterie] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m5s905ms).
