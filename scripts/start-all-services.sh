@@ -61,3 +61,11 @@ echo -e "\n${BLUE}📊 Services en cours d'exécution:${NC}"
 ps aux | grep -E "(npm|node)" | grep -v grep | while read line; do
     echo -e "${GREEN}  → $line${NC}"
 done
+
+# Ajoutez cette section pour surveiller les services
+echo "🔄 Surveillance des services (Ctrl+C pour arrêter)..."
+while true; do
+    sleep 30
+    echo "📊 $(date): Services en cours d'exécution"
+    ps aux | grep -E "(database|api-server|auth-service|notification-service|upload-service|background-jobs)" | grep -v grep | wc -l | xargs echo "   → Nombre de services actifs:"
+done

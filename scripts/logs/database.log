@@ -1,0 +1,6 @@
+
+> db:start
+> docker-compose up -d postgres
+
+time="2026-01-01T18:54:00+01:00" level=warning msg="/Users/salimtitouche/CiblOrgaSport_Back/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Container postgres  Running
