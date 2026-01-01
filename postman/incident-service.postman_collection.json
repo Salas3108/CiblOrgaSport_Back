@@ -1,0 +1,241 @@
+{
+  "info": {
+    "name": "incident-service",
+    "_postman_id": "incident-service-collection",
+    "description": "Collection to test the incident-service CRUD and filters. Ensure the service is running (default {{baseUrl}} = http://localhost:8084).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Entrée manuelle d'incident test\",\n  \"impactLevel\": \"CRITIQUE\",\n  \"type\": \"SECURITE\",\n  \"location\": \"Stade A\",\n  \"reportedBy\": \"tester-1\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "var body = pm.response.json();",
+              "pm.test('Response has id', function () { pm.expect(body.id).to.exist; });",
+              "pm.environment.set('incidentId', body.id);",
+              "pm.test('Status is ACTIF', function () { pm.expect(body.status).to.eql('ACTIF'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get All Incidents",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response is array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Incident by Id",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents/{{incidentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents",
+            "{{incidentId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "var body = pm.response.json();",
+              "pm.test('ID matches', function () { pm.expect(body.id).to.eql(parseInt(pm.environment.get('incidentId'))); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update Incident to RESOLU",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Incident résolu via test\",\n  \"impactLevel\": \"CRITIQUE\",\n  \"type\": \"SECURITE\",\n  \"location\": \"Stade A\",\n  \"status\": \"RESOLU\",\n  \"reportedBy\": \"tester-1\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents/{{incidentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents",
+            "{{incidentId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Status is RESOLU', function () { pm.expect(pm.response.json().status).to.eql('RESOLU'); });",
+              "pm.test('resolvedAt is present', function () { pm.expect(pm.response.json().resolvedAt).to.exist; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter Incidents (RESOLU + SECURITE)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents?status=RESOLU&type=SECURITE",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents"
+          ],
+          "query": [
+            { "key": "status", "value": "RESOLU" },
+            { "key": "type", "value": "SECURITE" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "var arr = pm.response.json();",
+              "pm.test('Response is array', function () { pm.expect(arr).to.be.an('array'); });",
+              "pm.test('Contains updated incident', function () { pm.expect(arr.some(i => i.id == parseInt(pm.environment.get('incidentId')))).to.be.true; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Incident",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents/{{incidentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents",
+            "{{incidentId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Verify Deletion (expect 404)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/incidents/{{incidentId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "incidents",
+            "{{incidentId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.sendRequest({url: pm.environment.get('baseUrl') + '/api/incidents/' + pm.environment.get('incidentId'), method: 'GET'}, function (err, res) {",
+              "  pm.test('Deleted incident returns 404', function () { pm.expect(res.status).to.equal(404); });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -43,6 +43,8 @@ services:
 
 volumes:
   postgres_data:
+    external: true
+    name: ciblorgasport_back_postgres_data
 
 networks:
   appnet:

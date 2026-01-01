@@ -1,5 +1,6 @@
 com\ciblorgasport\authservice\dto\RegisterRequest.class
 com\ciblorgasport\authservice\entity\Role.class
+com\ciblorgasport\authservice\security\SecurityConfig.class
 com\ciblorgasport\authservice\dto\JwtResponse.class
 com\ciblorgasport\authservice\security\AuthTokenFilter.class
 com\ciblorgasport\authservice\service\UserDetailsServiceImpl.class
