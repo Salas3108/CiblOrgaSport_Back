@@ -2,6 +2,7 @@ package com.ciblorgasport.eventservice.model;
 import com.ciblorgasport.eventservice.model.Competition;
 
 import jakarta.persistence.*;
+import com.ciblorgasport.eventservice.model.Lieu;
 
 @Entity
 public class Epreuve {
@@ -15,6 +16,9 @@ public class Epreuve {
     @JoinColumn(name = "competition_id")
     private Competition competition;
 
+    @ManyToOne
+    @JoinColumn(name = "lieu_id")
+    private Lieu lieu;
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -24,4 +28,6 @@ public class Epreuve {
     public void setDescription(String description) { this.description = description; }
     public Competition getCompetition() { return competition; }
     public void setCompetition(Competition competition) { this.competition = competition; }
+    public Lieu getLieu() { return lieu; }
+    public void setLieu(Lieu lieu) { this.lieu = lieu; }
 }

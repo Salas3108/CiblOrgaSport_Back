@@ -33,7 +33,7 @@ public class EventController {
         Event event = eventRepository.findById(id).orElse(null);
         if (event != null) {
             event.setName(eventDetails.getName());
-            event.setLocation(eventDetails.getLocation());
+            event.setLieuPrincipal(eventDetails.getLieuPrincipal());
             event.setDate(eventDetails.getDate());
             return eventRepository.save(event);
         }

@@ -1,6 +1,11 @@
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/BilletterieApplication.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/controller/TicketController.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/model/Ticket.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/repository/TicketRepository.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/service/TicketService.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/service/impl/TicketServiceImpl.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\BilletterieApplication.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\client\AuthServiceClient.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\controller\TicketController.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\model\Ticket.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\repository\TicketRepository.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\security\AuthTokenFilter.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\security\JwtUtils.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\security\SecurityConfig.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\service\impl\TicketServiceImpl.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\service\TicketService.java
+C:\Users\HP\Desktop\GLOP\CiblOrgaSport_Back\billetterie\src\main\java\com\ciblorgasport\billetterie\service\UserDetailsServiceImpl.java

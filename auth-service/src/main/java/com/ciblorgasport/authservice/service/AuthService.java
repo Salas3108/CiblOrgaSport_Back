@@ -55,8 +55,10 @@ public class AuthService {
         } else {
             user.setRole(Role.USER);
         }
-        // Valider automatiquement les utilisateurs normaux
-        if (user.getRole() == Role.USER) {
+        // Tous validés par défaut sauf ATHLETE
+        if (user.getRole() == Role.ATHLETE) {
+            user.setValidated(false);
+        } else {
             user.setValidated(true);
         }
         user.setCreatedAt(java.time.LocalDateTime.now());

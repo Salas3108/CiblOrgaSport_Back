@@ -4,6 +4,7 @@ import com.ciblorgasport.eventservice.model.Competition;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class CompetitionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Competition createCompetition(@RequestBody Competition competition) {
         return competitionRepository.save(competition);
     }
