@@ -1,0 +1,4 @@
+com\ciblorgasport\gateway\security\JwtAuthenticationFilter.class
+com\ciblorgasport\gateway\security\SecurityConfig.class
+com\ciblorgasport\gateway\security\JwtUtils.class
+com\ciblorgasport\gateway\GatewayApplication.class

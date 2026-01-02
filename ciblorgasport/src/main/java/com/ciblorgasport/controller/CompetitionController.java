@@ -2,6 +2,8 @@ package com.ciblorgasport.controller;
 
 import com.ciblorgasport.entity.*;
 import com.ciblorgasport.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,12 +18,12 @@ import java.util.UUID;
 public class CompetitionController {
 
     private final CompetitionRepository competitionRepo;
-    private final AbonnementRepository abonnementRepo;
-    
-    public CompetitionController(CompetitionRepository competitionRepo,
-                                AbonnementRepository abonnementRepo) {
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public CompetitionController(CompetitionRepository competitionRepo, RestTemplate restTemplate) {
         this.competitionRepo = competitionRepo;
-        this.abonnementRepo = abonnementRepo;
+        this.restTemplate = restTemplate;
     }
 
     @GetMapping("/competitions")
@@ -56,43 +58,36 @@ public class CompetitionController {
     public ResponseEntity<?> sabonnerCompetition(
             @PathVariable UUID competitionId,
             Authentication authentication) {
-        
         Long userId = getCurrentUserId(authentication);
-        
-        if (abonnementRepo.existsByUserIdAndCompetitionId(userId, competitionId)) {
-            return ResponseEntity.badRequest()
-                .body(Map.of("message", "Vous êtes déjà abonné à cette compétition"));
+        // Appel au microservice abonnement-service
+        String url = "http://localhost:8082/api/abonnements/subscribe?userId=" + userId + "&competitionId=" + competitionId;
+        try {
+            restTemplate.postForEntity(url, null, String.class);
+            return ResponseEntity.ok(Map.of(
+                "message", "Abonnement réussi à la compétition",
+                "competitionId", competitionId
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Erreur lors de l'abonnement"));
         }
-        
-        Competition competition = competitionRepo.findById(competitionId)
-            .orElseThrow(() -> new RuntimeException("Compétition non trouvée"));
-        
-        Abonnement abonnement = new Abonnement(userId, competition);
-        abonnementRepo.save(abonnement);
-        
-        return ResponseEntity.ok(Map.of(
-            "message", "Abonnement réussi à la compétition: " + competition.getName(),
-            "competitionId", competitionId,
-            "competitionName", competition.getName()
-        ));
     }
     
     @DeleteMapping("/competitions/{competitionId}/desabonner")
     public ResponseEntity<?> desabonnerCompetition(
             @PathVariable UUID competitionId,
             Authentication authentication) {
-        
         Long userId = getCurrentUserId(authentication);
-        
-        Abonnement abonnement = abonnementRepo.findByUserIdAndCompetitionId(userId, competitionId)
-            .orElseThrow(() -> new RuntimeException("Vous n'êtes pas abonné à cette compétition"));
-        
-        abonnementRepo.delete(abonnement);
-        
-        return ResponseEntity.ok(Map.of(
-            "message", "Désabonnement réussi",
-            "competitionId", competitionId
-        ));
+        // Appel au microservice abonnement-service
+        String url = "http://localhost:8082/api/abonnements/unsubscribe?userId=" + userId + "&competitionId=" + competitionId;
+        try {
+            restTemplate.delete(url);
+            return ResponseEntity.ok(Map.of(
+                "message", "Désabonnement réussi",
+                "competitionId", competitionId
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Erreur lors du désabonnement"));
+        }
     }
     
     @GetMapping("/mes-abonnements")

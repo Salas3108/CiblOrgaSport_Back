@@ -1,0 +1,108 @@
+Documentation de endpoints
+
+
+
+
+Liste des endpoints par microservice
+===================================
+
+incident-service
+- /api/incidents (GET, POST)
+- /api/incidents/{id} (GET, PUT, DELETE)
+
+event-service
+- /lieux (GET, POST)
+- /lieux/{id} (GET, PUT, DELETE)
+- /events (GET, POST)
+- /events/{id} (GET, PUT, DELETE)
+- /epreuves (GET, POST)
+- /epreuves/{id} (GET, PUT, DELETE)
+- /competitions (GET, POST)
+- /competitions/{id} (GET, PUT, DELETE)
+- /admin/events (GET, POST, DELETE)
+- /admin/events/{id} (DELETE)
+- /admin/events/{eventId}/competitions (POST)
+- /admin/events/competitions/{competitionId}/epreuves (POST)
+
+auth-service
+- /auth/user/upload-documents (POST)
+- /auth/admin/validate-athlete (POST)
+- /auth/user/username/{username} (GET)
+- /auth/hello (GET)
+- /auth/login (POST)
+- /auth/register (POST)
+
+billetterie
+- /api/tickets (GET, POST)
+- /api/tickets/{id} (GET, PUT, DELETE)
+- /api/tickets/price (GET)
+
+
+Spécificités des endpoints des microservices
+============================================
+
+incident-service
+----------------
+- /api/incidents (GET, POST)
+  - Authentification JWT obligatoire (header Authorization: Bearer).
+  - Rôle minimum : utilisateur authentifié.
+  - GET : liste des incidents (souvent paginée).
+  - POST : création d’un incident (body JSON requis).
+- /api/incidents/{id} (GET, PUT, DELETE)
+  - Authentification JWT obligatoire.
+  - GET : détails d’un incident.
+  - PUT/DELETE : modification/suppression, souvent réservé à l’auteur ou à un rôle admin.
+
+
+event-service
+-------------
+- /lieux, /lieux/{id} (GET, POST, PUT, DELETE)
+  - Authentification JWT obligatoire.
+  - POST/PUT/DELETE : accès réservé aux rôles admin/gestionnaire.
+  - Paramètres : body JSON pour création/modification, path pour l’id.
+- /events, /events/{id}
+  - GET : public ou authentifié selon config.
+  - POST/PUT/DELETE : réservé admin/gestionnaire.
+  - Paramètres : body JSON, path id.
+- /epreuves, /epreuves/{id}
+  - Même logique que events.
+- /competitions, /competitions/{id}
+  - GET : public ou authentifié.
+  - POST/PUT/DELETE : admin uniquement (annotation @PreAuthorize("hasRole('ADMIN')")).
+- /admin/events, /admin/events/{id}, /admin/events/{eventId}/competitions, /admin/events/competitions/{competitionId}/epreuves
+  - Accès strictement réservé aux admins.
+  - Paramètres : body JSON, path id.
+
+
+auth-service
+------------
+- /auth/user/upload-documents (POST)
+  - Authentification JWT obligatoire.
+  - Body : fichiers/document à uploader (multipart/form-data).
+- /auth/admin/validate-athlete (POST)
+  - Accès réservé au rôle admin.
+  - Body : infos de validation.
+- /auth/user/username/{username} (GET)
+  - Authentification requise.
+  - Path : username.
+- /auth/hello (GET)
+  - Test d’authentification (JWT).
+- /auth/login, /auth/register (POST)
+  - Public.
+  - Body : JSON avec identifiants ou infos d’inscription.
+
+
+billetterie
+-----------
+- /api/tickets (GET, POST)
+  - Authentification JWT obligatoire.
+  - POST : création de ticket (body JSON).
+- /api/tickets/{id} (GET, PUT, DELETE)
+  - Authentification JWT obligatoire.
+  - PUT/DELETE : réservé à l’auteur ou admin.
+- /api/tickets/price (GET)
+  - Authentification requise.
+  - Paramètres : query (ex : type, catégorie…).
+
+
+Tous les endpoints nécessitent en général un header Authorization: Bearer <token>. Les droits précis (admin, user, etc.) sont gérés par les annotations Spring Security (@PreAuthorize, etc.) et la logique dans les filtres JWT. Pour plus de détails endpoint par endpoint, il faut lire chaque contrôleur.

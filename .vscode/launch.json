@@ -6,6 +6,26 @@
     "configurations": [
         {
             "type": "java",
+<<<<<<< HEAD
+            "name": "BilletterieApplication",
+            "request": "launch",
+            "mainClass": "com.ciblorgasport.billetterie.BilletterieApplication",
+=======
+            "name": "IncidentServiceApplication",
+            "request": "launch",
+            "mainClass": "com.ciblorgasport.incidentservice.IncidentServiceApplication",
+>>>>>>> origin/Refactor
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "AuthServiceApplication",
+            "request": "launch",
+            "mainClass": "com.ciblorgasport.authservice.AuthServiceApplication",
+            "projectName": "auth-service"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
