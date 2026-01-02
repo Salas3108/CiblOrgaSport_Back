@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "services:start": "./scripts/start-all-services.sh",
+    "services:stop": "./scripts/stop-all-services.sh",
+    "services:status": "./scripts/service-status.sh",
+    "services:restart": "./scripts/stop-all-services.sh && ./scripts/start-all-services.sh",
+    "db:start": "docker-compose up -d postgres",
+    "auth:start": "node src/services/auth/server.js",
+    "notifications:start": "node src/services/notifications/server.js",
+    "upload:start": "node src/services/upload/server.js",
+    "jobs:start": "node src/services/jobs/worker.js"
+  }
+}

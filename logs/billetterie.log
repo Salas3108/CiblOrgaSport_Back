@@ -1,0 +1,50 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-01-02T00:02:08.080+01:00  INFO 49502 --- [billetterie] [           main] c.c.billetterie.BilletterieApplication   : Starting BilletterieApplication using Java 21.0.6 with PID 49502 (/Users/salimtitouche/CiblOrgaSport_Back/billetterie/target/billetterie-0.0.1-SNAPSHOT.jar started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/billetterie)
+2026-01-02T00:02:08.085+01:00  INFO 49502 --- [billetterie] [           main] c.c.billetterie.BilletterieApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-01-02T00:02:09.131+01:00  INFO 49502 --- [billetterie] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-02T00:02:09.240+01:00  INFO 49502 --- [billetterie] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 1 JPA repository interface.
+2026-01-02T00:02:10.565+01:00  INFO 49502 --- [billetterie] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2026-01-02T00:02:10.593+01:00  INFO 49502 --- [billetterie] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-02T00:02:10.593+01:00  INFO 49502 --- [billetterie] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-01-02T00:02:10.652+01:00  INFO 49502 --- [billetterie] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-02T00:02:10.654+01:00  INFO 49502 --- [billetterie] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2456 ms
+2026-01-02T00:02:10.912+01:00  INFO 49502 --- [billetterie] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-02T00:02:11.006+01:00  INFO 49502 --- [billetterie] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-01-02T00:02:11.073+01:00  INFO 49502 --- [billetterie] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-02T00:02:11.640+01:00  INFO 49502 --- [billetterie] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-02T00:02:11.680+01:00  INFO 49502 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-02T00:02:11.970+01:00  INFO 49502 --- [billetterie] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1f26b992
+2026-01-02T00:02:11.972+01:00  INFO 49502 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-02T00:02:12.973+01:00  INFO 49502 --- [billetterie] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-02T00:02:13.017+01:00  INFO 49502 --- [billetterie] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-02T00:02:13.265+01:00  INFO 49502 --- [billetterie] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-02T00:02:13.972+01:00  WARN 49502 --- [billetterie] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-01-02T00:02:13.973+01:00  INFO 49502 --- [billetterie] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-02T00:02:13.974+01:00  INFO 49502 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-01-02T00:02:13.976+01:00  INFO 49502 --- [billetterie] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-01-02T00:02:13.986+01:00  INFO 49502 --- [billetterie] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-02T00:02:14.004+01:00 ERROR 49502 --- [billetterie] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8083 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8083 or configure this application to listen on another port.
+

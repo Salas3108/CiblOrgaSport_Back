@@ -98,7 +98,6 @@
         <version>3.2.5</version>
         <configuration>
           <useModulePath>false</useModulePath>
-          <skipTests>true</skipTests>
         </configuration>
       </plugin>
     </plugins>
