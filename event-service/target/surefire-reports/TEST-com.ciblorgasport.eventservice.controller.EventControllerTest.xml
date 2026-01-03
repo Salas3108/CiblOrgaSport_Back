@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.ciblorgasport.eventservice.EventServiceApplicationTests" time="4.34" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.025" tests="7" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -8,7 +8,6 @@
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://adoptium.net/"/>
     <property name="user.timezone" value="Europe/Paris"/>
-    <property name="org.jboss.logging.provider" value="slf4j"/>
     <property name="os.name" value="Mac OS X"/>
     <property name="java.vm.specification.version" value="21"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
@@ -30,8 +29,6 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
-    <property name="java.awt.headless" value="true"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
     <property name="surefire.real.class.path" value="/Users/salimtitouche/CiblOrgaSport_Back/event-service/target/surefire/surefirebooter-20260103162525434_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
@@ -48,13 +45,10 @@
     <property name="localRepository" value="/Users/salimtitouche/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
     <property name="java.io.tmpdir" value="/var/folders/rh/xt3snpjn7ng64htp00_8m9nw0000gn/T/"/>
-    <property name="com.zaxxer.hikari.pool_number" value="1"/>
     <property name="java.version" value="21.0.6"/>
     <property name="user.dir" value="/Users/salimtitouche/CiblOrgaSport_Back/event-service"/>
     <property name="os.arch" value="x86_64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="12301"/>
-    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/Users/salimtitouche/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.vm.info" value="mixed mode"/>
@@ -64,37 +58,12 @@
     <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.class.version" value="65.0"/>
-    <property name="LOGGED_APPLICATION_NAME" value="[event-service] "/>
   </properties>
-  <testcase name="contextLoads" classname="com.ciblorgasport.eventservice.EventServiceApplicationTests" time="0.011">
-    <system-out><![CDATA[16:25:27.563 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.ciblorgasport.eventservice.EventServiceApplicationTests]: EventServiceApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-16:25:27.642 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.ciblorgasport.eventservice.EventServiceApplication for test class com.ciblorgasport.eventservice.EventServiceApplicationTests
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v3.2.0)
-
-2026-01-03T16:25:27.930+01:00  INFO 12301 --- [event-service] [           main] c.c.e.EventServiceApplicationTests       : Starting EventServiceApplicationTests using Java 21.0.6 with PID 12301 (started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/event-service)
-2026-01-03T16:25:27.931+01:00  INFO 12301 --- [event-service] [           main] c.c.e.EventServiceApplicationTests       : No active profile set, falling back to 1 default profile: "default"
-2026-01-03T16:25:28.489+01:00  INFO 12301 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-01-03T16:25:28.611+01:00  INFO 12301 --- [event-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 108 ms. Found 4 JPA repository interfaces.
-2026-01-03T16:25:29.382+01:00  INFO 12301 --- [event-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-01-03T16:25:29.455+01:00  INFO 12301 --- [event-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
-2026-01-03T16:25:29.492+01:00  INFO 12301 --- [event-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-01-03T16:25:29.616+01:00  INFO 12301 --- [event-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-01-03T16:25:29.647+01:00  INFO 12301 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-01-03T16:25:29.822+01:00  INFO 12301 --- [event-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@33c9f1ac
-2026-01-03T16:25:29.823+01:00  INFO 12301 --- [event-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-01-03T16:25:29.849+01:00  WARN 12301 --- [event-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-01-03T16:25:30.523+01:00  INFO 12301 --- [event-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-01-03T16:25:30.631+01:00  INFO 12301 --- [event-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-01-03T16:25:31.038+01:00  WARN 12301 --- [event-service] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-03T16:25:31.379+01:00  INFO 12301 --- [event-service] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6179551b, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@54626326, org.springframework.security.web.context.SecurityContextHolderFilter@d0456ad, org.springframework.security.web.header.HeaderWriterFilter@309ac89e, org.springframework.web.filter.CorsFilter@6f4e39b3, org.springframework.security.web.authentication.logout.LogoutFilter@64404db6, com.ciblorgasport.eventservice.security.AuthTokenFilter@3c3a767, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4cb0e39e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@650e6569, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7ea91c39, org.springframework.security.web.session.SessionManagementFilter@46374b8, org.springframework.security.web.access.ExceptionTranslationFilter@46bbcb82, org.springframework.security.web.access.intercept.AuthorizationFilter@3509f32d]
-2026-01-03T16:25:31.746+01:00  INFO 12301 --- [event-service] [           main] c.c.e.EventServiceApplicationTests       : Started EventServiceApplicationTests in 3.994 seconds (process running for 6.214)
-]]></system-out>
-  </testcase>
+  <testcase name="deleteEvent_ShouldCallDelete" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.002"/>
+  <testcase name="getAllEvents_ShouldReturnAllEvents" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.002"/>
+  <testcase name="getEventById_WhenEventNotExists_ShouldReturnNull" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.002"/>
+  <testcase name="createEvent_ShouldSaveAndReturnEvent" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.002"/>
+  <testcase name="getEventById_WhenEventExists_ShouldReturnEvent" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.003"/>
+  <testcase name="updateEvent_WhenEventExists_ShouldUpdateEvent" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.004"/>
+  <testcase name="updateEvent_WhenEventNotExists_ShouldReturnNull" classname="com.ciblorgasport.eventservice.controller.EventControllerTest" time="0.004"/>
 </testsuite>

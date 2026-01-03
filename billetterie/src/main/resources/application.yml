@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${BILL_DB_URL:jdbc:postgresql://localhost:5432/ciblorgasport_billetterie}
+    url: ${BILL_DB_URL:jdbc:postgresql://localhost:5400/ciblorgasport_billetterie}
     username: ${BILL_DB_USER:postgres}
     password: ${BILL_DB_PASS:password}
     driver-class-name: org.postgresql.Driver
