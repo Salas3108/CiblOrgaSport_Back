@@ -43,11 +43,9 @@ class AbonnementControllerTest {
 
     @Test
     void testGetMesAbonnements() throws Exception {
-        // Given
         List<Abonnement> abonnements = Arrays.asList(abonnement);
         when(abonnementRepository.findByUserId(userId)).thenReturn(abonnements);
 
-        // When & Then
         mockMvc.perform(get("/api/abonnements/user/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userId").value(userId))
@@ -56,10 +54,8 @@ class AbonnementControllerTest {
 
     @Test
     void testGetMesAbonnements_Empty() throws Exception {
-        // Given
         when(abonnementRepository.findByUserId(userId)).thenReturn(Collections.emptyList());
 
-        // When & Then
         mockMvc.perform(get("/api/abonnements/user/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -68,11 +64,9 @@ class AbonnementControllerTest {
 
     @Test
     void testSabonnerCompetition_Success() throws Exception {
-        // Given
         when(abonnementRepository.existsByUserIdAndCompetitionId(userId, competitionId)).thenReturn(false);
         when(abonnementRepository.save(any(Abonnement.class))).thenReturn(abonnement);
 
-        // When & Then
         mockMvc.perform(post("/api/abonnements/subscribe")
                 .param("userId", userId.toString())
                 .param("competitionId", competitionId.toString()))
@@ -83,10 +77,8 @@ class AbonnementControllerTest {
 
     @Test
     void testSabonnerCompetition_AlreadySubscribed() throws Exception {
-        // Given
         when(abonnementRepository.existsByUserIdAndCompetitionId(userId, competitionId)).thenReturn(true);
 
-        // When & Then
         mockMvc.perform(post("/api/abonnements/subscribe")
                 .param("userId", userId.toString())
                 .param("competitionId", competitionId.toString()))
@@ -96,7 +88,6 @@ class AbonnementControllerTest {
 
     @Test
     void testSabonnerCompetition_MissingUserId() throws Exception {
-        // When & Then
         mockMvc.perform(post("/api/abonnements/subscribe")
                 .param("competitionId", competitionId.toString()))
                 .andExpect(status().isBadRequest());
@@ -112,7 +103,6 @@ class AbonnementControllerTest {
 
     @Test
     void testSabonnerCompetition_InvalidUUID() throws Exception {
-        // When & Then
         mockMvc.perform(post("/api/abonnements/subscribe")
                 .param("userId", userId.toString())
                 .param("competitionId", "invalid-uuid"))
@@ -121,11 +111,9 @@ class AbonnementControllerTest {
 
     @Test
     void testDesabonnerCompetition_Success() throws Exception {
-        // Given
         when(abonnementRepository.findByUserIdAndCompetitionId(userId, competitionId))
                 .thenReturn(Optional.of(abonnement));
 
-        // When & Then
         mockMvc.perform(delete("/api/abonnements/unsubscribe")
                 .param("userId", userId.toString())
                 .param("competitionId", competitionId.toString()))
@@ -136,7 +124,6 @@ class AbonnementControllerTest {
 
     @Test
     void testDesabonnerCompetition_MissingUserId() throws Exception {
-        // When & Then
         mockMvc.perform(delete("/api/abonnements/unsubscribe")
                 .param("competitionId", competitionId.toString()))
                 .andExpect(status().isBadRequest());
@@ -144,7 +131,6 @@ class AbonnementControllerTest {
 
     @Test
     void testDesabonnerCompetition_MissingCompetitionId() throws Exception {
-        // When & Then
         mockMvc.perform(delete("/api/abonnements/unsubscribe")
                 .param("userId", userId.toString()))
                 .andExpect(status().isBadRequest());
