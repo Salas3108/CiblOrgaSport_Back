@@ -58,14 +58,17 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
-            auth.requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/test/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/user/upload-documents").authenticated()
-                .requestMatchers("/user/**").authenticated()
-                .anyRequest().authenticated()
-        )
-
+                auth
+                    // public endpoints
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/hello").permitAll()
+                    // secure endpoint needs JWT
+                    .requestMatchers("/auth/me").authenticated()
+                    // existing rules
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/user/upload-documents").authenticated()
+                    .requestMatchers("/user/**").authenticated()
+                    .anyRequest().authenticated()
+            )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         http.authenticationProvider(authenticationProvider());

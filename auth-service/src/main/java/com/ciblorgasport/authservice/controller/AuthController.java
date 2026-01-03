@@ -6,6 +6,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import com.ciblorgasport.authservice.dto.DocumentUploadRequest;
 import com.ciblorgasport.authservice.dto.ValidateAthleteRequest;
 
@@ -15,6 +18,7 @@ import com.ciblorgasport.authservice.dto.RegisterRequest;
 import com.ciblorgasport.authservice.entity.User;
 import com.ciblorgasport.authservice.repository.UserRepository;
 import com.ciblorgasport.authservice.service.AuthService;
+import com.ciblorgasport.authservice.security.JwtUtils;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,6 +46,9 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
     public AuthController(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
         this.userRepository = userRepository;
@@ -56,6 +63,30 @@ public class AuthController {
         map.put("role", "ROLE_" + user.getRole().name());
         map.put("email", user.getEmail());
         return map;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, Object>> me(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authorization.substring(7);
+        if (!jwtUtils.validateJwtToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
+        map.put("username", user.getUsername());
+        map.put("email", user.getEmail());
+        map.put("role", "ROLE_" + user.getRole().name());
+        map.put("validated", user.isValidated());
+        map.put("documents", user.getDocuments());
+        map.put("createdAt", user.getCreatedAt());
+        map.put("updatedAt", user.getUpdatedAt());
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/hello")
