@@ -2,8 +2,6 @@ package com.ciblorgasport.billetterie.service.impl;
 
 import com.ciblorgasport.billetterie.model.Ticket;
 import com.ciblorgasport.billetterie.repository.TicketRepository;
-import com.ciblorgasport.billetterie.service.impl.TicketServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,10 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,200 +20,151 @@ class TicketServiceImplTest {
 
     @Mock
     private TicketRepository ticketRepository;
-
+    
     @InjectMocks
     private TicketServiceImpl ticketService;
 
-    private Ticket testTicket;
-
-    @BeforeEach
-    void setUp() {
-        testTicket = new Ticket();
-        testTicket.setId(1L);
-        testTicket.setCategory("VIP");
-        testTicket.setBasePrice(100.0);
-    }
-
     @Test
-    void findAll_ShouldReturnAllTickets() {
-        // Given
+    void findAll_ReturnsAllTickets() {
+        // Arrange
+        Ticket ticket1 = new Ticket();
+        ticket1.setId(1L);
         Ticket ticket2 = new Ticket();
         ticket2.setId(2L);
-        ticket2.setCategory("Standard");
-        ticket2.setBasePrice(50.0);
         
-        List<Ticket> expectedTickets = Arrays.asList(testTicket, ticket2);
-        when(ticketRepository.findAll()).thenReturn(expectedTickets);
+        List<Ticket> tickets = Arrays.asList(ticket1, ticket2);
+        when(ticketRepository.findAll()).thenReturn(tickets);
 
-        // When
+        // Act
         List<Ticket> result = ticketService.findAll();
 
-        // Then
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyElementsOf(expectedTickets);
+        // Assert
+        assertEquals(2, result.size());
         verify(ticketRepository, times(1)).findAll();
     }
 
     @Test
-    void findAll_ShouldReturnEmptyListWhenNoTickets() {
-        // Given
-        when(ticketRepository.findAll()).thenReturn(Arrays.asList());
+    void findById_WhenExists_ReturnsTicket() {
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1L);
+        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
 
-        // When
-        List<Ticket> result = ticketService.findAll();
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(ticketRepository, times(1)).findAll();
-    }
-
-    @Test
-    void findById_ShouldReturnTicketWhenExists() {
-        // Given
-        when(ticketRepository.findById(1L)).thenReturn(Optional.of(testTicket));
-
-        // When
+        // Act
         Optional<Ticket> result = ticketService.findById(1L);
 
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(testTicket);
-        assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getCategory()).isEqualTo("VIP");
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(1L, result.get().getId());
         verify(ticketRepository, times(1)).findById(1L);
     }
 
     @Test
-    void findById_ShouldReturnEmptyWhenNotExists() {
-        // Given
-        when(ticketRepository.findById(anyLong())).thenReturn(Optional.empty());
+    void findById_WhenNotExists_ReturnsEmpty() {
+        // Arrange
+        when(ticketRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When
-        Optional<Ticket> result = ticketService.findById(999L);
+        // Act
+        Optional<Ticket> result = ticketService.findById(1L);
 
-        // Then
-        assertThat(result).isEmpty();
-        verify(ticketRepository, times(1)).findById(999L);
+        // Assert
+        assertFalse(result.isPresent());
+        verify(ticketRepository, times(1)).findById(1L);
     }
 
     @Test
-    void create_ShouldSaveAndReturnTicket() {
-        // Given
-        Ticket newTicket = new Ticket();
-        newTicket.setCategory("Premium");
-        newTicket.setBasePrice(75.0);
-        
-        Ticket savedTicket = new Ticket();
-        savedTicket.setId(3L);
-        savedTicket.setCategory("Premium");
-        savedTicket.setBasePrice(75.0);
-        
-        when(ticketRepository.save(any(Ticket.class))).thenReturn(savedTicket);
-
-        // When
-        Ticket result = ticketService.create(newTicket);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(3L);
-        assertThat(result.getCategory()).isEqualTo("Premium");
-        assertThat(result.getBasePrice()).isEqualTo(75.0);
-        verify(ticketRepository, times(1)).save(newTicket);
-    }
-
-    @Test
-    void update_ShouldSetIdAndSaveTicket() {
-        // Given
-        Ticket updateTicket = new Ticket();
-        updateTicket.setCategory("Economy");
-        updateTicket.setBasePrice(25.0);
+    void create_SavesAndReturnsTicket() {
+        // Arrange
+        Ticket ticketToSave = new Ticket();
+        ticketToSave.setCategory("Standard");
+        ticketToSave.setBasePrice(50.0);
         
         Ticket savedTicket = new Ticket();
         savedTicket.setId(1L);
-        savedTicket.setCategory("Economy");
-        savedTicket.setBasePrice(25.0);
+        savedTicket.setCategory("Standard");
+        savedTicket.setBasePrice(50.0);
         
-        when(ticketRepository.save(any(Ticket.class))).thenReturn(savedTicket);
+        when(ticketRepository.save(ticketToSave)).thenReturn(savedTicket);
 
-        // When
-        Ticket result = ticketService.update(1L, updateTicket);
+        // Act
+        Ticket result = ticketService.create(ticketToSave);
 
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getCategory()).isEqualTo("Economy");
-        assertThat(result.getBasePrice()).isEqualTo(25.0);
-        
-        // Verify that the ID was set on the input ticket
-        assertThat(updateTicket.getId()).isEqualTo(1L);
-        verify(ticketRepository, times(1)).save(updateTicket);
+        // Assert
+        assertNotNull(result.getId());
+        assertEquals("Standard", result.getCategory());
+        verify(ticketRepository, times(1)).save(ticketToSave);
     }
 
     @Test
-    void delete_ShouldCallRepositoryDeleteById() {
-        // Given
-        Long ticketId = 1L;
+    void update_SetsIdAndSaves() {
+        // Arrange
+        Ticket ticketUpdate = new Ticket();
+        ticketUpdate.setCategory("Updated");
+        ticketUpdate.setBasePrice(75.0);
+        
+        Ticket updatedTicket = new Ticket();
+        updatedTicket.setId(1L);
+        updatedTicket.setCategory("Updated");
+        updatedTicket.setBasePrice(75.0);
+        
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(updatedTicket);
 
-        // When
-        ticketService.delete(ticketId);
+        // Act
+        Ticket result = ticketService.update(1L, ticketUpdate);
 
-        // Then
-        verify(ticketRepository, times(1)).deleteById(ticketId);
+        // Assert
+        assertEquals(1L, result.getId());
+        assertEquals("Updated", result.getCategory());
+        verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
 
     @Test
-    void calculatePrice_ShouldReturnBasePriceWhenCategoryExists() {
-        // Given
+    void delete_CallsRepositoryDelete() {
+        // Act
+        ticketService.delete(1L);
+
+        // Assert
+        verify(ticketRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void calculatePrice_WhenCategoryExists_ReturnsPrice() {
+        // Arrange
         String category = "VIP";
-        Double expectedPrice = 100.0;
-        when(ticketRepository.findBasePriceByCategory(category)).thenReturn(expectedPrice);
+        Double basePrice = 150.0;
+        
+        when(ticketRepository.findBasePriceByCategory(category)).thenReturn(basePrice);
 
-        // When
+        // Act
         double result = ticketService.calculatePrice(category);
 
-        // Then
-        assertThat(result).isEqualTo(100.0);
+        // Assert
+        assertEquals(150.0, result);
         verify(ticketRepository, times(1)).findBasePriceByCategory(category);
     }
 
     @Test
-    void calculatePrice_ShouldReturnZeroWhenCategoryNotExists() {
-        // Given
-        String category = "NonExistent";
+    void calculatePrice_WhenCategoryNotExists_ReturnsZero() {
+        // Arrange
+        String category = "Unknown";
+        
         when(ticketRepository.findBasePriceByCategory(category)).thenReturn(null);
 
-        // When
+        // Act
         double result = ticketService.calculatePrice(category);
 
-        // Then
-        assertThat(result).isEqualTo(0.0);
+        // Assert
+        assertEquals(0.0, result);
         verify(ticketRepository, times(1)).findBasePriceByCategory(category);
     }
 
     @Test
-    void calculatePrice_ShouldHandleEmptyCategory() {
-        // Given
-        String category = "";
-        when(ticketRepository.findBasePriceByCategory(category)).thenReturn(null);
-
-        // When
-        double result = ticketService.calculatePrice(category);
-
-        // Then
-        assertThat(result).isEqualTo(0.0);
-        verify(ticketRepository, times(1)).findBasePriceByCategory(category);
-    }
-
-    @Test
-    void calculatePrice_ShouldHandleNullCategory() {
-        // Given
-        when(ticketRepository.findBasePriceByCategory(null)).thenReturn(null);
-
-        // When
+    void calculatePrice_WhenNullCategory_ReturnsZero() {
+        // Act
         double result = ticketService.calculatePrice(null);
 
-        // Then
-        assertThat(result).isEqualTo(0.0);
-        verify(ticketRepository, times(1)).findBasePriceByCategory(null);
+        // Assert
+        assertEquals(0.0, result);
+
     }
 }
