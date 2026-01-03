@@ -158,6 +158,23 @@ npm run test
 npm run test:e2e
 ```
 
+## Tests API avec Postman
+Importer les fichiers de collection et d’environnement situés dans `postman/` :
+- `postman/CiblOrgaSport.postman_collection.json`
+- `postman/CiblOrgaSport.postman_environment.json`
+
+Étapes:
+1. Ouvrir Postman, importer la collection et l’environnement.
+2. Démarrer les services (voir section Démarrage).
+3. Obtenir un token JWT via `auth-service /auth/login` ou `monolith /api/auth/login`.
+4. Mettre à jour la variable `token` dans l’environnement.
+5. Exécuter les requêtes regroupées par microservice.
+
+Remarques:
+- Les URLs de base sont configurables via l’environnement (`*_base`).
+- Certaines requêtes nécessitent un rôle (ADMIN/ATHLETE).
+- Les endpoints multipart (upload-documents) attendent des fichiers en form-data.
+
 ## Qualité de code
 - Lint: ESLint/TSLint
 - Format: Prettier
