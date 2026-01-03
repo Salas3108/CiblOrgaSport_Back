@@ -1,1 +1,4 @@
-/Users/salimtitouche/CiblOrgaSport_Back/auth-service/src/test/java/com/ciblorgasport/authservice/AuthServiceApplicationTests.java
+/home/ait-yahia/final/CiblOrgaSport_Back/auth-service/src/test/java/com/ciblorgasport/authservice/service/AuthServiceTest.java
+/home/ait-yahia/final/CiblOrgaSport_Back/auth-service/src/test/java/com/ciblorgasport/authservice/AuthServiceApplicationTests.java
+/home/ait-yahia/final/CiblOrgaSport_Back/auth-service/src/test/java/com/ciblorgasport/authservice/service/UserDetailsServiceImplTest.java
+/home/ait-yahia/final/CiblOrgaSport_Back/auth-service/src/test/java/com/ciblorgasport/authservice/controller/AuthControllerTest.java

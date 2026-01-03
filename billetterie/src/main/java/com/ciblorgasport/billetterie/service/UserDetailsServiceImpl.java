@@ -9,8 +9,7 @@ import com.ciblorgasport.billetterie.client.AuthServiceClient;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired
-    private AuthServiceClient authServiceClient;
+    @Autowired AuthServiceClient authServiceClient;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

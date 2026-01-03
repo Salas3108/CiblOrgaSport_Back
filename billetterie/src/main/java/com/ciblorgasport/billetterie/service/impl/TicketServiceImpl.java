@@ -12,8 +12,7 @@ import java.util.Optional;
 @Service
 public class TicketServiceImpl implements TicketService {
 
-    @Autowired
-    private TicketRepository ticketRepository;
+    @Autowired TicketRepository ticketRepository;
 
     @Override
     public List<Ticket> findAll() {

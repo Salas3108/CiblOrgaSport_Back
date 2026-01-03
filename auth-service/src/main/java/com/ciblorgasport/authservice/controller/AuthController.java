@@ -45,8 +45,7 @@ public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    @Autowired JwtUtils jwtUtils;
 
     @Autowired
     public AuthController(AuthService authService, UserRepository userRepository) {
