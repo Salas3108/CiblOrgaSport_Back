@@ -1,9 +1,13 @@
 package com.ciblorgasport.authservice.repository;
 
-import com.ciblorgasport.authservice.entity.User;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
+
+import com.ciblorgasport.authservice.entity.Role;
+import com.ciblorgasport.authservice.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -11,4 +15,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
+
+    // Trouver tous les athlètes validés ou non
+    List<User> findByRoleAndValidated(Role role, boolean validated);
+    List<User> findByRole(Role role);
 }

@@ -88,7 +88,24 @@
               "raw": "{\n  \"username\": \"user1\",\n  \"validated\": true\n}"
             }
           }
-        }
+        },
+        {
+          "name": "Liste des Athlètes (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "url": {
+              "raw": "{{auth_base}}/auth/admin/athletes?validated=true",
+              "host": ["{{auth_base}}"],
+              "path": ["auth", "admin", "athletes"],
+              "query": [
+                { "key": "validated", "value": "true" }
+              ]
+            }
+          }
+        },
       ]
     },
     {

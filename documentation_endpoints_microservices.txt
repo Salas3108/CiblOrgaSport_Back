@@ -1,56 +1,34 @@
 Documentation de endpoints
 
-
-
-
 Liste des endpoints par microservice
+abonnement-service
+- /api/abonnements/user/{userId} (GET)
+- /api/abonnements/subscribe (POST)
+- /api/abonnements/unsubscribe (DELETE)
 ===================================
 
 incident-service
 - /api/incidents (GET, POST)
 - /api/incidents/{id} (GET, PUT, DELETE)
-
-event-service
 - /lieux (GET, POST)
 - /lieux/{id} (GET, PUT, DELETE)
 - /events (GET, POST)
 - /events/{id} (GET, PUT, DELETE)
-- /epreuves (GET, POST)
 - /epreuves/{id} (GET, PUT, DELETE)
 - /competitions (GET, POST)
 - /competitions/{id} (GET, PUT, DELETE)
 - /admin/events (GET, POST, DELETE)
 - /admin/events/{id} (DELETE)
-- /admin/events/{eventId}/competitions (POST)
-- /admin/events/competitions/{competitionId}/epreuves (POST)
-
-auth-service
-- /auth/user/upload-documents (POST)
-- /auth/admin/validate-athlete (POST)
-- /auth/user/username/{username} (GET)
-- /auth/hello (GET)
-- /auth/login (POST)
-- /auth/register (POST)
-
-billetterie
-- /api/tickets (GET, POST)
-- /api/tickets/{id} (GET, PUT, DELETE)
-- /api/tickets/price (GET)
 
 
-Spécificités des endpoints des microservices
 ============================================
-
-incident-service
 ----------------
 - /api/incidents (GET, POST)
   - Authentification JWT obligatoire (header Authorization: Bearer).
-  - Rôle minimum : utilisateur authentifié.
   - GET : liste des incidents (souvent paginée).
   - POST : création d’un incident (body JSON requis).
 - /api/incidents/{id} (GET, PUT, DELETE)
   - Authentification JWT obligatoire.
-  - GET : détails d’un incident.
   - PUT/DELETE : modification/suppression, souvent réservé à l’auteur ou à un rôle admin.
 
 

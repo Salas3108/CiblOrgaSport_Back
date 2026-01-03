@@ -4,21 +4,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.ciblorgasport.authservice.dto.DocumentUploadRequest;
-import com.ciblorgasport.authservice.dto.ValidateAthleteRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.ciblorgasport.authservice.dto.DocumentUploadRequest;
 import com.ciblorgasport.authservice.dto.JwtResponse;
 import com.ciblorgasport.authservice.dto.LoginRequest;
 import com.ciblorgasport.authservice.dto.RegisterRequest;
+import com.ciblorgasport.authservice.dto.ValidateAthleteRequest;
 import com.ciblorgasport.authservice.entity.User;
 import com.ciblorgasport.authservice.repository.UserRepository;
-import com.ciblorgasport.authservice.service.AuthService;
 import com.ciblorgasport.authservice.security.JwtUtils;
+import com.ciblorgasport.authservice.service.AuthService;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,6 +49,22 @@ public class AuthController {
             userRepository.save(user);
             return request.isValidated() ? "Athlète validé." : "Athlète rejeté.";
         }
+
+        // ADMIN : récupérer la liste des athlètes (validés ou non)
+        @GetMapping("/admin/athletes")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<?> getAthletes(@RequestParam(required = false) Boolean validated) {
+            org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Authorities: " + authentication.getAuthorities());
+            if (validated == null) {
+                // Tous les athlètes
+                return ResponseEntity.ok(userRepository.findByRole(com.ciblorgasport.authservice.entity.Role.ATHLETE));
+            } else {
+                // Filtrer par statut de validation
+                return ResponseEntity.ok(userRepository.findByRoleAndValidated(com.ciblorgasport.authservice.entity.Role.ATHLETE, validated));
+            }
+        }
+
     private final AuthService authService;
     private final UserRepository userRepository;
 
