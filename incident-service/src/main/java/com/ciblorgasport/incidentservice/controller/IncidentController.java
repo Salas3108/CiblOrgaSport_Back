@@ -6,8 +6,12 @@ import com.ciblorgasport.incidentservice.model.IncidentType;
 import com.ciblorgasport.incidentservice.model.ImpactLevel;
 import com.ciblorgasport.incidentservice.service.IncidentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController("incidentControllerApi")
@@ -18,6 +22,15 @@ public class IncidentController {
 
     public IncidentController(IncidentService incidentService) {
         this.incidentService = incidentService;
+    }
+
+    // Méthode utilitaire pour obtenir le username de manière sécurisée
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        return "system"; // Valeur par défaut pour les tests
     }
 
     @GetMapping
@@ -40,12 +53,27 @@ public class IncidentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Incident> create(@RequestBody Incident incident) {
+        // Utiliser la méthode utilitaire
+        String currentUsername = getCurrentUsername();
+        
+        incident.setReportedBy(currentUsername);
+        
+        if (incident.getReportedAt() == null) {
+            incident.setReportedAt(LocalDateTime.now());
+        }
+        
+        if (incident.getStatus() == null) {
+            incident.setStatus(IncidentStatus.ACTIF);
+        }
+        
         Incident created = incidentService.create(incident);
         return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Incident> update(@PathVariable Long id, @RequestBody Incident incident) {
         try {
             Incident updated = incidentService.update(id, incident);
@@ -56,6 +84,7 @@ public class IncidentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         incidentService.delete(id);
         return ResponseEntity.noContent().build();
