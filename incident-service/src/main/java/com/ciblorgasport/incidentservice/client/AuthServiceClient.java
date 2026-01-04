@@ -76,6 +76,12 @@ public class AuthServiceClient {
                     .authorities("ROLE_ADMIN")
                     .build();
         }
+        else if ("commissaire1".equals(username)) {
+            return User.withUsername("commissaire1")
+                    .password("")
+                    .authorities("ROLE_COMMISSAIRE")
+                    .build();
+        }
         // Ajoutez d'autres utilisateurs si besoin
         
         return User.withUsername(username)
