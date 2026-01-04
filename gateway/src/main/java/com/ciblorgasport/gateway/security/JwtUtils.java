@@ -10,7 +10,7 @@ import java.security.Key;
 
 @Component
 public class JwtUtils {
-    @Value("${jwt.secret}")
+    @Value("${ciblorgasport.app.jwtSecret}")
     private String jwtSecret;
 
     public Claims getClaimsFromJwtToken(String token) {
