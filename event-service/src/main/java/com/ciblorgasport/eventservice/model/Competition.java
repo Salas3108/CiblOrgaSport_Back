@@ -1,5 +1,6 @@
 package com.ciblorgasport.eventservice.model;
 import com.ciblorgasport.eventservice.model.Event;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class Competition {
 
     @ManyToOne
     @JoinColumn(name = "event_id")
+    @JsonIgnoreProperties({"lieuPrincipal"}) // Inclut event avec id, name, date mais sans lieuPrincipal
     private Event event;
 
     // Getters et setters

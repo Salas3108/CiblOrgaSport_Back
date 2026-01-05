@@ -1,5 +1,6 @@
 package com.ciblorgasport.eventservice.model;
 import com.ciblorgasport.eventservice.model.Competition;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import com.ciblorgasport.eventservice.model.Lieu;
@@ -14,6 +15,7 @@ public class Epreuve {
 
     @ManyToOne
     @JoinColumn(name = "competition_id")
+    @JsonIgnoreProperties({"event"}) // Inclut competition sans l'event pour éviter trop de niveaux
     private Competition competition;
 
     @ManyToOne
