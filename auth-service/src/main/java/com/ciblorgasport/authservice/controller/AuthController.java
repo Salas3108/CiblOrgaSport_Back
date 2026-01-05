@@ -87,6 +87,29 @@ public class AuthController {
         return map;
     }
 
+    // Retrieve user by numeric id
+    @GetMapping("/user/{id}")
+    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", user.getId());
+                    map.put("username", user.getUsername());
+                    map.put("email", user.getEmail());
+                    map.put("role", "ROLE_" + user.getRole().name());
+                    map.put("validated", user.isValidated());
+                    return ResponseEntity.ok(map);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Check existence by id (used by other microservices)
+    @GetMapping("/user/exists/{id}")
+    public ResponseEntity<Boolean> userExists(@PathVariable Long id) {
+        boolean exists = userRepository.existsById(id);
+        return ResponseEntity.ok(exists);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> me(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {

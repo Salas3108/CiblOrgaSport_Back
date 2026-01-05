@@ -3,12 +3,13 @@ package com.ciblorgasport.eventservice.controller;
 import com.ciblorgasport.eventservice.model.Event;
 import com.ciblorgasport.eventservice.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping({"/events", "/api/events"})
 public class EventController {
     @Autowired
     private EventRepository eventRepository;
@@ -24,8 +25,10 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public Event getEventById(@PathVariable Long id) {
-        return eventRepository.findById(id).orElse(null);
+    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
+        return eventRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")

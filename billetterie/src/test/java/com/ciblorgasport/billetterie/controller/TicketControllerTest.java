@@ -1,7 +1,10 @@
 package com.ciblorgasport.billetterie.controller;
 
 import com.ciblorgasport.billetterie.model.Ticket;
+import com.ciblorgasport.billetterie.dto.TicketResponse;
 import com.ciblorgasport.billetterie.service.TicketService;
+import com.ciblorgasport.billetterie.client.AuthServiceClient;
+import com.ciblorgasport.billetterie.client.EventServiceClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +24,19 @@ class TicketControllerTest {
 
     @Mock
     private TicketService ticketService;
+    @Mock
+    private AuthServiceClient authServiceClient;
+    @Mock
+    private EventServiceClient eventServiceClient;
     
     private TicketController ticketController;
 
     @BeforeEach
     void setUp() {
-        ticketController = new TicketController(ticketService);
+        // default remote calls return null details
+        lenient().when(authServiceClient.fetchSpectatorById(anyLong())).thenReturn(null);
+        lenient().when(eventServiceClient.fetchEventById(anyLong())).thenReturn(null);
+        ticketController = new TicketController(ticketService, authServiceClient, eventServiceClient);
     }
 
     @Test
@@ -39,12 +49,30 @@ class TicketControllerTest {
         when(ticketService.findAll()).thenReturn(tickets);
 
         // Act
-        ResponseEntity<List<Ticket>> response = ticketController.findAll();
+        ResponseEntity<List<TicketResponse>> response = ticketController.findAll(null);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(2, response.getBody().size());
         verify(ticketService, times(1)).findAll();
+    }
+
+    @Test
+    void findAll_WithSpectatorId_ReturnsFilteredTickets() {
+        // Arrange
+        Ticket ticket1 = mock(Ticket.class);
+        List<Ticket> tickets = Arrays.asList(ticket1);
+        
+        when(ticketService.findBySpectatorId(1L)).thenReturn(tickets);
+
+        // Act
+        ResponseEntity<List<TicketResponse>> response = ticketController.findAll(1L);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().size());
+        verify(ticketService, times(1)).findBySpectatorId(1L);
+        verify(ticketService, never()).findAll();
     }
 
     @Test
@@ -54,11 +82,11 @@ class TicketControllerTest {
         when(ticketService.findById(1L)).thenReturn(Optional.of(ticket));
 
         // Act
-        ResponseEntity<Ticket> response = ticketController.findById(1L);
+        ResponseEntity<TicketResponse> response = ticketController.findById(1L);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertSame(ticket, response.getBody());
+        assertNotNull(response.getBody());
         verify(ticketService, times(1)).findById(1L);
     }
 
@@ -68,7 +96,7 @@ class TicketControllerTest {
         when(ticketService.findById(1L)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<Ticket> response = ticketController.findById(1L);
+        ResponseEntity<TicketResponse> response = ticketController.findById(1L);
 
         // Assert
         assertEquals(404, response.getStatusCodeValue());
@@ -85,11 +113,11 @@ class TicketControllerTest {
         when(ticketService.create(ticketToCreate)).thenReturn(createdTicket);
 
         // Act
-        ResponseEntity<Ticket> response = ticketController.create(ticketToCreate);
+        ResponseEntity<?> response = ticketController.create(ticketToCreate);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertSame(createdTicket, response.getBody());
+        assertNotNull(response.getBody());
         verify(ticketService, times(1)).create(ticketToCreate);
     }
 
@@ -102,11 +130,11 @@ class TicketControllerTest {
         when(ticketService.update(1L, ticketUpdate)).thenReturn(updatedTicket);
 
         // Act
-        ResponseEntity<Ticket> response = ticketController.update(1L, ticketUpdate);
+        ResponseEntity<TicketResponse> response = ticketController.update(1L, ticketUpdate);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertSame(updatedTicket, response.getBody());
+        assertNotNull(response.getBody());
         verify(ticketService, times(1)).update(1L, ticketUpdate);
     }
 

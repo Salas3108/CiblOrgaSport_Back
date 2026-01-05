@@ -58,6 +58,9 @@ public class SecurityConfig {
                 auth
                     // public endpoints
                     .requestMatchers("/auth/login", "/auth/register", "/auth/hello").permitAll()
+                    // public read-only endpoints for inter-service validation
+                    .requestMatchers("/auth/user/exists/**").permitAll()
+                    .requestMatchers("/auth/user/**").permitAll()
                     // secure endpoint needs JWT
                     .requestMatchers("/auth/me").authenticated()
                     // existing rules

@@ -3,12 +3,13 @@ package com.ciblorgasport.eventservice.controller;
 import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/epreuves")
+@RequestMapping({"/epreuves", "/api/epreuves"})
 public class EpreuveController {
     @Autowired
     private EpreuveRepository epreuveRepository;
@@ -24,8 +25,10 @@ public class EpreuveController {
     }
 
     @GetMapping("/{id}")
-    public Epreuve getEpreuveById(@PathVariable Long id) {
-        return epreuveRepository.findById(id).orElse(null);
+    public ResponseEntity<Epreuve> getEpreuveById(@PathVariable Long id) {
+        return epreuveRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")

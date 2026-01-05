@@ -34,4 +34,27 @@ public class AuthServiceClient {
         }
         throw new UsernameNotFoundException("User Not Found with username: " + username);
     }
+
+    public boolean existsById(Long id) {
+        if (id == null) return true;
+        RestTemplate restTemplate = new RestTemplate();
+        String url = authServiceUrl + "/auth/user/exists/" + id;
+        try {
+            ResponseEntity<Boolean> resp = restTemplate.getForEntity(url, Boolean.class);
+            return resp.getStatusCode().is2xxSuccessful() && Boolean.TRUE.equals(resp.getBody());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public java.util.Map fetchSpectatorById(Long id) {
+        if (id == null) return null;
+        RestTemplate restTemplate = new RestTemplate();
+        String url = authServiceUrl + "/auth/user/" + id;
+        try {
+            ResponseEntity<java.util.Map> resp = restTemplate.getForEntity(url, java.util.Map.class);
+            if (resp.getStatusCode().is2xxSuccessful()) return resp.getBody();
+        } catch (Exception ignored) {}
+        return null;
+    }
 }

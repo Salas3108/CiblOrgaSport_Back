@@ -47,6 +47,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // allow public read endpoints for events and epreuves
+                .requestMatchers("/epreuves/**").permitAll()
+                .requestMatchers("/events/**").permitAll()
+                // if a context path or gateway prefixes with /api
+                .requestMatchers("/api/epreuves/**").permitAll()
+                .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .anyRequest().authenticated()
             );

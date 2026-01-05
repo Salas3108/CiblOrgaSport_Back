@@ -15,6 +15,9 @@ public class Ticket {
 	private String category;
 
 	private Double basePrice;
+	// External references to other microservices (no DB foreign keys)
+	private Long spectatorId;
+	private Long epreuveId;
 
 	public Long getId() {
 		return id;
@@ -38,5 +41,21 @@ public class Ticket {
 
 	public void setBasePrice(Double basePrice) {
 		this.basePrice = basePrice;
+	}
+
+	public Long getSpectatorId() {
+		return spectatorId;
+	}
+
+	public void setSpectatorId(Long spectatorId) {
+		this.spectatorId = spectatorId;
+	}
+
+	public Long getEpreuveId() {
+		return epreuveId;
+	}
+
+	public void setEpreuveId(Long epreuveId) {
+		this.epreuveId = epreuveId;
 	}
 }
