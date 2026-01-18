@@ -41,7 +41,7 @@ detect_port() {
     port=$(grep -E '^server\.port\s*=' "$prop_file" | tail -n1 | awk -F'=' '{gsub(/ /,"",$2);print $2}')
   fi
   if [ -z "$port" ] && [ -f "$yml_file" ]; then
-    port=$(grep -E '^\s*port:\s*[0-9]+' "$yml_file" | grep -i 'server' -A0 | awk -F':' '{gsub(/ /,"",$2);print $2}' | tail -n1)
+    port=$(awk '/^server:/{flag=1} flag && /^\s*port:/{print $2; exit}' "$yml_file" | tr -d ' ')
   fi
   echo "${port:-$default_port}"
 }
@@ -66,9 +66,9 @@ start_service() {
     return 1
   }
 
-  # Find JAR file
+  # Find JAR file (exclude .original files)
   local jar_file
-  jar_file=$(find "$service_dir/target" -name "$jar_pattern" -type f | head -n1)
+  jar_file=$(find "$service_dir/target" -name "$jar_pattern" -type f ! -name "*.original" | head -n1)
   if [ -z "$jar_file" ]; then
     echo -e "${RED}❌ JAR introuvable pour ${service_name} (pattern: $jar_pattern)${NC}"
     ls -la "$service_dir/target/"*.jar 2>/dev/null || echo "Aucun JAR trouvé dans target/"
@@ -84,12 +84,22 @@ start_service() {
   local log_file="${LOG_DIR}/${service_name}.log"
   echo -e "${BLUE}🚀 Démarrage: ${service_name} sur le port ${YELLOW}${port}${NC}"
   
-  # Start the service
-  (cd "$service_dir" && nohup java -jar "$jar_file" --server.port=${port} > "$log_file" 2>&1 &)
+  # Start the service and properly capture PID
+  cd "$service_dir"
+  nohup java -jar "$jar_file" --server.port=${port} > "$log_file" 2>&1 &
   local pid=$!
+  cd - > /dev/null
 
   echo $pid > "${LOG_DIR}/${service_name}.pid"
-  echo -e "${GREEN}✅ ${service_name} démarré (PID: $pid, Port: ${port}) | Logs: ${log_file}${NC}"
+  
+  # Wait and verify process started
+  sleep 1
+  if ps -p $pid > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ ${service_name} démarré (PID: $pid, Port: ${port}) | Logs: ${log_file}${NC}"
+  else
+    echo -e "${RED}❌ ${service_name} n'a pas pu démarrer (Port: ${port}) | Logs: ${log_file}${NC}"
+    return 1
+  fi
 }
 
 check_service() {
@@ -124,6 +134,7 @@ start_service "auth-service" "$AUTH_DIR" "auth-service-*.jar" 0 &
 start_service "event-service" "$EVENT_DIR" "event-service-*.jar" 0 &
 start_service "billetterie" "$BILL_DIR" "billetterie-*.jar" 0 &
 start_service "incident-service" "$INCIDENT_DIR" "incident-service-*.jar" 0 &
+start_service "abonnement-service" "${ROOT_DIR}/abonnement-service" "abonnement-service-*.jar" 0 &
 
 # Wait for all background services to start
 wait
@@ -135,7 +146,7 @@ wait
 echo -e "${YELLOW}⏳ Vérification de l'état des services...${NC}"
 sleep 8
 
-services="auth-service event-service billetterie incident-service gateway"
+services="auth-service event-service billetterie incident-service abonnement-service gateway"
 all_running=true
 echo -e "\n${BLUE}📊 État des services:${NC}"
 
