@@ -69,21 +69,7 @@ public class AuthServiceClient {
     }
     
     private UserDetails createFallbackUser(String username) {
-        // Logique de fallback
-        if ("admin2".equals(username)) {
-            return User.withUsername("admin2")
-                    .password("")
-                    .authorities("ROLE_ADMIN")
-                    .build();
-        }
-        else if ("commissaire1".equals(username)) {
-            return User.withUsername("commissaire1")
-                    .password("")
-                    .authorities("ROLE_COMMISSAIRE")
-                    .build();
-        }
-        // Ajoutez d'autres utilisateurs si besoin
-        
+        // Simplified fallback: no hardcoded admin/commissaire users
         return User.withUsername(username)
                 .password("")
                 .authorities("ROLE_USER")
