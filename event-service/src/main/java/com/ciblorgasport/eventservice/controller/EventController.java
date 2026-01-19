@@ -37,11 +37,13 @@ public class EventController {
         if (event != null) {
             event.setName(eventDetails.getName());
             event.setLieuPrincipal(eventDetails.getLieuPrincipal());
-            event.setDate(eventDetails.getDate());
+            event.setDateDebut(eventDetails.getDateDebut());
+            event.setDateFin(eventDetails.getDateFin());
             return eventRepository.save(event);
         }
         return null;
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable Long id) {

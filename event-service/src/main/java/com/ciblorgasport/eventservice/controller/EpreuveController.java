@@ -37,10 +37,14 @@ public class EpreuveController {
         if (epreuve != null) {
             epreuve.setNom(epreuveDetails.getNom());
             epreuve.setDescription(epreuveDetails.getDescription());
+            epreuve.setDate(epreuveDetails.getDate());
+            epreuve.setHeureDebut(epreuveDetails.getHeureDebut());
+            epreuve.setHeureFin(epreuveDetails.getHeureFin());
             return epreuveRepository.save(epreuve);
         }
         return null;
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteEpreuve(@PathVariable Long id) {

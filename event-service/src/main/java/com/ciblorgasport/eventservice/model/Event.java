@@ -19,8 +19,9 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "lieu_principal_id")
     private Lieu lieuPrincipal;
-    private LocalDate date;
-    // Ajoutez d'autres champs si nécessaire
+
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
 
     // Getters et setters
     public Long getId() { return id; }
@@ -29,6 +30,19 @@ public class Event {
     public void setName(String name) { this.name = name; }
     public Lieu getLieuPrincipal() { return lieuPrincipal; }
     public void setLieuPrincipal(Lieu lieuPrincipal) { this.lieuPrincipal = lieuPrincipal; }
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+	public LocalDate getDateDebut() {
+		return dateDebut;
+	}
+	public void setDateDebut(LocalDate dateDebut) {
+		this.dateDebut = dateDebut;
+	}
+	public LocalDate getDateFin() {
+		return dateFin;
+	}
+	public void setDateFin(LocalDate dateFin) {
+		this.dateFin = dateFin;
+	}
+    
+    
+
 }

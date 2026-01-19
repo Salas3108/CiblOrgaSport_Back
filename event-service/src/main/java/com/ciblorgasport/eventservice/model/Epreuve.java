@@ -1,4 +1,7 @@
 package com.ciblorgasport.eventservice.model;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import com.ciblorgasport.eventservice.model.Competition;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -12,7 +15,9 @@ public class Epreuve {
     private Long id;
     private String nom;
     private String description;
-
+    private LocalDate date;
+    private LocalTime heureDebut;
+    private LocalTime heureFin;
     @ManyToOne
     @JoinColumn(name = "competition_id")
     @JsonIgnoreProperties({"event"}) // Inclut competition sans l'event pour éviter trop de niveaux
@@ -32,4 +37,23 @@ public class Epreuve {
     public void setCompetition(Competition competition) { this.competition = competition; }
     public Lieu getLieu() { return lieu; }
     public void setLieu(Lieu lieu) { this.lieu = lieu; }
+	public LocalDate getDate() {
+		return date;
+	}
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+	public LocalTime getHeureDebut() {
+		return heureDebut;
+	}
+	public void setHeureDebut(LocalTime heureDebut) {
+		this.heureDebut = heureDebut;
+	}
+	public LocalTime getHeureFin() {
+		return heureFin;
+	}
+	public void setHeureFin(LocalTime heureFin) {
+		this.heureFin = heureFin;
+	}
+    
 }

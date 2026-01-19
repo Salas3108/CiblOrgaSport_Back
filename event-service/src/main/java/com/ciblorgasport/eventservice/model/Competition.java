@@ -11,7 +11,9 @@ public class Competition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private LocalDate date;
+
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
     private String type;
 
     @ManyToOne
@@ -24,10 +26,21 @@ public class Competition {
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
+	public LocalDate getDateDebut() {
+		return dateDebut;
+	}
+	public void setDateDebut(LocalDate dateDebut) {
+		this.dateDebut = dateDebut;
+	}
+	public LocalDate getDateFin() {
+		return dateFin;
+	}
+	public void setDateFin(LocalDate dateFin) {
+		this.dateFin = dateFin;
+	}
+    
 }

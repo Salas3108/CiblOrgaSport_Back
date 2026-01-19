@@ -34,9 +34,11 @@ public class CompetitionController {
     public Competition updateCompetition(@PathVariable Long id, @RequestBody Competition competitionDetails) {
         Competition competition = competitionRepository.findById(id).orElse(null);
         if (competition != null) {
-            competition.setName(competitionDetails.getName());
-            competition.setDate(competitionDetails.getDate());
-            competition.setType(competitionDetails.getType());
+        	competition.setName(competitionDetails.getName());
+        	competition.setDateDebut(competitionDetails.getDateDebut());
+        	competition.setDateFin(competitionDetails.getDateFin());
+        	competition.setType(competitionDetails.getType());
+
             return competitionRepository.save(competition);
         }
         return null;
