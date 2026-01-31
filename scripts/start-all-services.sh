@@ -39,11 +39,21 @@ detect_port() {
   local port=""
 
   if [ -f "$prop_file" ]; then
-    port=$(grep -E '^server\.port\s*=' "$prop_file" | tail -n1 | awk -F'=' '{gsub(/ /,"",$2);print $2}')
+    port=$(grep -E '^[[:space:]]*server\.port[[:space:]]*=' "$prop_file" | tail -n1 | awk -F'=' '{gsub(/ /,"",$2);print $2}')
   fi
+
+  # Improved YAML parsing: find 'server:' block then read 'port:' within it
   if [ -z "$port" ] && [ -f "$yml_file" ]; then
-    port=$(grep -E '^\s*port:\s*[0-9]+' "$yml_file" | grep -i 'server' -A0 | awk -F':' '{gsub(/ /,"",$2);print $2}' | tail -n1)
+    port=$(awk '
+      BEGIN{found=0}
+      /^[[:space:]]*server:[[:space:]]*$/ {found=1; next}
+      found && /^[[:space:]]*port:[[:space:]]*[0-9]+[[:space:]]*$/ {
+        gsub(/ /,"")
+        split($0,a,":"); print a[2]; exit
+      }
+    ' "$yml_file")
   fi
+
   echo "${port:-$default_port}"
 }
 
@@ -102,7 +112,7 @@ check_service() {
     if ps -p "$pid" > /dev/null 2>&1; then
       return 0
     fi
-  fi
+  }
   return 1
 }
 

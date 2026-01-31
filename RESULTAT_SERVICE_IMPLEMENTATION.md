@@ -34,13 +34,13 @@ resultat-service/
 │   │   │   │   ├── CreerResultatRequest.java       # Création
 │   │   │   │   ├── ModifierResultatRequest.java    # Modification
 │   │   │   │   └── ValiderResultatRequest.java     # Validation
-│   │   │   └── security/
+│   │   └── security/
 │   │   │       ├── SecurityConfig.java             # Config Spring Security
 │   │   │       ├── JwtTokenProvider.java           # Gestion JWT
 │   │   │       ├── JwtAuthenticationFilter.java    # Filtre authentification
 │   │   │       └── JwtAuthenticationEntryPoint.java # Erreurs auth
 │   │   └── resources/
-│   │       └── application.properties              # Configuration
+│   │       └── application.properties              # Configuration (port, DB, JWT)
 │   └── test/
 │       └── java/com/ciblorgasport/resultatservice/
 │           └── ResultatServiceTest.java            # Tests unitaires

@@ -237,7 +237,7 @@ cd billetterie
 ```
 
 ### Config
-Variables (via application.yml ou env):
+Variables (via application.properties ou env):
 - BILL_DB_URL, BILL_DB_USER, BILL_DB_PASS
 
 ### Dépannage (billetterie)

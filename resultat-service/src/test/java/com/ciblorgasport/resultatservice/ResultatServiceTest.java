@@ -5,6 +5,7 @@ import com.ciblorgasport.resultatservice.dto.ResultatDTO;
 import com.ciblorgasport.resultatservice.entity.Resultat;
 import com.ciblorgasport.resultatservice.entity.StatusResultat;
 import com.ciblorgasport.resultatservice.repository.ResultatRepository;
+import com.ciblorgasport.resultatservice.repository.HistoriqueResultatRepository;
 import com.ciblorgasport.resultatservice.service.ResultatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,8 @@ public class ResultatServiceTest {
     
     @Mock
     private ResultatRepository resultatRepository;
+    @Mock
+    private HistoriqueResultatRepository historiqueResultatRepository;
     
     @InjectMocks
     private ResultatService resultatService;
@@ -35,28 +38,26 @@ public class ResultatServiceTest {
     public void testSaisirResultat() {
         // Arrange
         Long commissaireId = 10L;
-        CreerResultatRequest request = CreerResultatRequest.builder()
-                .epreuveId(1L)
-                .athleteId(5L)
-                .classement(1)
-                .temps(45.32)
-                .distance(100.50)
-                .points(100.0)
-                .observations("Test observation")
-                .build();
+        CreerResultatRequest request = new CreerResultatRequest();
+        request.setEpreuveId(1L);
+        request.setAthleteId(5L);
+        request.setClassement(1);
+        request.setTemps(45.32);
+        request.setDistance(100.50);
+        request.setPoints(100.0);
+        request.setObservations("Test observation");
         
-        Resultat resultatEntity = Resultat.builder()
-                .id(1L)
-                .epreuveId(request.getEpreuveId())
-                .athleteId(request.getAthleteId())
-                .classement(request.getClassement())
-                .temps(request.getTemps())
-                .distance(request.getDistance())
-                .points(request.getPoints())
-                .observations(request.getObservations())
-                .saisieParId(commissaireId)
-                .status(StatusResultat.SAISI)
-                .build();
+        Resultat resultatEntity = new Resultat();
+        resultatEntity.setId(1L);
+        resultatEntity.setEpreuveId(request.getEpreuveId());
+        resultatEntity.setAthleteId(request.getAthleteId());
+        resultatEntity.setClassement(request.getClassement());
+        resultatEntity.setTemps(request.getTemps());
+        resultatEntity.setDistance(request.getDistance());
+        resultatEntity.setPoints(request.getPoints());
+        resultatEntity.setObservations(request.getObservations());
+        resultatEntity.setSaisieParId(commissaireId);
+        resultatEntity.setStatus(StatusResultat.SAISI);
         
         when(resultatRepository.findByEpreuveIdAndAthleteId(request.getEpreuveId(), request.getAthleteId()))
                 .thenReturn(Optional.empty());
@@ -77,11 +78,10 @@ public class ResultatServiceTest {
     public void testSaisirResultat_Duplicate() {
         // Arrange
         Long commissaireId = 10L;
-        CreerResultatRequest request = CreerResultatRequest.builder()
-                .epreuveId(1L)
-                .athleteId(5L)
-                .classement(1)
-                .build();
+        CreerResultatRequest request = new CreerResultatRequest();
+        request.setEpreuveId(1L);
+        request.setAthleteId(5L);
+        request.setClassement(1);
         
         Resultat existingResultat = new Resultat();
         when(resultatRepository.findByEpreuveIdAndAthleteId(request.getEpreuveId(), request.getAthleteId()))
