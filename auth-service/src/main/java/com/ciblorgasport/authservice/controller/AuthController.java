@@ -80,6 +80,7 @@ public class AuthController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
         map.put("username", user.getUsername());
         map.put("password", user.getPassword());
         map.put("role", "ROLE_" + user.getRole().name());
