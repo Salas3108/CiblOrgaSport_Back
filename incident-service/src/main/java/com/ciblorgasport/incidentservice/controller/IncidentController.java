@@ -44,29 +44,31 @@ public class IncidentController {
             @RequestParam(required = false) ImpactLevel impact
     ) {
         if (status == null && type == null && impact == null) {
-            return ResponseEntity.ok(incidentService.findAll().stream().map(incidentMapper::toDto).toList());
+            return ResponseEntity.<java.util.List<com.ciblorgasport.incidentservice.dto.IncidentDTO>>ok(
+                    incidentService.findAll().stream().map(incidentMapper::toDto).toList());
         }
-        return ResponseEntity.ok(incidentService.search(status, type, impact).stream().map(incidentMapper::toDto).toList());
+        return ResponseEntity.<java.util.List<com.ciblorgasport.incidentservice.dto.IncidentDTO>>ok(
+                incidentService.search(status, type, impact).stream().map(incidentMapper::toDto).toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<IncidentDTO> findById(@PathVariable Long id) {
         return incidentService.findById(id)
-                .map(i -> ResponseEntity.ok(incidentMapper.toDto(i)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+            .map(i -> ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(i)))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<IncidentDTO> create(@RequestBody IncidentDTO incidentDto) {
-        // Utiliser la méthode utilitaire
+
         String currentUsername = getCurrentUsername();
         Incident incident = incidentMapper.toEntity(incidentDto);
         incident.setReportedBy(currentUsername);
         if (incident.getReportedAt() == null) incident.setReportedAt(LocalDateTime.now());
         if (incident.getStatus() == null) incident.setStatus(IncidentStatus.ACTIF);
         Incident created = incidentService.create(incident);
-        return ResponseEntity.ok(incidentMapper.toDto(created));
+        return ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(created));
     }
 
     @PutMapping("/{id}")
@@ -75,7 +77,7 @@ public class IncidentController {
         try {
             Incident incident = incidentMapper.toEntity(incidentDto);
             Incident updated = incidentService.update(id, incident);
-            return ResponseEntity.ok(incidentMapper.toDto(updated));
+            return ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(updated));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
         }
