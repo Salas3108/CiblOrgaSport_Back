@@ -9,7 +9,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
+
 @RequestMapping("/competitions")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
+
 public class CompetitionController {
     @Autowired
     private CompetitionRepository competitionRepository;
@@ -20,7 +23,6 @@ public class CompetitionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public Competition createCompetition(@RequestBody Competition competition) {
         return competitionRepository.save(competition);
     }

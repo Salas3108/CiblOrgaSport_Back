@@ -68,8 +68,3 @@ public class Abonnement {
     public void setStatus(AbonnementStatus status) { this.status = status; }
 }
 
-enum AbonnementStatus {
-    ACTIF,
-    DESABONNE,
-    SUSPENDU
-}

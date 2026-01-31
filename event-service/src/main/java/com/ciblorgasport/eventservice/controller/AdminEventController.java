@@ -3,6 +3,7 @@ package com.ciblorgasport.eventservice.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,8 @@ import com.ciblorgasport.eventservice.repository.EventRepository;
 
 @RestController
 @RequestMapping("/admin/events")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
+
 public class AdminEventController {
     private final EventRepository eventRepo;
     private final CompetitionRepository competitionRepo;
