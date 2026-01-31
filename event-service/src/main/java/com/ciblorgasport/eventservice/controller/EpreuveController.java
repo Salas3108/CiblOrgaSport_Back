@@ -1,15 +1,26 @@
 package com.ciblorgasport.eventservice.controller;
 
-import com.ciblorgasport.eventservice.model.Epreuve;
-import com.ciblorgasport.eventservice.repository.EpreuveRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.ciblorgasport.eventservice.model.Epreuve;
+import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 
 @RestController
 @RequestMapping({"/epreuves", "/api/epreuves"})
+@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
+
 public class EpreuveController {
     @Autowired
     private EpreuveRepository epreuveRepository;

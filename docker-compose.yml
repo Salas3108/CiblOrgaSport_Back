@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5400:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d glop"]
       interval: 5s
@@ -43,7 +43,7 @@ services:
 
 volumes:
   postgres_data:
-    external: true
+    #external: true
     name: ciblorgasport_back_postgres_data
 
 networks:
