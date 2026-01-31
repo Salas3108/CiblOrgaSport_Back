@@ -8,39 +8,32 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-01-02T00:02:08.056+01:00  INFO 49514 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : Starting IncidentServiceApplication using Java 21.0.6 with PID 49514 (/Users/salimtitouche/CiblOrgaSport_Back/incident-service/target/incident-service-0.0.1-SNAPSHOT.jar started by salimtitouche in /Users/salimtitouche/CiblOrgaSport_Back/incident-service)
-2026-01-02T00:02:08.062+01:00 DEBUG 49514 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : Running with Spring Boot v3.3.4, Spring v6.1.13
-2026-01-02T00:02:08.064+01:00  INFO 49514 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : No active profile set, falling back to 1 default profile: "default"
-2026-01-02T00:02:08.393+01:00  WARN 49514 --- [incident-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.ciblorgasport.incidentservice.IncidentServiceApplication]
-2026-01-02T00:02:09.196+01:00 ERROR 49514 --- [incident-service] [           main] o.s.boot.SpringApplication               : Application run failed
-
-org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.ciblorgasport.incidentservice.IncidentServiceApplication]
-	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:179) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:417) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:789) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:607) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.4.jar!/:3.3.4]
-	at com.ciblorgasport.incidentservice.IncidentServiceApplication.main(IncidentServiceApplication.java:11) ~[!/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
-	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:102) ~[incident-service-0.0.1-SNAPSHOT.jar:na]
-	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) ~[incident-service-0.0.1-SNAPSHOT.jar:na]
-	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) ~[incident-service-0.0.1-SNAPSHOT.jar:na]
-Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 'incidentServiceImpl' for bean class [com.ciblorgasport.incidentservice.service.IncidentServiceImpl] conflicts with existing, non-compatible bean definition of same name and class [com.ciblorgasport.incidentservice.service.impl.IncidentServiceImpl]
-	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:361) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:288) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:306) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:246) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:197) ~[spring-context-6.1.13.jar!/:6.1.13]
-	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:165) ~[spring-context-6.1.13.jar!/:6.1.13]
-	... 18 common frames omitted
-
+2026-01-31T11:43:11.474+01:00  INFO 486443 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : Starting IncidentServiceApplication v0.0.1-SNAPSHOT using Java 17.0.17 with PID 486443 (/home/ait-yahia/Bureau/glop/CiblOrgaSport_Back/incident-service/target/incident-service-0.0.1-SNAPSHOT.jar started by ait-yahia in /home/ait-yahia/Bureau/glop/CiblOrgaSport_Back/incident-service)
+2026-01-31T11:43:11.485+01:00 DEBUG 486443 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : Running with Spring Boot v3.3.4, Spring v6.1.13
+2026-01-31T11:43:11.488+01:00  INFO 486443 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-01-31T11:43:17.645+01:00  INFO 486443 --- [incident-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-31T11:43:18.505+01:00  INFO 486443 --- [incident-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 829 ms. Found 1 JPA repository interface.
+2026-01-31T11:43:28.549+01:00  INFO 486443 --- [incident-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8086 (http)
+2026-01-31T11:43:28.583+01:00  INFO 486443 --- [incident-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-31T11:43:28.583+01:00  INFO 486443 --- [incident-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-01-31T11:43:28.897+01:00  INFO 486443 --- [incident-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-31T11:43:28.922+01:00  INFO 486443 --- [incident-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 17255 ms
+2026-01-31T11:43:29.792+01:00 DEBUG 486443 --- [incident-service] [           main] c.c.i.security.AuthTokenFilter           : Filter 'authenticationJwtTokenFilter' configured for use
+2026-01-31T11:43:30.126+01:00  INFO 486443 --- [incident-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-31T11:43:30.445+01:00  INFO 486443 --- [incident-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-01-31T11:43:30.691+01:00  INFO 486443 --- [incident-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-31T11:43:32.912+01:00  INFO 486443 --- [incident-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-31T11:43:32.991+01:00  INFO 486443 --- [incident-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-31T11:43:37.813+01:00  INFO 486443 --- [incident-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1d2def55
+2026-01-31T11:43:37.827+01:00  INFO 486443 --- [incident-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-31T11:43:38.393+01:00  WARN 486443 --- [incident-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-31T11:43:44.542+01:00  INFO 486443 --- [incident-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table if exists incident_model 
+       alter column description set data type TEXT
+2026-01-31T11:43:45.067+01:00  INFO 486443 --- [incident-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-31T11:43:46.551+01:00  INFO 486443 --- [incident-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-31T11:43:49.201+01:00  WARN 486443 --- [incident-service] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-31T11:43:49.355+01:00  INFO 486443 --- [incident-service] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-01-31T11:43:51.336+01:00  INFO 486443 --- [incident-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8086 (http) with context path '/'
+2026-01-31T11:43:51.434+01:00  INFO 486443 --- [incident-service] [           main] c.c.i.IncidentServiceApplication         : Started IncidentServiceApplication in 44.562 seconds (process running for 50.316)

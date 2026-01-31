@@ -22,6 +22,7 @@ get_default_port() {
     "event-service") echo "8082";;
     "billetterie") echo "8083";;
     "incident-service") echo "8084";;
+    "resultat-service") echo "8085";;
     "gateway") echo "8080";;
     *) echo "8080";;
   esac
@@ -115,6 +116,7 @@ AUTH_DIR="${ROOT_DIR}/auth-service"
 BILL_DIR="${ROOT_DIR}/billetterie"
 EVENT_DIR="${ROOT_DIR}/event-service"
 INCIDENT_DIR="${ROOT_DIR}/incident-service"
+RESULTAT_DIR="${ROOT_DIR}/resultat-service"
 GATEWAY_DIR="${ROOT_DIR}/gateway"
 
 # Start services in parallel (gateway last)
@@ -124,6 +126,7 @@ start_service "auth-service" "$AUTH_DIR" "auth-service-*.jar" 0 &
 start_service "event-service" "$EVENT_DIR" "event-service-*.jar" 0 &
 start_service "billetterie" "$BILL_DIR" "billetterie-*.jar" 0 &
 start_service "incident-service" "$INCIDENT_DIR" "incident-service-*.jar" 0 &
+start_service "resultat-service" "$RESULTAT_DIR" "resultat-service-*.jar" 0 &
 
 # Wait for all background services to start
 wait
@@ -135,7 +138,7 @@ wait
 echo -e "${YELLOW}⏳ Vérification de l'état des services...${NC}"
 sleep 8
 
-services="auth-service event-service billetterie incident-service gateway"
+services="auth-service event-service billetterie incident-service resultat-service gateway"
 all_running=true
 echo -e "\n${BLUE}📊 État des services:${NC}"
 
@@ -147,6 +150,7 @@ for s in $services; do
       "event-service") p=$(detect_port "$EVENT_DIR" "$s");;
       "billetterie") p=$(detect_port "$BILL_DIR" "$s");;
       "incident-service") p=$(detect_port "$INCIDENT_DIR" "$s");;
+      "resultat-service") p=$(detect_port "$RESULTAT_DIR" "$s");;
       "gateway") p=$(detect_port "$GATEWAY_DIR" "$s");;
     esac
     echo -e "${GREEN}  ✅ $s: En cours (Port ${p})${NC}"
@@ -163,6 +167,7 @@ if [ "$all_running" = true ]; then
   echo -e "${GREEN}  🎪 Event Service: http://localhost:$(detect_port "$EVENT_DIR" "event-service")/api/events${NC}"
   echo -e "${GREEN}  🎫 Billetterie: http://localhost:$(detect_port "$BILL_DIR" "billetterie")/api/tickets${NC}"
   echo -e "${GREEN}  🚨 Incident Service: http://localhost:$(detect_port "$INCIDENT_DIR" "incident-service")/api/incidents${NC}"
+  echo -e "${GREEN}  📊 Resultat Service: http://localhost:$(detect_port "$RESULTAT_DIR" "resultat-service")/api/resultats${NC}"
   echo -e "${GREEN}  🌐 Gateway: http://localhost:$(detect_port "$GATEWAY_DIR" "gateway")${NC}"
 else
   echo -e "\n${YELLOW}⚠️  Certains services ont échoué. Vérifiez les logs.${NC}"

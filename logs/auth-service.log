@@ -1,1 +1,33 @@
-aucun attribut manifest principal dans /Users/salimtitouche/CiblOrgaSport_Back/auth-service/target/auth-service-0.0.1-SNAPSHOT.jar
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2026-01-31T11:43:11.157+01:00  INFO 486333 --- [ciblorgasport] [           main] c.c.authservice.AuthServiceApplication   : Starting AuthServiceApplication v0.0.1-SNAPSHOT using Java 17.0.17 with PID 486333 (/home/ait-yahia/Bureau/glop/CiblOrgaSport_Back/auth-service/target/auth-service-0.0.1-SNAPSHOT.jar started by ait-yahia in /home/ait-yahia/Bureau/glop/CiblOrgaSport_Back/auth-service)
+2026-01-31T11:43:11.196+01:00  INFO 486333 --- [ciblorgasport] [           main] c.c.authservice.AuthServiceApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-01-31T11:43:22.684+01:00  INFO 486333 --- [ciblorgasport] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-31T11:43:23.101+01:00  INFO 486333 --- [ciblorgasport] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 344 ms. Found 1 JPA repository interface.
+2026-01-31T11:43:32.571+01:00  INFO 486333 --- [ciblorgasport] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-01-31T11:43:32.693+01:00  INFO 486333 --- [ciblorgasport] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-31T11:43:32.695+01:00  INFO 486333 --- [ciblorgasport] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-01-31T11:43:33.267+01:00  INFO 486333 --- [ciblorgasport] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-31T11:43:33.280+01:00  INFO 486333 --- [ciblorgasport] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 21479 ms
+2026-01-31T11:43:34.914+01:00  INFO 486333 --- [ciblorgasport] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-31T11:43:35.583+01:00  INFO 486333 --- [ciblorgasport] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
+2026-01-31T11:43:36.696+01:00  INFO 486333 --- [ciblorgasport] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-31T11:43:39.733+01:00  INFO 486333 --- [ciblorgasport] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-31T11:43:39.888+01:00  INFO 486333 --- [ciblorgasport] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-31T11:43:41.837+01:00  INFO 486333 --- [ciblorgasport] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@67c0c90b
+2026-01-31T11:43:41.914+01:00  INFO 486333 --- [ciblorgasport] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-31T11:43:42.262+01:00  WARN 486333 --- [ciblorgasport] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-31T11:43:56.211+01:00  INFO 486333 --- [ciblorgasport] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-31T11:43:57.027+01:00  INFO 486333 --- [ciblorgasport] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-31T11:44:02.311+01:00  WARN 486333 --- [ciblorgasport] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-31T11:44:05.241+01:00  INFO 486333 --- [ciblorgasport] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-01-31T11:44:05.834+01:00  INFO 486333 --- [ciblorgasport] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@67c61551, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7bca98d5, org.springframework.security.web.context.SecurityContextHolderFilter@900ffc4, org.springframework.security.web.header.HeaderWriterFilter@5a86112a, org.springframework.security.web.authentication.logout.LogoutFilter@43600de0, com.ciblorgasport.authservice.security.AuthTokenFilter@17f7a1af, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5b5f06bb, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@665574fb, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6bbff652, org.springframework.security.web.session.SessionManagementFilter@5fa0943d, org.springframework.security.web.access.ExceptionTranslationFilter@50ac63b2, org.springframework.security.web.access.intercept.AuthorizationFilter@67544105]
+2026-01-31T11:44:11.118+01:00  INFO 486333 --- [ciblorgasport] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path ''
+2026-01-31T11:44:11.161+01:00  INFO 486333 --- [ciblorgasport] [           main] c.c.authservice.AuthServiceApplication   : Started AuthServiceApplication in 64.257 seconds (process running for 74.533)

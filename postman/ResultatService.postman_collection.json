@@ -1,0 +1,278 @@
+{
+  "info": {
+    "name": "Resultat Service API",
+    "description": "Collection pour tester l'API de gestion des résultats",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Créer un résultat",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"epreuveId\": 1,\n  \"athleteId\": 5,\n  \"classement\": 1,\n  \"temps\": 45.32,\n  \"distance\": 100.50,\n  \"points\": 100,\n  \"observations\": \"Athlète en excellente forme\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8085/api/resultats",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Récupérer un résultat",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Résultats d'une épreuve",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/epreuve/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "epreuve",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Modifier un résultat",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"classement\": 1,\n  \"temps\": 45.30,\n  \"distance\": 100.50,\n  \"points\": 100,\n  \"observations\": \"Temps corrigé\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Valider un résultat",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"VALIDE\",\n  \"raison\": \"Résultat validé par l'administrateur\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/1/valider",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "1",
+            "valider"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Résultats en attente",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/en-attente",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "en-attente"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Historique d'un résultat",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/1/historique",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "1",
+            "historique"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Supprimer un résultat",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{userId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8085/api/resultats/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "api",
+            "resultats",
+            "1"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "10",
+      "type": "string"
+    }
+  ]
+}

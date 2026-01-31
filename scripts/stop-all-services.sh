@@ -44,6 +44,7 @@ stop_service() {
 
 # Stop all services (reverse order)
 stop_service "gateway"
+stop_service "resultat-service"
 stop_service "incident-service"
 stop_service "billetterie"
 stop_service "event-service"
@@ -60,6 +61,7 @@ pkill -f "java.*incident-service"
 pkill -f "java.*auth-service"
 pkill -f "java.*event-service"
 pkill -f "java.*billetterie"
+pkill -f "java.*resultat-service"
 pkill -f "java.*gateway"
 
 echo -e "${GREEN}✅ Tous les services ont été arrêtés${NC}"

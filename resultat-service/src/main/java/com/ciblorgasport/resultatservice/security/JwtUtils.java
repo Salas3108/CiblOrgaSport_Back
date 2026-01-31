@@ -1,0 +1,89 @@
+package com.ciblorgasport.resultatservice.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
+
+@Component
+public class JwtUtils {
+    
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+    
+    @Value("${ciblorgasport.app.jwtSecret}")
+    private String jwtSecret;
+    
+    @Value("${ciblorgasport.app.jwtExpirationMs}")
+    private int jwtExpirationMs;
+    
+    public Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
+    
+    public String generateJwtToken(Authentication authentication) {
+        org.springframework.security.core.userdetails.User userPrincipal = 
+            (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .claim("role", userPrincipal.getAuthorities().stream().findFirst().get().getAuthority())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    
+    public String getUserNameFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+    
+    public String getRoleFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+    }
+    
+    public boolean validateJwtToken(String authToken) {
+        try {
+            Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(authToken);
+            return true;
+        } catch (JwtException e) {
+            logger.error("JWT validation error: {}", e.getMessage());
+        }
+        return false;
+    }
+    
+    // Nouvelle méthode pour extraire l'ID utilisateur depuis le token
+    public Long getUserIdFromJwtToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            
+            // Essayez de récupérer l'ID utilisateur (si présent dans le token)
+            return claims.get("userId", Long.class);
+        } catch (Exception e) {
+            logger.error("Error extracting user ID from JWT: {}", e.getMessage());
+            return null;
+        }
+    }
+}
