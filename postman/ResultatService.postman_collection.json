@@ -1,23 +1,23 @@
 {
   "info": {
     "name": "Resultat Service API",
-    "description": "Collection pour tester l'API de gestion des résultats",
+    "description": "Collection pour tester l'API de gestion des résultats - PORT 8087",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Créer un résultat",
+      "name": "01 - Créer un résultat (COMMISSAIRE)",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{commissaire_token}}",
             "type": "text"
           },
           {
             "key": "X-User-Id",
-            "value": "{{userId}}",
+            "value": "{{commissaire_id}}",
             "type": "text"
           },
           {
@@ -31,85 +31,80 @@
           "raw": "{\n  \"epreuveId\": 1,\n  \"athleteId\": 5,\n  \"classement\": 1,\n  \"temps\": 45.32,\n  \"distance\": 100.50,\n  \"points\": 100,\n  \"observations\": \"Athlète en excellente forme\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8085/api/resultats",
+          "raw": "{{base_url}}/api/resultats",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats"]
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Sauvegarde l'ID du résultat créé",
+              "if (pm.response.code === 201) {",
+              "  var resultatId = pm.response.json().id;",
+              "  pm.environment.set(\"resultat_id\", resultatId);",
+              "  console.log(\"✅ Résultat créé avec ID: \" + resultatId);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
-      "name": "Récupérer un résultat",
+      "name": "02 - Récupérer un résultat",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{commissaire_token}}",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8085/api/resultats/1",
+          "raw": "{{base_url}}/api/resultats/{{resultat_id}}",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "1"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "{{resultat_id}}"]
         }
       }
     },
     {
-      "name": "Résultats d'une épreuve",
+      "name": "03 - Résultats d'une épreuve",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{commissaire_token}}",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8085/api/resultats/epreuve/1",
+          "raw": "{{base_url}}/api/resultats/epreuve/1",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "epreuve",
-            "1"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "epreuve", "1"]
         }
       }
     },
     {
-      "name": "Modifier un résultat",
+      "name": "04 - Modifier un résultat (COMMISSAIRE)",
       "request": {
         "method": "PUT",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{commissaire_token}}",
             "type": "text"
           },
           {
             "key": "X-User-Id",
-            "value": "{{userId}}",
+            "value": "{{commissaire_id}}",
             "type": "text"
           },
           {
@@ -120,36 +115,29 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"classement\": 1,\n  \"temps\": 45.30,\n  \"distance\": 100.50,\n  \"points\": 100,\n  \"observations\": \"Temps corrigé\"\n}"
+          "raw": "{\n  \"classement\": 2,\n  \"temps\": 45.30,\n  \"observations\": \"Temps corrigé après vérification vidéo\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8085/api/resultats/1",
+          "raw": "{{base_url}}/api/resultats/{{resultat_id}}",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "1"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "{{resultat_id}}"]
         }
       }
     },
     {
-      "name": "Valider un résultat",
+      "name": "05 - Valider un résultat (ADMIN ONLY)",
       "request": {
         "method": "PATCH",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{admin_token}}",
             "type": "text"
           },
           {
             "key": "X-User-Id",
-            "value": "{{userId}}",
+            "value": "{{admin_id}}",
             "type": "text"
           },
           {
@@ -163,116 +151,198 @@
           "raw": "{\n  \"status\": \"VALIDE\",\n  \"raison\": \"Résultat validé par l'administrateur\"\n}"
         },
         "url": {
-          "raw": "http://localhost:8085/api/resultats/1/valider",
+          "raw": "{{base_url}}/api/resultats/{{resultat_id}}/valider",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "1",
-            "valider"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "{{resultat_id}}", "valider"]
         }
       }
     },
     {
-      "name": "Résultats en attente",
+      "name": "06 - Historique d'un résultat (ADMIN)",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{admin_token}}",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8085/api/resultats/en-attente",
+          "raw": "{{base_url}}/api/resultats/{{resultat_id}}/historique",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "en-attente"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "{{resultat_id}}", "historique"]
         }
       }
     },
     {
-      "name": "Historique d'un résultat",
+      "name": "07 - Résultats en attente (ADMIN)",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{admin_token}}",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8085/api/resultats/1/historique",
+          "raw": "{{base_url}}/api/resultats/en-attente",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "1",
-            "historique"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "en-attente"]
         }
       }
     },
     {
-      "name": "Supprimer un résultat",
+      "name": "08 - Résultats par commissaire (ADMIN)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/resultats/commissaire/{{commissaire_id}}",
+          "protocol": "http",
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "commissaire", "{{commissaire_id}}"]
+        }
+      }
+    },
+    {
+      "name": "09 - Supprimer un résultat (COMMISSAIRE)",
       "request": {
         "method": "DELETE",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{commissaire_token}}",
             "type": "text"
           },
           {
             "key": "X-User-Id",
-            "value": "{{userId}}",
+            "value": "{{commissaire_id}}",
             "type": "text"
           }
         ],
         "url": {
-          "raw": "http://localhost:8085/api/resultats/1",
+          "raw": "{{base_url}}/api/resultats/{{resultat_id}}",
           "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "api",
-            "resultats",
-            "1"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats", "{{resultat_id}}"]
+        }
+      }
+    },
+    {
+      "name": "10 - Test erreur: Créer sans autorisation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"epreuveId\": 1,\n  \"athleteId\": 6,\n  \"classement\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/resultats",
+          "protocol": "http",
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats"]
+        }
+      }
+    },
+    {
+      "name": "11 - Test erreur: Données invalides",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{commissaire_token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{commissaire_id}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"epreuveId\": null,\n  \"athleteId\": 6,\n  \"classement\": -1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/resultats",
+          "protocol": "http",
+          "host": ["{{base_url}}"],
+          "path": ["api", "resultats"]
         }
       }
     }
   ],
   "variable": [
     {
-      "key": "token",
-      "value": "YOUR_JWT_TOKEN_HERE",
-      "type": "string"
+      "key": "base_url",
+      "value": "http://localhost:8087",
+      "type": "string",
+      "description": "URL du resultat-service (PORT 8087)"
     },
     {
-      "key": "userId",
+      "key": "commissaire_token",
+      "value": "COLLER_TOKEN_COMMISSAIRE_ICI",
+      "type": "string",
+      "description": "Token JWT d'un utilisateur avec rôle COMMISSAIRE"
+    },
+    {
+      "key": "admin_token",
+      "value": "COLLER_TOKEN_ADMIN_ICI",
+      "type": "string",
+      "description": "Token JWT d'un utilisateur avec rôle ADMIN"
+    },
+    {
+      "key": "commissaire_id",
       "value": "10",
-      "type": "string"
+      "type": "string",
+      "description": "ID de l'utilisateur commissaire"
+    },
+    {
+      "key": "admin_id",
+      "value": "1",
+      "type": "string",
+      "description": "ID de l'administrateur"
+    },
+    {
+      "key": "resultat_id",
+      "value": "",
+      "type": "string",
+      "description": "ID du résultat créé (rempli automatiquement)"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "console.log(\"🔧 Préparation test Resultat-Service sur \" + pm.variables.get(\"base_url\"));"
+        ],
+        "type": "text/javascript"
+      }
     }
   ]
 }
