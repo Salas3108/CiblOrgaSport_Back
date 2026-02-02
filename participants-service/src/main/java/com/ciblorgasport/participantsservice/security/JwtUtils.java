@@ -1,37 +1,30 @@
-package com.ciblorgasport.authservice.security;
+package com.ciblorgasport.participantsservice.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import com.ciblorgasport.authservice.entity.User;
-import java.security.Key;
-import java.util.Date;
 
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+/**
+ * Utilitaire JWT (copie du pattern utilisé par les autres microservices).
+ */
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+
     @Value("${ciblorgasport.app.jwtSecret}")
     private String jwtSecret;
-    @Value("${ciblorgasport.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+
     public Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
-    public String generateJwtToken(Authentication authentication) {
-        User userPrincipal = (User) authentication.getPrincipal();
-        return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .claim("role", "ROLE_" + userPrincipal.getRole().name())
-                .claim("userId", userPrincipal.getId())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -40,6 +33,7 @@ public class JwtUtils {
                 .getBody()
                 .getSubject();
     }
+
     public String getRoleFromJwtToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -48,6 +42,25 @@ public class JwtUtils {
                 .getBody()
                 .get("role", String.class);
     }
+
+    public Long getUserIdFromJwtToken(String token) {
+        Object val = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId");
+
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).longValue();
+        try {
+            return Long.parseLong(val.toString());
+        } catch (NumberFormatException e) {
+            logger.warn("Cannot parse userId claim to Long: {}", val);
+            return null;
+        }
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);

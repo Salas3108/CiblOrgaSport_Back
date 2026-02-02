@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "Participants Service - CiblOrgaSport",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0",
+    "description": "Collection pour tester les endpoints Athlète / Commissaire du microservice participants-service"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8087",
+      "type": "string"
+    },
+    {
+      "key": "athleteId",
+      "value": "2",
+      "type": "string",
+      "description": "ID utilisateur/athlete utilisé pour les requêtes"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Mettez ici un JWT valide (ex: depuis auth-service)"
+    }
+  ],
+  "item": [
+    {
+      "name": "Athlete - Create Profile",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/api/athlete", "host": ["{{baseUrl}}"], "path": ["api","athlete"] }
+      }
+    },
+    {
+      "name": "Commissaire - List Athletes",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes"] }
+      }
+    },
+    {
+      "name": "Athlete - Post Info (upsert)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Marie\",\n  \"dateNaissance\": \"2000-03-22\",\n  \"pays\": \"Belgique\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","athlete","{{athleteId}}","info"]
+        }
+      }
+    },
+    {
+      "name": "Athlete - Post Doc",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docs\": {\n    \"certificatMedical\": \"certificat_medical_dupont.pdf\",\n    \"passport\": \"passport_dupont.pdf\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","athlete","{{athleteId}}","doc"]
+        }
+      }
+    },
+    {
+      "name": "Athlete - Post Remarque",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"observation\": \"Certificat médical valide\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/remarque", "host": ["{{baseUrl}}"], "path": ["api","athlete","{{athleteId}}","remarque"] }
+      }
+    },
+    {
+      "name": "Commissaire - Get Athlete Info",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/info", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","info"] }
+      }
+    },
+    {
+      "name": "Commissaire - Get Athlete Docs",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/doc", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","doc"] }
+      }
+    },
+    {
+      "name": "Commissaire - Post Validation (refuse)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"valide\": false,\n  \"message\": \"Passport expiré\",\n  \"motifRefus\": \"Passport expiré\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","validation"] }
+      }
+    },
+    {
+      "name": "Commissaire - Post Validation (accept)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"valide\": true\n}" },
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","validation"] }
+      }
+    },
+    {
+      "name": "Commissaire - Post Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"contenu\": \"Passeport expiré, merci de renouveler\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/message", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","message"] }
+      }
+    }
+  ]
+}
