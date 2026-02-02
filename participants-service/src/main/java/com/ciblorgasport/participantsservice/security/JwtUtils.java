@@ -1,6 +1,7 @@
 package com.ciblorgasport.participantsservice.security;
 
 import java.security.Key;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,15 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${ciblorgasport.app.jwtSecret}")
+    // default values to avoid startup failure when property is missing (override in prod via properties)
+    @Value("${ciblorgasport.app.jwtSecret:mySuperSecretKeyForCiblorgasportApplicationThatIsVeryLongAndSecure}")
     private String jwtSecret;
+    @Value("${ciblorgasport.app.jwtExpirationMs:86400000}")
+    private int jwtExpirationMs;
 
     public Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        // ensure charset consistency
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String getUserNameFromJwtToken(String token) {
