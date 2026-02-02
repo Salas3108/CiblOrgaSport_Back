@@ -3,12 +3,14 @@ package com.ciblorgasport.eventservice.controller;
 import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.repository.LieuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/lieux")
+@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
 public class LieuController {
     @Autowired
     private LieuRepository lieuRepository;
