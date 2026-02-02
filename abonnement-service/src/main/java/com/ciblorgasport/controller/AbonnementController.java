@@ -20,9 +20,10 @@ import com.ciblorgasport.entity.Abonnement;
 import com.ciblorgasport.repository.AbonnementRepository;
 import com.ciblorgasport.dto.AbonnementDTO;
 import com.ciblorgasport.dto.AbonnementMapper;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 @RestController
 @RequestMapping("/api/abonnements")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AbonnementController {
 
     private final AbonnementRepository abonnementRepo;
