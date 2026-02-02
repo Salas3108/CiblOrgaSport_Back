@@ -1,20 +1,29 @@
 package com.ciblorgasport.incidentservice.controller;
 
-import com.ciblorgasport.incidentservice.model.Incident;
-import com.ciblorgasport.incidentservice.model.IncidentStatus;
-import com.ciblorgasport.incidentservice.model.IncidentType;
-import com.ciblorgasport.incidentservice.model.ImpactLevel;
-import com.ciblorgasport.incidentservice.service.IncidentService;
-import com.ciblorgasport.incidentservice.dto.IncidentDTO;
-import com.ciblorgasport.incidentservice.dto.IncidentMapper;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.ciblorgasport.incidentservice.dto.IncidentDTO;
+import com.ciblorgasport.incidentservice.dto.IncidentMapper;
+import com.ciblorgasport.incidentservice.model.ImpactLevel;
+import com.ciblorgasport.incidentservice.model.Incident;
+import com.ciblorgasport.incidentservice.model.IncidentStatus;
+import com.ciblorgasport.incidentservice.model.IncidentType;
+import com.ciblorgasport.incidentservice.service.IncidentService;
 
 @RestController("incidentControllerApi")
 @RequestMapping("/api/incidents")
@@ -44,18 +53,16 @@ public class IncidentController {
             @RequestParam(required = false) ImpactLevel impact
     ) {
         if (status == null && type == null && impact == null) {
-            return ResponseEntity.<java.util.List<com.ciblorgasport.incidentservice.dto.IncidentDTO>>ok(
-                    incidentService.findAll().stream().map(incidentMapper::toDto).toList());
+            return ResponseEntity.ok(incidentService.findAll().stream().map(incidentMapper::toDto).toList());
         }
-        return ResponseEntity.<java.util.List<com.ciblorgasport.incidentservice.dto.IncidentDTO>>ok(
-                incidentService.search(status, type, impact).stream().map(incidentMapper::toDto).toList());
+        return ResponseEntity.ok(incidentService.search(status, type, impact).stream().map(incidentMapper::toDto).toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<IncidentDTO> findById(@PathVariable Long id) {
         return incidentService.findById(id)
-            .map(i -> ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(i)))
-            .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(i -> ResponseEntity.ok(incidentMapper.toDto(i)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -68,7 +75,7 @@ public class IncidentController {
         if (incident.getReportedAt() == null) incident.setReportedAt(LocalDateTime.now());
         if (incident.getStatus() == null) incident.setStatus(IncidentStatus.ACTIF);
         Incident created = incidentService.create(incident);
-        return ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(created));
+        return ResponseEntity.ok(incidentMapper.toDto(created));
     }
 
     @PutMapping("/{id}")
@@ -77,7 +84,7 @@ public class IncidentController {
         try {
             Incident incident = incidentMapper.toEntity(incidentDto);
             Incident updated = incidentService.update(id, incident);
-            return ResponseEntity.<com.ciblorgasport.incidentservice.dto.IncidentDTO>ok(incidentMapper.toDto(updated));
+            return ResponseEntity.ok(incidentMapper.toDto(updated));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
         }
