@@ -41,7 +41,24 @@
               "mode": "raw",
               "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"Passw0rd!\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "    pm.environment.set('token', json.token);",
+                  "    pm.environment.set('jwt', 'Bearer ' + json.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Get User by Username",
@@ -105,7 +122,7 @@
               ]
             }
           }
-        },
+        }
       ]
     },
     {
@@ -148,7 +165,19 @@
               "mode": "raw",
               "raw": "{\n  \"description\": \"Incident test\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Lieu\",\n  \"reportedBy\": \"user1\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('incident_id', json.id); } } catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Get Incident by Id",
@@ -197,7 +226,19 @@
             ],
             "url": { "raw": "{{event_base}}/lieux", "host": ["{{event_base}}"], "path": ["lieux"] },
             "body": { "mode": "raw", "raw": "{ \"nom\": \"Stade\", \"ville\": \"Paris\" }" }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('lieu_id', json.id); } } catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Events – List",
@@ -213,7 +254,19 @@
             ],
             "url": { "raw": "{{event_base}}/events", "host": ["{{event_base}}"], "path": ["events"] },
             "body": { "mode": "raw", "raw": "{ \"name\": \"Championnat\", \"date\": \"2025-05-01\" }" }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('event_id', json.id); } } catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Epreuves – List",
@@ -245,7 +298,19 @@
             ],
             "url": { "raw": "{{event_base}}/competitions", "host": ["{{event_base}}"], "path": ["competitions"] },
             "body": { "mode": "raw", "raw": "{ \"name\": \"100m Sprint\", \"type\": \"Athletics\" }" }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('competition_id', json.id); } } catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Admin – List Events",
@@ -361,7 +426,19 @@
             ],
             "url": { "raw": "{{billetterie_base}}/api/tickets", "host": ["{{billetterie_base}}"], "path": ["api","tickets"] },
             "body": { "mode": "raw", "raw": "{ \"spectatorId\": 1, \"eventId\": 1, \"seat\": \"A12\" }" }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('ticket_id', json.id); } } catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Update Ticket",

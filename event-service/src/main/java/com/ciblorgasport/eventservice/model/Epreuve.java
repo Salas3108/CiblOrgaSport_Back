@@ -8,6 +8,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import com.ciblorgasport.eventservice.model.Lieu;
 
+import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
+import com.ciblorgasport.eventservice.model.enums.GenreEpreuve;
+import com.ciblorgasport.eventservice.model.enums.NiveauEpreuve;
+
+import java.util.Set;
+import java.util.HashSet;
+
 @Entity
 public class Epreuve {
     @Id
@@ -26,6 +33,27 @@ public class Epreuve {
     @ManyToOne
     @JoinColumn(name = "lieu_id")
     private Lieu lieu;
+
+    @Enumerated(EnumType.STRING)
+    private TypeEpreuve typeEpreuve;
+
+    @Enumerated(EnumType.STRING)
+    private GenreEpreuve genreEpreuve;
+
+    @Enumerated(EnumType.STRING)
+    private NiveauEpreuve niveauEpreuve;
+
+    @ElementCollection
+    @CollectionTable(name = "epreuve_participants", joinColumns = @JoinColumn(name = "epreuve_id"))
+    @Column(name = "participant_id")
+    private Set<Long> participantIds = new HashSet<>();
+
+    // participants (IDs) -> permet d'ajouter des athlètes par leur id sans dépendre d'un entity Athlete
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "epreuve_athletes", joinColumns = @JoinColumn(name = "epreuve_id"))
+    @Column(name = "athlete_id")
+    private Set<Long> athleteIds = new HashSet<>();
+
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,6 +65,14 @@ public class Epreuve {
     public void setCompetition(Competition competition) { this.competition = competition; }
     public Lieu getLieu() { return lieu; }
     public void setLieu(Lieu lieu) { this.lieu = lieu; }
+    public TypeEpreuve getTypeEpreuve() { return typeEpreuve; }
+    public void setTypeEpreuve(TypeEpreuve typeEpreuve) { this.typeEpreuve = typeEpreuve; }
+    public GenreEpreuve getGenreEpreuve() { return genreEpreuve; }
+    public void setGenreEpreuve(GenreEpreuve genreEpreuve) { this.genreEpreuve = genreEpreuve; }
+    public NiveauEpreuve getNiveauEpreuve() { return niveauEpreuve; }
+    public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
+    public Set<Long> getParticipantIds() { return participantIds; }
+    public void setParticipantIds(Set<Long> participantIds) { this.participantIds = participantIds; }
 	public LocalDate getDate() {
 		return date;
 	}
@@ -47,7 +83,7 @@ public class Epreuve {
 		return heureDebut;
 	}
 	public void setHeureDebut(LocalTime heureDebut) {
-		this.heureDebut = heureDebut;
+		this.heureDebut = heureDebut; 
 	}
 	public LocalTime getHeureFin() {
 		return heureFin;
@@ -55,5 +91,10 @@ public class Epreuve {
 	public void setHeureFin(LocalTime heureFin) {
 		this.heureFin = heureFin;
 	}
-    
+    public Set<Long> getAthleteIds() {
+        return athleteIds;
+    }
+    public void setAthleteIds(Set<Long> athleteIds) {
+        this.athleteIds = athleteIds;
+    }
 }

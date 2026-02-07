@@ -3,7 +3,7 @@
     "name": "Participants Service - CiblOrgaSport",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": "1.0.0",
-    "description": "Collection pour tester les endpoints Athlète / Commissaire du microservice participants-service"
+    "description": "DEPRECATED - tests consolidated into 'CiblOrgaSport - Unified Tests' (see postman/CiblOrgaSport_All.postman_collection.json)"
   },
   "variable": [
     {
@@ -26,6 +26,13 @@
   ],
   "item": [
     {
+      "name": "DEPRECATED - See Unified collection",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "https://example.com/deprecated-participants-collection", "host": ["example.com"], "path": ["deprecated-participants-collection"] }
+      }
+    },
+    {
       "name": "Athlete - Create Profile",
       "request": {
         "method": "POST",
@@ -34,7 +41,25 @@
           { "key": "Authorization", "value": "Bearer {{token}}" }
         ],
         "url": { "raw": "{{baseUrl}}/api/athlete", "host": ["{{baseUrl}}"], "path": ["api","athlete"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201 or 200\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              "",
+              "try {",
+              "    const json = pm.response.json();",
+              "    if (json && json.id) { pm.environment.set('athlete_id', json.id); }",
+              "} catch (e) {}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - List Athletes",
@@ -42,7 +67,18 @@
         "method": "GET",
         "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Athlete - Post Info (upsert)",
@@ -61,7 +97,18 @@
           "host": ["{{baseUrl}}"],
           "path": ["api","athlete","{{athleteId}}","info"]
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 201\", function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Athlete - Post Doc",
@@ -80,7 +127,18 @@
           "host": ["{{baseUrl}}"],
           "path": ["api","athlete","{{athleteId}}","doc"]
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Athlete - Post Remarque",
@@ -92,7 +150,18 @@
         ],
         "body": { "mode": "raw", "raw": "{\n  \"observation\": \"Certificat médical valide\"\n}" },
         "url": { "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/remarque", "host": ["{{baseUrl}}"], "path": ["api","athlete","{{athleteId}}","remarque"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - Get Athlete Info",
@@ -100,7 +169,18 @@
         "method": "GET",
         "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/info", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","info"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - Get Athlete Docs",
@@ -108,7 +188,18 @@
         "method": "GET",
         "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/doc", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","doc"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - Post Validation (refuse)",
@@ -123,7 +214,18 @@
           "raw": "{\n  \"valide\": false,\n  \"message\": \"Passport expiré\",\n  \"motifRefus\": \"Passport expiré\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","validation"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - Post Validation (accept)",
@@ -135,7 +237,18 @@
         ],
         "body": { "mode": "raw", "raw": "{\n  \"valide\": true\n}" },
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","validation"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Commissaire - Post Message",
@@ -147,7 +260,18 @@
         ],
         "body": { "mode": "raw", "raw": "{\n  \"contenu\": \"Passeport expiré, merci de renouveler\"\n}" },
         "url": { "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/message", "host": ["{{baseUrl}}"], "path": ["api","commissaire","athletes","{{athleteId}}","message"] }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     }
   ]
 }
