@@ -17,6 +17,7 @@ import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservatio
 import com.ciblorgasport.participantsservice.dto.request.ValidationRequest;
 import com.ciblorgasport.participantsservice.dto.AthleteDocsDto;
 import com.ciblorgasport.participantsservice.model.Athlete;
+import com.ciblorgasport.participantsservice.model.AthleteDocs;
 import com.ciblorgasport.participantsservice.model.Message;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
 import com.ciblorgasport.participantsservice.repository.JpaMessageRepository;
@@ -128,7 +129,16 @@ class AthleteServiceTest {
 
     @Test
     void commissaire_validate_refusal_sets_motifRefus_and_creates_message_if_provided() {
-        fakeStore.put(10L, new Athlete(10L, "A", null, null, null, false, null, null));
+        fakeStore.put(10L, new Athlete(
+            10L,
+            "Dupont",
+            "Marie",
+            LocalDate.parse("2000-03-22"),
+            "Belgique",
+            false,
+            new AthleteDocs("certificat.pdf", "passport.pdf"),
+            null
+        ));
 
         ValidationRequest validation = new ValidationRequest();
         validation.setValide(false);
@@ -148,7 +158,16 @@ class AthleteServiceTest {
 
     @Test
     void commissaire_validate_true_clears_motifRefus() {
-        fakeStore.put(11L, new Athlete(11L, "A", null, null, null, false, null, null));
+        fakeStore.put(11L, new Athlete(
+            11L,
+            "Dupont",
+            "Marie",
+            LocalDate.parse("2000-03-22"),
+            "Belgique",
+            false,
+            new AthleteDocs("certificat.pdf", "passport.pdf"),
+            null
+        ));
 
         ValidationRequest refuse = new ValidationRequest();
         refuse.setValide(false);
