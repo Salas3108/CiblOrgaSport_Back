@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +32,9 @@ public class EpreuveController {
     }
 
     @PostMapping
-    public Epreuve createEpreuve(@RequestBody Epreuve epreuve) {
-        return epreuveRepository.save(epreuve);
+    public ResponseEntity<Epreuve> createEpreuve(@RequestBody Epreuve epreuve) {
+        Epreuve saved = epreuveRepository.save(epreuve);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -43,19 +45,19 @@ public class EpreuveController {
     }
 
     @PutMapping("/{id}")
-    public Epreuve updateEpreuve(@PathVariable Long id, @RequestBody Epreuve epreuveDetails) {
-        Epreuve epreuve = epreuveRepository.findById(id).orElse(null);
-        if (epreuve != null) {
-            epreuve.setNom(epreuveDetails.getNom());
-            epreuve.setDescription(epreuveDetails.getDescription());
-            epreuve.setDate(epreuveDetails.getDate());
-            epreuve.setHeureDebut(epreuveDetails.getHeureDebut());
-            epreuve.setHeureFin(epreuveDetails.getHeureFin());
-            return epreuveRepository.save(epreuve);
-        }
-        return null;
+    public ResponseEntity<Epreuve> updateEpreuve(@PathVariable Long id, @RequestBody Epreuve epreuveDetails) {
+        return epreuveRepository.findById(id)
+                .map(existing -> {
+                    existing.setNom(epreuveDetails.getNom());
+                    existing.setDescription(epreuveDetails.getDescription());
+                    existing.setDate(epreuveDetails.getDate());
+                    existing.setHeureDebut(epreuveDetails.getHeureDebut());
+                    existing.setHeureFin(epreuveDetails.getHeureFin());
+                    Epreuve updated = epreuveRepository.save(existing);
+                    return ResponseEntity.ok(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
-
 
     @DeleteMapping("/{id}")
     public void deleteEpreuve(@PathVariable Long id) {

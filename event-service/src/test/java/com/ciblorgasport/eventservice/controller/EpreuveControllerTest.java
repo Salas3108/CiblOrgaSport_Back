@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,11 +57,12 @@ class EpreuveControllerTest {
         when(epreuveRepository.save(epreuve)).thenReturn(savedEpreuve);
 
         // Act
-        Epreuve result = epreuveController.createEpreuve(epreuve);
+        ResponseEntity<Epreuve> result = epreuveController.createEpreuve(epreuve);
 
         // Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
+        assertNotNull(result.getBody());
+        assertEquals(1L, result.getBody().getId());
         verify(epreuveRepository, times(1)).save(epreuve);
     }
 
@@ -74,11 +76,12 @@ class EpreuveControllerTest {
         when(epreuveRepository.findById(1L)).thenReturn(Optional.of(epreuve));
 
         // Act
-        Epreuve result = epreuveController.getEpreuveById(1L);
+        ResponseEntity<Epreuve> result = epreuveController.getEpreuveById(1L);
 
         // Assert
         assertNotNull(result);
-        assertEquals("Semi-finale", result.getNom());
+        assertNotNull(result.getBody());
+        assertEquals("Semi-finale", result.getBody().getNom());
         verify(epreuveRepository, times(1)).findById(1L);
     }
 
@@ -97,10 +100,11 @@ class EpreuveControllerTest {
         when(epreuveRepository.save(any(Epreuve.class))).thenReturn(existing);
 
         // Act
-        Epreuve result = epreuveController.updateEpreuve(1L, updateDetails);
+        ResponseEntity<Epreuve> result = epreuveController.updateEpreuve(1L, updateDetails);
 
         // Assert
         assertNotNull(result);
+        assertNotNull(result.getBody());
         verify(epreuveRepository, times(1)).save(any(Epreuve.class));
     }
 

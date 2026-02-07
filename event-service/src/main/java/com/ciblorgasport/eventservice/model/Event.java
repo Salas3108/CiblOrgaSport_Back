@@ -22,6 +22,7 @@ public class Event {
 
     private LocalDate dateDebut;
     private LocalDate dateFin;
+    private LocalDate date; // added field used by tests
 
     // Getters et setters
     public Long getId() { return id; }
@@ -42,7 +43,6 @@ public class Event {
 	public void setDateFin(LocalDate dateFin) {
 		this.dateFin = dateFin;
 	}
-    
-    
-
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 }
