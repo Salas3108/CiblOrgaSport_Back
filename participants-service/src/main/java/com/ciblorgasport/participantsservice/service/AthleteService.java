@@ -152,7 +152,9 @@ public class AthleteService {
         return athleteRepository.findById(userId).orElseGet(() -> {
             Athlete athlete = new Athlete();
             athlete.setId(userId);
-            athlete.setUsername(username);
+            if (username != null && !username.isBlank()) {
+                athlete.setUsername(username);
+            }
             athlete.setValide(false);
             athlete.setDocs(new AthleteDocs(null, null));
             athlete.setObservation(null);
