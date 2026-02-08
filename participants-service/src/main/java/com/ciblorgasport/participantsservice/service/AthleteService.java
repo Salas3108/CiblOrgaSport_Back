@@ -84,6 +84,7 @@ public class AthleteService {
 
     public Athlete validate(Long id, ValidationRequest request) {
         Athlete athlete = findByIdOrThrow(id);
+        enforceCompletenessBeforeValidation(athlete);
         athlete.setValide(request.isValide());
 
         // Si validé, on efface le motif de refus
@@ -101,6 +102,30 @@ public class AthleteService {
 
         store.addLog("COMMISSAIRE validate id=" + id + " => " + request.isValide());
         return athleteRepository.save(athlete);
+    }
+
+    private void enforceCompletenessBeforeValidation(Athlete athlete) {
+        if (athlete.getNom() == null || athlete.getNom().isBlank()) {
+            throw new IllegalArgumentException("nom est obligatoire pour valider");
+        }
+        if (athlete.getPrenom() == null || athlete.getPrenom().isBlank()) {
+            throw new IllegalArgumentException("prenom est obligatoire pour valider");
+        }
+        if (athlete.getDateNaissance() == null) {
+            throw new IllegalArgumentException("dateNaissance est obligatoire pour valider");
+        }
+        if (athlete.getPays() == null || athlete.getPays().isBlank()) {
+            throw new IllegalArgumentException("pays est obligatoire pour valider");
+        }
+        if (athlete.getDocs() == null) {
+            throw new IllegalArgumentException("documents sont obligatoires pour valider");
+        }
+        if (athlete.getDocs().getCertificatMedical() == null || athlete.getDocs().getCertificatMedical().isBlank()) {
+            throw new IllegalArgumentException("certificatMedical est obligatoire pour valider");
+        }
+        if (athlete.getDocs().getPassport() == null || athlete.getDocs().getPassport().isBlank()) {
+            throw new IllegalArgumentException("passport est obligatoire pour valider");
+        }
     }
 
     public Message createMessage(Long athleteId, String contenu) {
