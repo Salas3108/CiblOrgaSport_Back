@@ -30,8 +30,10 @@ public class EpreuveDTO {
     @NotNull
     private NiveauEpreuve niveauEpreuve;
 
-    // participant ids (athletes or teams)
-    private Set<Long> participantIds;
+    // remplacez :
+    // private Set<Long> participantIds;
+    // par :
+    private Long equipeId;
 
     // optional: when creating/updating in non-admin path you can specify competition id
     private Long competitionId;
@@ -65,8 +67,8 @@ public class EpreuveDTO {
     public NiveauEpreuve getNiveauEpreuve() { return niveauEpreuve; }
     public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
 
-    public Set<Long> getParticipantIds() { return participantIds; }
-    public void setParticipantIds(Set<Long> participantIds) { this.participantIds = participantIds; }
+    public Long getEquipeId() { return equipeId; }
+    public void setEquipeId(Long equipeId) { this.equipeId = equipeId; }
 
     public Long getCompetitionId() { return competitionId; }
     public void setCompetitionId(Long competitionId) { this.competitionId = competitionId; }

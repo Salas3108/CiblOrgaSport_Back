@@ -20,7 +20,7 @@ public class EpreuveMapper {
         dto.setTypeEpreuve(e.getTypeEpreuve());
         dto.setGenreEpreuve(e.getGenreEpreuve());
         dto.setNiveauEpreuve(e.getNiveauEpreuve());
-        dto.setParticipantIds(e.getParticipantIds() != null ? new HashSet<>(e.getParticipantIds()) : null);
+        dto.setEquipeId(e.getEquipeId());
         if (e.getCompetition() != null) dto.setCompetitionId(e.getCompetition().getId());
         dto.setAthleteIds(e.getAthleteIds());
         return dto;
@@ -38,7 +38,7 @@ public class EpreuveMapper {
         e.setTypeEpreuve(dto.getTypeEpreuve());
         e.setGenreEpreuve(dto.getGenreEpreuve());
         e.setNiveauEpreuve(dto.getNiveauEpreuve());
-        if (dto.getParticipantIds() != null) e.setParticipantIds(new HashSet<>(dto.getParticipantIds()));
+        e.setEquipeId(dto.getEquipeId());
         e.setAthleteIds(dto.getAthleteIds());
         return e;
     }
@@ -53,9 +53,8 @@ public class EpreuveMapper {
         entity.setTypeEpreuve(dto.getTypeEpreuve());
         entity.setGenreEpreuve(dto.getGenreEpreuve());
         entity.setNiveauEpreuve(dto.getNiveauEpreuve());
-        // only update participantIds if provided (do not erase on partial update)
-        if (dto.getParticipantIds() != null) {
-            entity.setParticipantIds(new HashSet<>(dto.getParticipantIds()));
+        if (dto.getEquipeId() != null) {
+            entity.setEquipeId(dto.getEquipeId());
         }
     }
 }

@@ -43,10 +43,8 @@ public class Epreuve {
     @Enumerated(EnumType.STRING)
     private NiveauEpreuve niveauEpreuve;
 
-    @ElementCollection
-    @CollectionTable(name = "epreuve_participants", joinColumns = @JoinColumn(name = "epreuve_id"))
-    @Column(name = "participant_id")
-    private Set<Long> participantIds = new HashSet<>();
+    @Column(name = "equipe_id")
+    private Long equipeId;
 
     // participants (IDs) -> permet d'ajouter des athlètes par leur id sans dépendre d'un entity Athlete
     @ElementCollection(fetch = FetchType.LAZY)
@@ -71,8 +69,10 @@ public class Epreuve {
     public void setGenreEpreuve(GenreEpreuve genreEpreuve) { this.genreEpreuve = genreEpreuve; }
     public NiveauEpreuve getNiveauEpreuve() { return niveauEpreuve; }
     public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
-    public Set<Long> getParticipantIds() { return participantIds; }
-    public void setParticipantIds(Set<Long> participantIds) { this.participantIds = participantIds; }
+    public Long getEquipeId() { return equipeId; }
+    public void setEquipeId(Long equipeId) { this.equipeId = equipeId; }
+    public Set<Long> getAthleteIds() { return athleteIds; }
+    public void setAthleteIds(Set<Long> athleteIds) { this.athleteIds = athleteIds; }
 	public LocalDate getDate() {
 		return date;
 	}
@@ -91,10 +91,4 @@ public class Epreuve {
 	public void setHeureFin(LocalTime heureFin) {
 		this.heureFin = heureFin;
 	}
-    public Set<Long> getAthleteIds() {
-        return athleteIds;
-    }
-    public void setAthleteIds(Set<Long> athleteIds) {
-        this.athleteIds = athleteIds;
-    }
 }
