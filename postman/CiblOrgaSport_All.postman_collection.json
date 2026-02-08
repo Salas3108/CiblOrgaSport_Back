@@ -533,6 +533,54 @@
               }
             }
           ]
+        },
+        {
+          "name": "Events - Create (Lieu not found -> 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Test Event\", \"lieuId\": 999999 }" },
+            "url": { "raw": "{{event_base}}/events", "host": ["{{event_base}}"], "path": ["events"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function(){ pm.response.to.have.status(400); });",
+                  "try { var json = pm.response.json(); pm.test('message mentions Lieu', function(){ pm.expect(json.message || '').to.include('Lieu not found'); }); } catch(e) {}
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Events - Create (Data integrity -> 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Duplicate Event Name\" }" },
+            "url": { "raw": "{{event_base}}/events", "host": ["{{event_base}}"], "path": ["events"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 409 or 400', function(){ pm.expect(pm.response.code).to.be.oneOf([409,400]); });",
+                  "try { var json = pm.response.json(); pm.test('message mentions data integrity', function(){ pm.expect((json.message||'').toLowerCase()).to.include('data integrity'); }); } catch(e) {}
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },
