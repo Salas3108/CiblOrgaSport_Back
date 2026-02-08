@@ -15,7 +15,6 @@ import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoReques
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
 import com.ciblorgasport.participantsservice.service.AthleteService;
 import com.ciblorgasport.participantsservice.security.JwtUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -37,21 +36,6 @@ public class AthleteController {
         this.athleteService = athleteService;
         this.athleteMapper = athleteMapper;
         this.jwtUtils = jwtUtils;
-    }
-
-    // ATHLETE : create profile for current authenticated user (idempotent)
-    @PostMapping("")
-    public ResponseEntity<?> createForCurrentUser(HttpServletRequest httpRequest) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username == null || username.isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "unauthenticated"));
-        }
-        Long tokenUserId = extractUserIdFromRequest(httpRequest);
-        if (tokenUserId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "missing userId in token"));
-        }
-        var athlete = athleteService.createIfMissingForUser(tokenUserId, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(athleteMapper.toDto(athlete));
     }
 
     // ATHLETE : post info
