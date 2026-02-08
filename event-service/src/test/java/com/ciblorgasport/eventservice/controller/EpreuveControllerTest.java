@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -197,6 +198,21 @@ class EpreuveControllerTest {
     }
 
     @Test
+    void addAthlete_ShouldReturnBadRequestWhenMissingAthleteId() {
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+            () -> epreuveController.addAthlete(1L, Collections.emptyMap()));
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+    }
+
+    @Test
+    void addAthlete_ShouldReturnNotFoundWhenEpreuveNotFound() {
+        when(epreuveRepository.findById(1L)).thenReturn(Optional.empty());
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+            () -> epreuveController.addAthlete(1L, Collections.singletonMap("athleteId", 5L)));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+
+    @Test
     void getAthletes_ShouldReturnSet() {
         // Arrange
         Epreuve e = new Epreuve();
@@ -212,5 +228,49 @@ class EpreuveControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody().contains(7L));
         verify(epreuveRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void isAthleteParticipating_WhenPresent() {
+        // Arrange
+        Epreuve e = new Epreuve();
+        e.setId(1L);
+        e.setAthleteIds(new HashSet<>(Collections.singletonList(5L)));
+
+        when(epreuveRepository.findById(1L)).thenReturn(Optional.of(e));
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> resp = epreuveController.isAthleteParticipating(1L, 5L);
+
+        // Assert
+        assertEquals(HttpStatus.OK, resp.getStatusCode());
+        assertNotNull(resp.getBody());
+        assertTrue(resp.getBody().get("participating"));
+        verify(epreuveRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void isAthleteParticipating_WhenNotPresent() {
+        // Arrange
+        Epreuve e = new Epreuve();
+        e.setId(1L);
+        e.setAthleteIds(new HashSet<>(Collections.singletonList(2L)));
+
+        when(epreuveRepository.findById(1L)).thenReturn(Optional.of(e));
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> resp = epreuveController.isAthleteParticipating(1L, 5L);
+
+        // Assert
+        assertEquals(HttpStatus.OK, resp.getStatusCode());
+        assertFalse(resp.getBody().get("participating"));
+    }
+
+    @Test
+    void isAthleteParticipating_EpreuveNotFound() {
+        when(epreuveRepository.findById(99L)).thenReturn(Optional.empty());
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+            () -> epreuveController.isAthleteParticipating(99L, 5L));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
 }

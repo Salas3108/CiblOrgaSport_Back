@@ -221,10 +221,49 @@
             "body": { "mode": "raw", "raw": "{ \"athleteId\": {{athlete_id}} }" },
             "url": { "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes", "host": ["{{event_base}}"], "path": ["epreuves","{{epreuve_id}}","athletes"] }
           },
-          "event": [{ "listen": "test", "script": { "exec": [
-            "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });",
-            "try { var json = pm.response.json(); if (json && json.athleteIds) { pm.environment.set('epreuve_participants_count', json.athleteIds.length); } } catch(e) {}"
-          ], "type": "text/javascript" } }]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  pm.test('Has athleteIds array', function(){ pm.expect(json).to.have.property('athleteIds'); pm.expect(Array.isArray(json.athleteIds)).to.be.true; });",
+                  "  var aid = String(pm.environment.get('athlete_id'));",
+                  "  var present = Array.isArray(json.athleteIds) && json.athleteIds.some(function(id){ return String(id) === aid; });",
+                  "  pm.test('athleteIds contains athlete_id', function(){ pm.expect(present).to.be.true; });",
+                  "  pm.environment.set('epreuve_participants_count', json.athleteIds.length);",
+                  "  pm.environment.set('expect_athlete_participating', 'true');",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Add Athlete (no auth -> 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"athleteId\": 2 }" },
+            "url": { "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes", "host": ["{{event_base}}"], "path": ["epreuves","{{epreuve_id}}","athletes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', function(){ pm.response.to.have.status(401); });",
+                  "try { var json = pm.response.json(); pm.test('Has message', function(){ pm.expect(json.message || '').to.not.be.empty; }); } catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Epreuves - Add Athletes (bulk)",
@@ -233,7 +272,27 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "{{jwt}}" }],
             "body": { "mode": "raw", "raw": "{ \"athleteIds\": [ {{athlete_id}}, 2 ] }" },
             "url": { "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes/bulk", "host": ["{{event_base}}"], "path": ["epreuves","{{epreuve_id}}","athletes","bulk"] }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  pm.test('Has athleteIds array', function(){ pm.expect(json).to.have.property('athleteIds'); pm.expect(Array.isArray(json.athleteIds)).to.be.true; });",
+                  "  var aid = String(pm.environment.get('athlete_id'));",
+                  "  var hasAid = json.athleteIds.some(function(id){ return String(id) === aid; });",
+                  "  var has2 = json.athleteIds.some(function(id){ return String(id) === '2'; });",
+                  "  pm.test('contains both ids', function(){ pm.expect(hasAid && has2).to.be.true; });",
+                  "  pm.environment.set('epreuve_participants_count', json.athleteIds.length);",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Epreuves - Get Participants",
@@ -242,10 +301,145 @@
             "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
             "url": { "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes", "host": ["{{event_base}}"], "path": ["epreuves","{{epreuve_id}}","athletes"] }
           },
-          "event": [{ "listen": "test", "script": { "exec": [
-            "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });",
-            "try { var json = pm.response.json(); pm.environment.set('epreuve_participants_count', Array.isArray(json) ? json.length : (Object.keys(json||{}).length)); } catch(e) {}"
-          ], "type": "text/javascript" } }]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  var arr = Array.isArray(json) ? json : (Array.isArray(json && json.athleteIds) ? json.athleteIds : (json ? Object.values(json) : []));",
+                  "  var aid = String(pm.environment.get('athlete_id'));",
+                  "  var present = arr.some(function(id){ return String(id) === aid || (id && id.id && String(id.id) === aid); });",
+                  "  pm.test('contains athlete_id', function(){ pm.expect(present).to.be.true; });",
+                  "  pm.environment.set('epreuve_participants_count', arr.length || (json && json.athleteIds && json.athleteIds.length) || 0);",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Check Athlete Participation",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes/{{athlete_id}}",
+              "host": ["{{event_base}}"],
+              "path": ["epreuves","{{epreuve_id}}","athletes","{{athlete_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  pm.test('Has participating boolean', function(){ pm.expect(json).to.have.property('participating'); pm.expect(json.participating).to.be.a('boolean'); });",
+                  "  var expectParticipating = pm.environment.get('expect_athlete_participating');",
+                  "  if (expectParticipating === 'true') { pm.test('participating is true', function(){ pm.expect(json.participating).to.be.true; }); }",
+                  "  pm.environment.set('epreuve_participating', json.participating);",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Add Athlete (missing athleteId -> 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes", "host": ["{{event_base}}"], "path": ["epreuves","{{epreuve_id}}","athletes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function(){ pm.response.to.have.status(400); });",
+                  "try { var json = pm.response.json(); pm.test('Has message mentioning athleteId', function(){ pm.expect(json.message || '').to.include('athleteId'); }); } catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Add Athlete (epreuve not found -> 404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"athleteId\": {{athlete_id}} }" },
+            "url": { "raw": "{{event_base}}/epreuves/999999/athletes", "host": ["{{event_base}}"], "path": ["epreuves","999999","athletes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function(){ pm.response.to.have.status(404); });",
+                  "try { var json = pm.response.json(); pm.test('Has message Epreuve not found', function(){ pm.expect(json.message || '').to.include('Epreuve not found'); }); } catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Get Participants (epreuve not found -> 404)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": { "raw": "{{event_base}}/epreuves/999999/athletes", "host": ["{{event_base}}"], "path": ["epreuves","999999","athletes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function(){ pm.response.to.have.status(404); });",
+                  "try { var json = pm.response.json(); pm.test('Has message Epreuve not found', function(){ pm.expect(json.message || '').to.include('Epreuve not found'); }); } catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Epreuves - Check Athlete Participation (epreuve not found -> 404)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": { "raw": "{{event_base}}/epreuves/999999/athletes/{{athlete_id}}", "host": ["{{event_base}}"], "path": ["epreuves","999999","athletes","{{athlete_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function(){ pm.response.to.have.status(404); });",
+                  "try { var json = pm.response.json(); pm.test('Has message Epreuve not found', function(){ pm.expect(json.message || '').to.include('Epreuve not found'); }); } catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Competitions - Create",
@@ -272,10 +466,23 @@
             "url": { "raw": "{{event_base}}/competitions/{{competition_id}}/epreuves", "host": ["{{event_base}}"], "path": ["competitions","{{competition_id}}","epreuves"] }
           },
           "event": [
-            { "listen": "test", "script": { "exec": [
-              "pm.test(\"Status 201\", function(){ pm.response.to.have.status(201); });",
-              "try { var json = pm.response.json(); if (json && json.id) { pm.environment.set('epreuve_id', json.id); } } catch(e) {}"
-            ], "type": "text/javascript" } }
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function(){ pm.response.to.have.status(201); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  pm.test('Response has id', function(){ pm.expect(json).to.have.property('id'); });",
+                  "  if (json && json.id) pm.environment.set('epreuve_id', json.id);",
+                  "  var compResp = json.competitionId || (json.competition && json.competition.id);",
+                  "  var compEnv = String(pm.environment.get('competition_id') || '');",
+                  "  if (compEnv) pm.test('competitionId matches', function(){ pm.expect(String(compResp)).to.equal(compEnv); });",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
           ]
         },
         {
@@ -285,7 +492,22 @@
             "header": [ { "key": "Authorization", "value": "{{jwt}}" } ],
             "url": { "raw": "{{event_base}}/competitions/{{competition_id}}/epreuves/{{epreuve_id}}", "host": ["{{event_base}}"], "path": ["competitions","{{competition_id}}","epreuves","{{epreuve_id}}"] }
           },
-          "event": [ { "listen": "test", "script": { "exec": [ "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });" ], "type": "text/javascript" } } ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  var compResp = json.competitionId || (json.competition && json.competition.id);",
+                  "  pm.test('competitionId set', function(){ pm.expect(String(compResp)).to.equal(String(pm.environment.get('competition_id'))); });",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Competitions - List Epreuves",
@@ -294,7 +516,23 @@
             "header": [ { "key": "Authorization", "value": "{{jwt}}" } ],
             "url": { "raw": "{{event_base}}/competitions/{{competition_id}}/epreuves", "host": ["{{event_base}}"], "path": ["competitions","{{competition_id}}","epreuves"] }
           },
-          "event": [ { "listen": "test", "script": { "exec": [ "pm.test(\"Status 200\", function(){ pm.response.to.have.status(200); });" ], "type": "text/javascript" } } ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function(){ pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var json = pm.response.json();",
+                  "  var eprId = String(pm.environment.get('epreuve_id') || '');",
+                  "  var found = Array.isArray(json) && json.some(function(item){ return String(item.id) === eprId; });",
+                  "  if (eprId) pm.test('contains epreuve_id', function(){ pm.expect(found).to.be.true; });",
+                  "} catch(e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },

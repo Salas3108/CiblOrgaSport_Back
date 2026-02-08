@@ -29,7 +29,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             System.out.println("🔍 JWT Token: " + (jwt != null ? "PRESENT" : "ABSENT"));
             
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            if (jwt == null || jwt.isBlank()) {
+                // mark missing token (useful for error message)
+                request.setAttribute("X-JWT-MISSING", "true");
+            } else if (!jwtUtils.validateJwtToken(jwt)) {
+                // invalid/expired token
+                request.setAttribute("X-JWT-INVALID", "true");
+            } else {
                 System.out.println("✅ JWT Valid!");
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
                 String role = jwtUtils.getRoleFromJwtToken(jwt);
@@ -58,10 +64,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     System.out.println("✅ Authentication set in SecurityContext!");
                 }
-            } else {
-                System.out.println("❌ JWT validation failed or absent");
             }
         } catch (Exception e) {
+            // expose a short error marker for diagnostics (avoid leaking sensitive info)
+            request.setAttribute("X-JWT-ERROR", e.getClass().getSimpleName());
             System.out.println("❌ Error in filter: " + e.getMessage());
             e.printStackTrace();
         }

@@ -27,7 +27,6 @@ import com.ciblorgasport.eventservice.validator.EpreuveValidator;
 
 @RestController
 @RequestMapping({"/epreuves", "/api/epreuves"})
-@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
 public class EpreuveController {
     @Autowired
     private EpreuveRepository epreuveRepository;
@@ -49,6 +48,7 @@ public class EpreuveController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<EpreuveDTO> createEpreuve(@Valid @RequestBody EpreuveDTO epreuveDto) {
         epreuveValidator.validate(epreuveDto);
         Epreuve entity = epreuveMapper.toEntity(epreuveDto);
@@ -63,77 +63,79 @@ public class EpreuveController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EpreuveDTO> getEpreuveById(@PathVariable Long id) {
-        return epreuveRepository.findById(id)
-            .map(epreuveMapper::toDto)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        return ResponseEntity.ok(epreuveMapper.toDto(e));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<EpreuveDTO> updateEpreuve(@PathVariable Long id, @Valid @RequestBody EpreuveDTO epreuveDetails) {
         epreuveValidator.validate(epreuveDetails);
-        return epreuveRepository.findById(id)
-            .map(existing -> {
-                epreuveMapper.updateEntityFromDto(existing, epreuveDetails);
-                if (epreuveDetails.getCompetitionId() != null) {
-                    Competition comp = competitionRepository.findById(epreuveDetails.getCompetitionId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
-                    existing.setCompetition(comp);
-                }
-                Epreuve updated = epreuveRepository.save(existing);
-                return ResponseEntity.ok(epreuveMapper.toDto(updated));
-            })
-            .orElse(ResponseEntity.notFound().build());
+        Epreuve existing = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        epreuveMapper.updateEntityFromDto(existing, epreuveDetails);
+        if (epreuveDetails.getCompetitionId() != null) {
+            Competition comp = competitionRepository.findById(epreuveDetails.getCompetitionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
+            existing.setCompetition(comp);
+        }
+        Epreuve updated = epreuveRepository.save(existing);
+        return ResponseEntity.ok(epreuveMapper.toDto(updated));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Void> deleteEpreuve(@PathVariable Long id) {
         if (!epreuveRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id);
         }
         epreuveRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/epreuves/{id}/athletes")
+    @PostMapping("/{id}/athletes")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<EpreuveDTO> addAthlete(@PathVariable Long id, @RequestBody Map<String, Long> payload) {
         Long athleteId = payload == null ? null : payload.get("athleteId");
         if (athleteId == null) {
-            return ResponseEntity.badRequest().build();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing required field 'athleteId'");
         }
-        Optional<Epreuve> opt = epreuveRepository.findById(id);
-        if (!opt.isPresent()) return ResponseEntity.notFound().build();
-
-        Epreuve e = opt.get();
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().add(athleteId);
-
         Epreuve saved = epreuveRepository.save(e);
         return ResponseEntity.ok(epreuveMapper.toDto(saved));
     }
 
-    @PostMapping("/epreuves/{id}/athletes/bulk")
+    @PostMapping("/{id}/athletes/bulk")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<EpreuveDTO> addAthletes(@PathVariable Long id, @RequestBody Map<String, List<Long>> payload) {
         List<Long> athleteIds = payload == null ? null : payload.get("athleteIds");
         if (athleteIds == null || athleteIds.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'athleteIds' must be provided and non-empty");
         }
-        Optional<Epreuve> opt = epreuveRepository.findById(id);
-        if (!opt.isPresent()) return ResponseEntity.notFound().build();
-
-        Epreuve e = opt.get();
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().addAll(athleteIds);
-
         Epreuve saved = epreuveRepository.save(e);
         return ResponseEntity.ok(epreuveMapper.toDto(saved));
     }
 
-    @GetMapping("/epreuves/{id}/athletes")
+    @GetMapping("/{id}/athletes")
     public ResponseEntity<Set<Long>> getAthletes(@PathVariable Long id) {
-        Optional<Epreuve> opt = epreuveRepository.findById(id);
-        if (!opt.isPresent()) return ResponseEntity.notFound().build();
-        Epreuve e = opt.get();
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         return ResponseEntity.ok(e.getAthleteIds() == null ? Collections.emptySet() : e.getAthleteIds());
+    }
+
+    @GetMapping("/{id}/athletes/{athleteId}")
+    public ResponseEntity<Map<String, Boolean>> isAthleteParticipating(@PathVariable Long id, @PathVariable Long athleteId) {
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        boolean participating = e.getAthleteIds() != null && e.getAthleteIds().contains(athleteId);
+        return ResponseEntity.ok(Collections.singletonMap("participating", participating));
     }
 }
