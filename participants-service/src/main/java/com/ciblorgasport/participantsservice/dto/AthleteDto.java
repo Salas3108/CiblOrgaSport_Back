@@ -20,6 +20,8 @@ public class AthleteDto {
     private AthleteDocsDto docs;
     private String observation;
 
+    private Long equipeId;
+
     // Champ utilisé quand un commissaire refuse/justifie (optionnel côté front)
     private String motifRefus;
 
@@ -88,6 +90,14 @@ public class AthleteDto {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public Long getEquipeId() {
+        return equipeId;
+    }
+
+    public void setEquipeId(Long equipeId) {
+        this.equipeId = equipeId;
     }
 
     public String getMotifRefus() {

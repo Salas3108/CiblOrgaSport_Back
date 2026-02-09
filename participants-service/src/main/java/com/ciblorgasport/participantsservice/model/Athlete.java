@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
@@ -36,6 +39,10 @@ public class Athlete {
     private AthleteDocs docs;
 
     private String observation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "equipe_id")
+    private Equipe equipe;
 
     // Champs supplémentaires utiles côté validation (commissaire)
     @Column(name = "motif_refus")
@@ -129,6 +136,14 @@ public class Athlete {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public Equipe getEquipe() {
+        return equipe;
+    }
+
+    public void setEquipe(Equipe equipe) {
+        this.equipe = equipe;
     }
 
     public String getMotifRefus() {

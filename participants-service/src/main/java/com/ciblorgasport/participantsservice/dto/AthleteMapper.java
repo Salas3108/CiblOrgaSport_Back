@@ -22,6 +22,7 @@ public class AthleteMapper {
         dto.setValide(athlete.isValide());
         dto.setObservation(athlete.getObservation());
         dto.setMotifRefus(athlete.getMotifRefus());
+        dto.setEquipeId(athlete.getEquipe() != null ? athlete.getEquipe().getId() : null);
 
         if (athlete.getDocs() != null) {
             dto.setDocs(new AthleteDocsDto(athlete.getDocs().getCertificatMedical(), athlete.getDocs().getPassport()));
