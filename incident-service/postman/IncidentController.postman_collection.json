@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "Incident Controller - Update Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const token = pm.environment.get('token');",
+          "if (token) {",
+          "  try {",
+          "    const parts = token.split('.');",
+          "    if (parts.length >= 2) {",
+          "      let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');",
+          "      while (base64.length % 4) base64 += '=';",
+          "      const payloadJson = atob(base64);",
+          "      const payload = JSON.parse(payloadJson);",
+          "      pm.environment.set('jwt_subject', payload.sub || payload.username || payload.user || payload.name || '');",
+          "      let roles = payload.roles || payload.role || payload.authorities || payload.scope || '';",
+          "      if (Array.isArray(roles)) roles = roles.join(',');",
+          "      pm.environment.set('jwt_roles', roles || '');",
+          "    } else { pm.environment.unset('jwt_subject'); pm.environment.unset('jwt_roles'); }",
+          "  } catch (e) { pm.environment.unset('jwt_subject'); pm.environment.unset('jwt_roles'); }",
+          "} else { pm.environment.unset('jwt_subject'); pm.environment.unset('jwt_roles'); }"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "POST /api/incidents/{{id}} (auth)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Incident modifié\",\n  \"description\": \"Mise à jour via POST\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"status\": \"ACTIF\"\n}"
+        },
+        "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Content-Type is JSON', function () { pm.expect((pm.response.headers.get('Content-Type')||'')).to.include('application/json'); });",
+              "const json = pm.response.json();",
+              "pm.test('Response has id', function () { pm.expect(json).to.have.property('id'); });",
+              "const subj = pm.environment.get('jwt_subject');",
+              "if (subj) { pm.test('reportedBy matches token subject', function () { pm.expect(json.reportedBy).to.eql(subj); }); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PUT /api/incidents/{{id}} (auth)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Incident modifié PUT\",\n  \"description\": \"Mise à jour via PUT\",\n  \"type\": \"ORGANISATION\",\n  \"impactLevel\": \"ELEVE\",\n  \"status\": \"ACTIF\"\n}"
+        },
+        "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Response has id', function () { pm.expect(json).to.have.property('id'); });",
+              "const subj = pm.environment.get('jwt_subject');",
+              "if (subj) { pm.test('reportedBy matches token subject', function () { pm.expect(json.reportedBy).to.eql(subj); }); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/incidents/{{id}} (no auth -> 401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"title\": \"Attempt no auth\" }"
+        },
+        "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+              "var json = {}; try { json = pm.response.json(); } catch(e) {}",
+              "pm.test('Error is Unauthorized', function () { pm.expect(json.error || '').to.eql('Unauthorized'); });",
+              "pm.test('Has message', function () { pm.expect(json.message || '').to.not.be.empty; });",
+              "pm.test('X-Debug header exists', function () { pm.expect(pm.response.headers.has('X-Debug-AuthHeader-Present')).to.be.true; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/incidents/{{id_not_found}} (not found -> 404)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"title\": \"Should 404\" }" },
+        "url": { "raw": "{{incident_base}}/api/incidents/{{id_not_found}}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404', function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/debug/attributes (auth)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{incident_base}}/api/debug/attributes" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has debug keys', function () { pm.expect(json).to.have.property('jwtInvalid'); pm.expect(json).to.have.property('jwtMissing'); pm.expect(json).to.have.property('jwtUsername'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

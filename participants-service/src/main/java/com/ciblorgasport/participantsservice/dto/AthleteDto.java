@@ -1,0 +1,100 @@
+package com.ciblorgasport.participantsservice.dto;
+
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * DTO Athlète : correspond au JSON attendu par le front.
+ */
+public class AthleteDto {
+    private Long id;
+    private String nom;
+    private String prenom;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate dateNaissance;
+
+    private String pays;
+    private boolean valide;
+    private AthleteDocsDto docs;
+    private String observation;
+
+    // Champ utilisé quand un commissaire refuse/justifie (optionnel côté front)
+    private String motifRefus;
+
+    public AthleteDto() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public LocalDate getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public void setDateNaissance(LocalDate dateNaissance) {
+        this.dateNaissance = dateNaissance;
+    }
+
+    public String getPays() {
+        return pays;
+    }
+
+    public void setPays(String pays) {
+        this.pays = pays;
+    }
+
+    public boolean isValide() {
+        return valide;
+    }
+
+    public void setValide(boolean valide) {
+        this.valide = valide;
+    }
+
+    public AthleteDocsDto getDocs() {
+        return docs;
+    }
+
+    public void setDocs(AthleteDocsDto docs) {
+        this.docs = docs;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
+    public String getMotifRefus() {
+        return motifRefus;
+    }
+
+    public void setMotifRefus(String motifRefus) {
+        this.motifRefus = motifRefus;
+    }
+}

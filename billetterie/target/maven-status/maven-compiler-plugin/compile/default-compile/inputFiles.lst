@@ -1,6 +1,0 @@
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/BilletterieApplication.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/controller/TicketController.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/model/Ticket.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/repository/TicketRepository.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/service/TicketService.java
-/Users/salimtitouche/CiblOrgaSport_Back/billetterie/src/main/java/com/ciblorgasport/billetterie/service/impl/TicketServiceImpl.java

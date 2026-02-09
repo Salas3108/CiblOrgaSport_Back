@@ -1,5 +1,7 @@
 package com.ciblorgasport.billetterie.service.impl;
 
+import com.ciblorgasport.billetterie.client.AuthServiceClient;
+import com.ciblorgasport.billetterie.client.EventServiceClient;
 import com.ciblorgasport.billetterie.model.Ticket;
 import com.ciblorgasport.billetterie.repository.TicketRepository;
 import com.ciblorgasport.billetterie.service.TicketService;
@@ -12,12 +14,18 @@ import java.util.Optional;
 @Service
 public class TicketServiceImpl implements TicketService {
 
-    @Autowired
-    private TicketRepository ticketRepository;
+    @Autowired TicketRepository ticketRepository;
+    @Autowired AuthServiceClient authServiceClient;
+    @Autowired EventServiceClient eventServiceClient;
 
     @Override
     public List<Ticket> findAll() {
         return ticketRepository.findAll();
+    }
+
+    @Override
+    public List<Ticket> findBySpectatorId(Long spectatorId) {
+        return ticketRepository.findBySpectatorId(spectatorId);
     }
 
     @Override
@@ -27,6 +35,16 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket create(Ticket ticket) {
+        // validate external references
+        if (ticket.getSpectatorId() != null) {
+            System.out.println("Comparing spectatorId with userId in auth-service");
+            boolean ok = authServiceClient.existsById(ticket.getSpectatorId());
+            if (!ok) throw new IllegalArgumentException("Spectator/User not found: " + ticket.getSpectatorId());
+        }
+        if (ticket.getEpreuveId() != null) {
+            boolean ok = eventServiceClient.existsById(ticket.getEpreuveId());
+            if (!ok) throw new IllegalArgumentException("Epreuve/Event not found: " + ticket.getEpreuveId());
+        }
         return ticketRepository.save(ticket);
     }
 

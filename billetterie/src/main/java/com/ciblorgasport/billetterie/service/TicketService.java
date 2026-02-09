@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface TicketService {
     List<Ticket> findAll();
+    List<Ticket> findBySpectatorId(Long spectatorId);
     Optional<Ticket> findById(Long id);
     Ticket create(Ticket ticket);
     Ticket update(Long id, Ticket ticket);
