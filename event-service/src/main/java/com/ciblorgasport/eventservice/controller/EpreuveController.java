@@ -138,4 +138,15 @@ public class EpreuveController {
         boolean participating = e.getAthleteIds() != null && e.getAthleteIds().contains(athleteId);
         return ResponseEntity.ok(Collections.singletonMap("participating", participating));
     }
+
+    @GetMapping("/athletes/{athleteId}")
+    public ResponseEntity<List<EpreuveDTO>> getEpreuvesForAthlete(@PathVariable Long athleteId) {
+        if (athleteId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing required athleteId");
+        }
+        List<EpreuveDTO> epreuves = epreuveRepository.findByAthleteIdsContains(athleteId).stream()
+            .map(epreuveMapper::toDto)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(epreuves);
+    }
 }

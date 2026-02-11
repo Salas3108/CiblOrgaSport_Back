@@ -231,6 +231,30 @@ class EpreuveControllerTest {
     }
 
     @Test
+    void getEpreuvesForAthlete_ShouldReturnList() {
+        Epreuve epreuve1 = new Epreuve();
+        epreuve1.setId(1L);
+        Epreuve epreuve2 = new Epreuve();
+        epreuve2.setId(2L);
+
+        EpreuveDTO dto1 = new EpreuveDTO();
+        dto1.setId(1L);
+        EpreuveDTO dto2 = new EpreuveDTO();
+        dto2.setId(2L);
+
+        when(epreuveRepository.findByAthleteIdsContains(5L)).thenReturn(Arrays.asList(epreuve1, epreuve2));
+        when(epreuveMapper.toDto(epreuve1)).thenReturn(dto1);
+        when(epreuveMapper.toDto(epreuve2)).thenReturn(dto2);
+
+        ResponseEntity<List<EpreuveDTO>> response = epreuveController.getEpreuvesForAthlete(5L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().size());
+        verify(epreuveRepository, times(1)).findByAthleteIdsContains(5L);
+    }
+
+    @Test
     void isAthleteParticipating_WhenPresent() {
         // Arrange
         Epreuve e = new Epreuve();
