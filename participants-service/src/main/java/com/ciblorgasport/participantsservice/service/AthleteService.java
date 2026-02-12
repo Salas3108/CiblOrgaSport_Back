@@ -38,9 +38,24 @@ public class AthleteService {
         return athleteRepository.findAll();
     }
 
+    public boolean existsById(Long id) {
+        return athleteRepository.existsById(id);
+    }
+
     public Athlete findByIdOrThrow(Long id) {
         return athleteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Athlète introuvable: " + id));
+    }
+
+    public Athlete updateUsernameIfMissing(Long id, String username) {
+        Athlete athlete = findByIdOrThrow(id);
+        if (athlete.getUsername() == null || athlete.getUsername().isBlank()) {
+            if (username != null && !username.isBlank()) {
+                athlete.setUsername(username);
+                return athleteRepository.save(athlete);
+            }
+        }
+        return athlete;
     }
 
     /**
@@ -149,7 +164,14 @@ public class AthleteService {
         if (userId == null) {
             throw new IllegalArgumentException("userId est obligatoire");
         }
-        return athleteRepository.findById(userId).orElseGet(() -> {
+        return athleteRepository.findById(userId).map(existing -> {
+            if ((existing.getUsername() == null || existing.getUsername().isBlank())
+                    && username != null && !username.isBlank()) {
+                existing.setUsername(username);
+                return athleteRepository.save(existing);
+            }
+            return existing;
+        }).orElseGet(() -> {
             Athlete athlete = new Athlete();
             athlete.setId(userId);
             if (username != null && !username.isBlank()) {

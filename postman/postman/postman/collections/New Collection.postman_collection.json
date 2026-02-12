@@ -1,0 +1,63 @@
+{
+  "info": {
+    "_postman_id": "499c8815-a24b-4bc5-8708-55a35f9601ea",
+    "name": "New Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "New Folder",
+      "item": [],
+      "id": "71f1c0f8-b714-492f-a586-43758568d9ce"
+    },
+    {
+      "name": "Upload Athlete Documents",
+      "id": "7e8427c0-61e5-456f-909d-6c9e0cea8d89",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Athlete",
+      "id": "5cf698f8-4d81-4f94-8af9-bbd009d67bf8",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MTUxNDQwMiwiZXhwIjoxNzYxNjAwODAyfQ.NKorbEElczdGXkLunPGEzWclR9zVWxRsZNkPnLbliNk",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\"passeport\", \"certificat_medical\"]\r\n\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/user/upload-documents",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "user",
+            "upload-documents"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

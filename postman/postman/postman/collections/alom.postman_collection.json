@@ -1,0 +1,54 @@
+{
+  "info": {
+    "_postman_id": "d1c25d83-7da2-42ce-878c-e4a997c18af0",
+    "name": "alom",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "registerbob",
+      "id": "7c76e2ac-2af1-4822-b493-cbc788c55b0e",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "registermaya",
+      "id": "80ba6290-1222-40f4-ae92-20f0412888e6",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "register lam",
+      "id": "5b234b11-4807-4ac1-a505-f1765211605c",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "channel join",
+      "id": "2a2afb01-3bf9-44ec-80ea-3ca665011ff8",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "private send",
+      "id": "50782d24-a671-43d0-9b6b-a62f18a85140",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
