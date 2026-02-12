@@ -6,15 +6,21 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.ciblorgasport.participantsservice.dto.AthleteMapper;
+import com.ciblorgasport.participantsservice.dto.CoequipierDto;
+import com.ciblorgasport.participantsservice.dto.EquipeDetailDto;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteDocsRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
 import com.ciblorgasport.participantsservice.dto.request.ValidationRequest;
 import com.ciblorgasport.participantsservice.model.Athlete;
 import com.ciblorgasport.participantsservice.model.AthleteDocs;
+import com.ciblorgasport.participantsservice.model.Equipe;
 import com.ciblorgasport.participantsservice.model.Message;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
 import com.ciblorgasport.participantsservice.repository.JpaMessageRepository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AthleteService {
@@ -56,6 +62,37 @@ public class AthleteService {
             }
         }
         return athlete;
+    }
+
+    @Transactional(readOnly = true)
+    public EquipeDetailDto getEquipeDetailForAthlete(Long athleteId) {
+        Athlete athlete = findByIdOrThrow(athleteId);
+        Equipe equipe = athlete.getEquipe();
+        if (equipe == null) {
+            return null;
+        }
+        EquipeDetailDto dto = new EquipeDetailDto();
+        dto.setId(equipe.getId());
+        dto.setNom(equipe.getNom());
+        dto.setPays(equipe.getPays());
+        List<CoequipierDto> members = new ArrayList<>();
+        String currentUsername = athlete.getUsername();
+        if (equipe.getAthletes() != null) {
+            for (Athlete member : equipe.getAthletes()) {
+                if (member.getId() != null && member.getId().equals(athleteId)) {
+                    continue;
+                }
+                if (currentUsername != null && !currentUsername.isBlank()
+                        && currentUsername.equalsIgnoreCase(member.getUsername())) {
+                    continue;
+                }
+                CoequipierDto coequipier = new CoequipierDto(member.getId(), member.getNom(), member.getPrenom(), member.getPays());
+                coequipier.setUsername(member.getUsername());
+                members.add(coequipier);
+            }
+        }
+        dto.setMembers(members);
+        return dto;
     }
 
     /**
