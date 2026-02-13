@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ciblorgasport.eventservice.model.Competition;
 import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.model.Event;
+import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.EventRepository;
+import com.ciblorgasport.eventservice.repository.LieuRepository;
 
 @RestController
 @RequestMapping("/admin/events")
@@ -27,12 +29,14 @@ public class AdminEventController {
     private final EventRepository eventRepo;
     private final CompetitionRepository competitionRepo;
     private final EpreuveRepository epreuveRepo;
+    private final LieuRepository lieuRepo;
 
     @Autowired
-    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo) {
+    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo, LieuRepository lieuRepo) {
         this.eventRepo = eventRepo;
         this.competitionRepo = competitionRepo;
         this.epreuveRepo = epreuveRepo;
+        this.lieuRepo = lieuRepo;
     }
 
     // EVENTS
@@ -64,6 +68,14 @@ public class AdminEventController {
     public Epreuve addEpreuve(@PathVariable Long competitionId, @RequestBody Epreuve epreuve) {
         Competition competition = competitionRepo.findById(competitionId).orElseThrow(() -> new RuntimeException("Competition not found"));
         epreuve.setCompetition(competition);
+        Long lieuId = epreuve.getLieuId();
+        if (lieuId == null && epreuve.getLieu() != null) {
+            lieuId = epreuve.getLieu().getId();
+        }
+        if (lieuId != null) {
+            Lieu lieu = lieuRepo.findById(lieuId).orElseThrow(() -> new RuntimeException("Lieu not found"));
+            epreuve.setLieu(lieu);
+        }
         return epreuveRepo.save(epreuve);
     }
 }

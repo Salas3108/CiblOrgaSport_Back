@@ -23,9 +23,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/internal/**").permitAll()
-                .anyRequest().authenticated()
-            )
+            	    .requestMatchers("/internal/**").permitAll()
+            	    .requestMatchers("/commissaire/epreuves/**", "/api/commissaire/epreuves/**").permitAll()
+            	    .requestMatchers("/epreuves/**").permitAll()   // 👈 AJOUTE CETTE LIGNE
+            	    .anyRequest().authenticated()
+            	)
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

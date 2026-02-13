@@ -2,6 +2,7 @@ package com.ciblorgasport.eventservice.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -41,23 +42,26 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // allow public read endpoints for events and epreuves
-                .requestMatchers("/epreuves/**").permitAll()
-                .requestMatchers("/events/**").permitAll()
-                // if a context path or gateway prefixes with /api
-                .requestMatchers("/api/epreuves/**").permitAll()
-                .requestMatchers("/api/events/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
-                .anyRequest().authenticated()
-            );
+            	    // public
+            	    .requestMatchers(HttpMethod.GET, "/api/epreuves/**").permitAll()
+            	    .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
+
+            	    // protégé
+            	    .requestMatchers(HttpMethod.POST, "/api/epreuves/**").hasRole("COMMISSAIRE")
+            	    .requestMatchers(HttpMethod.POST, "/api/events/**").hasRole("ADMIN")
+
+            	    .anyRequest().authenticated()
+            	);
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 }

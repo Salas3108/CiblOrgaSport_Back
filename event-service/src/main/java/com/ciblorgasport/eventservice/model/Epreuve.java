@@ -26,6 +26,8 @@ public class Epreuve {
     @ManyToOne
     @JoinColumn(name = "lieu_id")
     private Lieu lieu;
+    @Transient
+    private Long lieuId;
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,6 +39,8 @@ public class Epreuve {
     public void setCompetition(Competition competition) { this.competition = competition; }
     public Lieu getLieu() { return lieu; }
     public void setLieu(Lieu lieu) { this.lieu = lieu; }
+    public Long getLieuId() { return lieuId; }
+    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
 	public LocalDate getDate() {
 		return date;
 	}
