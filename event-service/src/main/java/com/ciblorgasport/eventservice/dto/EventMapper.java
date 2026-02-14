@@ -19,10 +19,9 @@ public class EventMapper {
         EventDTO dto = new EventDTO();
         dto.setId(event.getId());
         dto.setName(event.getName());
-        dto.setDateDebut(event.getDateDebut());
-        dto.setDateFin(event.getDateFin());
+        dto.setDate(event.getDate());
         Lieu lieu = event.getLieuPrincipal();
-        dto.setLieuPrincipalId(lieu != null ? lieu.getId() : null);
+        dto.setLieuId(lieu != null ? lieu.getId() : null);
         return dto;
     }
 
@@ -31,10 +30,9 @@ public class EventMapper {
         Event event = new Event();
         event.setId(dto.getId());
         event.setName(dto.getName());
-        event.setDateDebut(dto.getDateDebut());
-        event.setDateFin(dto.getDateFin());
-        if (dto.getLieuPrincipalId() != null) {
-            Optional<Lieu> opt = lieuRepository.findById(dto.getLieuPrincipalId());
+        event.setDate(dto.getDate());
+        if (dto.getLieuId() != null) {
+            Optional<Lieu> opt = lieuRepository.findById(dto.getLieuId());
             opt.ifPresent(event::setLieuPrincipal);
         } else {
             event.setLieuPrincipal(null);
@@ -45,10 +43,9 @@ public class EventMapper {
     public void updateEntityFromDto(Event event, EventDTO dto) {
         if (event == null || dto == null) return;
         event.setName(dto.getName());
-        event.setDateDebut(dto.getDateDebut());
-        event.setDateFin(dto.getDateFin());
-        if (dto.getLieuPrincipalId() != null) {
-            Optional<Lieu> opt = lieuRepository.findById(dto.getLieuPrincipalId());
+        event.setDate(dto.getDate());
+        if (dto.getLieuId() != null) {
+            Optional<Lieu> opt = lieuRepository.findById(dto.getLieuId());
             opt.ifPresent(event::setLieuPrincipal);
         } else {
             event.setLieuPrincipal(null);

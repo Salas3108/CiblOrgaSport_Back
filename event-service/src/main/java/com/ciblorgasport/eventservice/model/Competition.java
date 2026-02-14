@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.ciblorgasport.eventservice.model.enums.CompetitionType;
+
 @Entity
 public class Competition {
     @Id
@@ -21,6 +23,9 @@ public class Competition {
     @JoinColumn(name = "event_id")
     @JsonIgnoreProperties({"lieuPrincipal"}) // Inclut event avec id, name, date mais sans lieuPrincipal
     private Event event;
+
+    @Enumerated(EnumType.STRING)
+    private CompetitionType typeCompetition;
 
     // Getters et setters
     public Long getId() { return id; }
@@ -49,5 +54,7 @@ public class Competition {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+    public CompetitionType getTypeCompetition() { return typeCompetition; }
+    public void setTypeCompetition(CompetitionType typeCompetition) { this.typeCompetition = typeCompetition; }
     
 }

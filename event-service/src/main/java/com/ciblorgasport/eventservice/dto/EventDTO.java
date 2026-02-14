@@ -5,9 +5,9 @@ import java.time.LocalDate;
 public class EventDTO {
     private Long id;
     private String name;
-    private Long lieuPrincipalId;
-    private LocalDate dateDebut;
-    private LocalDate dateFin;
+    private LocalDate date;
+    private Long lieuId;
+    private String description;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -15,12 +15,12 @@ public class EventDTO {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Long getLieuPrincipalId() { return lieuPrincipalId; }
-    public void setLieuPrincipalId(Long lieuPrincipalId) { this.lieuPrincipalId = lieuPrincipalId; }
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 
-    public LocalDate getDateDebut() { return dateDebut; }
-    public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
+    public Long getLieuId() { return lieuId; }
+    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
 
-    public LocalDate getDateFin() { return dateFin; }
-    public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }
