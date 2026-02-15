@@ -17,6 +17,7 @@ import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.model.Event;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
+import com.ciblorgasport.eventservice.kafka.ResultatValideEventProducer;
 import com.ciblorgasport.eventservice.repository.EventRepository;
 
 @RestController
@@ -27,12 +28,14 @@ public class AdminEventController {
     private final EventRepository eventRepo;
     private final CompetitionRepository competitionRepo;
     private final EpreuveRepository epreuveRepo;
+    private final ResultatValideEventProducer resultatProducer;
 
     @Autowired
-    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo) {
+    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo, ResultatValideEventProducer resultatProducer) {
         this.eventRepo = eventRepo;
         this.competitionRepo = competitionRepo;
         this.epreuveRepo = epreuveRepo;
+        this.resultatProducer = resultatProducer;
     }
 
     // EVENTS
@@ -65,5 +68,29 @@ public class AdminEventController {
         Competition competition = competitionRepo.findById(competitionId).orElseThrow(() -> new RuntimeException("Competition not found"));
         epreuve.setCompetition(competition);
         return epreuveRepo.save(epreuve);
+    }
+
+    @PostMapping("/competitions/{competitionId}/epreuves/{epreuveId}/validate")
+    public void validateResult(@PathVariable Long competitionId, @PathVariable Long epreuveId, @RequestBody(required = false) java.util.Map<String, Object> payload) {
+        // minimal endpoint to allow publishing a ResultatValideEvent
+        Long validatedBy = null;
+        String message = "Résultat validé";
+        if (payload != null) {
+            Object v = payload.get("validatedBy");
+            if (v instanceof Number) validatedBy = ((Number) v).longValue();
+            Object m = payload.get("message");
+            if (m instanceof String) message = (String) m;
+        }
+        java.util.UUID competitionUuid = null;
+        // try to obtain competition uuid if competition entity has id mapping to UUID or just send null
+        try {
+            Competition comp = competitionRepo.findById(competitionId).orElse(null);
+            if (comp != null && comp.getId() != null) {
+                // competition id is Long in this model; forward as null in UUID field
+            }
+        } catch (Exception ignored) {}
+
+        // publish event
+        resultatProducer.publishResultat(competitionUuid, epreuveId, message, validatedBy);
     }
 }

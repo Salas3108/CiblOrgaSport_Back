@@ -1,5 +1,7 @@
 package com.ciblorgasport.incidentservice.service.impl;
 
+import com.ciblorgasport.incidentservice.kafka.NotificationEventProducer;
+import com.ciblorgasport.incidentservice.kafka.dto.IncidentEvent;
 import com.ciblorgasport.incidentservice.model.Incident;
 import com.ciblorgasport.incidentservice.model.IncidentStatus;
 import com.ciblorgasport.incidentservice.model.IncidentType;
@@ -8,6 +10,7 @@ import com.ciblorgasport.incidentservice.repository.IncidentRepository;
 import com.ciblorgasport.incidentservice.service.IncidentService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +20,12 @@ import java.util.stream.Collectors;
 public class IncidentServiceImpl implements IncidentService {
 
     private final IncidentRepository incidentRepository;
+    private final NotificationEventProducer notificationEventProducer;
 
-    public IncidentServiceImpl(IncidentRepository incidentRepository) {
+    public IncidentServiceImpl(IncidentRepository incidentRepository,
+                               NotificationEventProducer notificationEventProducer) {
         this.incidentRepository = incidentRepository;
+        this.notificationEventProducer = notificationEventProducer;
     }
 
     @Override
@@ -40,7 +46,18 @@ public class IncidentServiceImpl implements IncidentService {
         if (incident.getStatus() == null) {
             incident.setStatus(IncidentStatus.ACTIF);
         }
-        return incidentRepository.save(incident);
+        Incident saved = incidentRepository.save(incident);
+
+        IncidentEvent evt = new IncidentEvent();
+        evt.setIncidentId(saved.getId());
+        evt.setType(saved.getType() != null ? saved.getType().name() : null);
+        evt.setLocation(saved.getLocation());
+        evt.setImpactLevel(saved.getImpactLevel() != null ? saved.getImpactLevel().name() : null);
+        evt.setDescription(saved.getDescription());
+        evt.setCreatedAt(Instant.now());
+        notificationEventProducer.publishIncidentCreated(evt);
+
+        return saved;
     }
 
     @Override

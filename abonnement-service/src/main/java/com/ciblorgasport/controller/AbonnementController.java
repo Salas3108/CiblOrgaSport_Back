@@ -44,6 +44,23 @@ public class AbonnementController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/competition/{competitionId}/userIds")
+    public ResponseEntity<?> getSubscribersUserIds(@PathVariable UUID competitionId) {
+        List<Abonnement> abonnements = abonnementRepo.findByCompetitionId(competitionId);
+        List<Long> userIds = abonnements.stream().map(Abonnement::getUserId).toList();
+        return ResponseEntity.ok(userIds);
+    }
+
+    @GetMapping("/competition/{competitionId}/userIds")
+    public ResponseEntity<List<Long>> getSubscriberUserIds(@PathVariable UUID competitionId) {
+        List<Long> userIds = abonnementRepo.findByCompetitionId(competitionId)
+            .stream()
+            .map(Abonnement::getUserId)
+            .distinct()
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(userIds);
+    }
+
     @PostMapping("/subscribe")
     public ResponseEntity<?> sabonnerCompetition(@RequestParam Long userId, @RequestParam UUID competitionId) {
         if (abonnementRepo.existsByUserIdAndCompetitionId(userId, competitionId)) {

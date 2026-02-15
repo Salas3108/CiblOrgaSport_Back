@@ -31,10 +31,12 @@ public class IncidentController {
 
     private final IncidentService incidentService;
     private final IncidentMapper incidentMapper;
+    private final com.ciblorgasport.incidentservice.kafka.IncidentEventProducer incidentEventProducer;
 
-    public IncidentController(IncidentService incidentService, IncidentMapper incidentMapper) {
+    public IncidentController(IncidentService incidentService, IncidentMapper incidentMapper, com.ciblorgasport.incidentservice.kafka.IncidentEventProducer incidentEventProducer) {
         this.incidentService = incidentService;
         this.incidentMapper = incidentMapper;
+        this.incidentEventProducer = incidentEventProducer;
     }
 
     // Méthode utilitaire pour obtenir le username de manière sécurisée
@@ -75,6 +77,13 @@ public class IncidentController {
         if (incident.getReportedAt() == null) incident.setReportedAt(LocalDateTime.now());
         if (incident.getStatus() == null) incident.setStatus(IncidentStatus.ACTIF);
         Incident created = incidentService.create(incident);
+        // publish Kafka event
+        try {
+            incidentEventProducer.publishIncident(created);
+        } catch (Exception e) {
+            // log and continue
+            System.err.println("Failed to publish incident event: " + e.getMessage());
+        }
         return ResponseEntity.ok(incidentMapper.toDto(created));
     }
 
