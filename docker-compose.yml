@@ -65,6 +65,7 @@ services:
       echo "⏳ Waiting for Kafka to be ready...";
       cub kafka-ready -b kafka:29092 1 60;
       echo "✅ Creating topics (if not exists)...";
+      # Pour les tests Postman/integ, ces topics sont requis
       kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic resultats-topic --partitions 3 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic incidents-topic --partitions 3 --replication-factor 1;
       kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic programme-topic --partitions 3 --replication-factor 1;
@@ -106,5 +107,9 @@ networks:
 
 # After updating pom.xml and Dockerfile, run:
 # docker compose build billetterie && docker compose up -d billetterie
+
+# Tips:
+# - Démarrer Kafka pour les tests Postman: docker compose up -d zookeeper kafka kafka-init
+# - Les tests JUnit n'ont pas besoin de Kafka grâce aux mocks
 
 

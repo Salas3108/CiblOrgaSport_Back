@@ -1,0 +1,194 @@
+{
+  "info": {
+    "_postman_id": "2e0c6c7b-9fce-4c7b-9a15-ntf-postman-col",
+    "name": "Notifications Service - CiblOrgaSport",
+    "description": "Tests basiques pour le microservice notifications-service (health, liste, détail).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Ensure base variable exists",
+          "pm.variables.set('notifications_base', pm.environment.get('notifications_base') || 'http://localhost:8092');"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health – /actuator/health",
+      "id": "b7a1f8e2-2d06-49f5-9e7c-health-notifs",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{notifications_base}}/actuator/health",
+          "host": ["{{notifications_base}}"],
+          "path": ["actuator", "health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "let json = {}; try { json = pm.response.json(); } catch(e) {}",
+              "pm.test('Health is UP', function() { pm.expect(json.status).to.eql('UP'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications – List",
+      "id": "0f1160a7-2f26-4f7f-bb5a-list-notifs",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{notifications_base}}/api/notifications",
+          "host": ["{{notifications_base}}"],
+          "path": ["api", "notifications"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Response is array', function () { pm.expect(json).to.be.an('array'); });",
+              "if (Array.isArray(json) && json.length > 0) {",
+              "  const n = json[0];",
+              "  pm.test('Item has minimal fields', function () {",
+              "    pm.expect(n).to.have.property('id');",
+              "    pm.expect(n).to.have.property('type');",
+              "    pm.expect(n).to.have.property('message');",
+              "    pm.expect(n).to.have.property('targetType');",
+              "    pm.expect(n).to.have.property('createdAt');",
+              "  });",
+              "  pm.environment.set('notification_id', n.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications – Get by Id",
+      "id": "c0b2d8c3-0b37-4f4f-8d5d-get-notif",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{notifications_base}}/api/notifications/{{notification_id}}",
+          "host": ["{{notifications_base}}"],
+          "path": ["api", "notifications", "{{notification_id}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Has id', function () { pm.expect(json).to.have.property('id'); });",
+              "pm.test('Has core fields', function () {",
+              "  pm.expect(json).to.have.property('type');",
+              "  pm.expect(json).to.have.property('message');",
+              "  pm.expect(json).to.have.property('targetType');",
+              "  pm.expect(json).to.have.property('createdAt');",
+              "});",
+              "pm.test('Types are valid', function () {",
+              "  pm.expect(['RESULTAT','INCIDENT','PROGRAMME','SCHEDULE_UPDATE','EVENT_FLUX']).to.include(json.type);",
+              "  pm.expect(['USER','COMPETITION_SUBSCRIBERS','BROADCAST']).to.include(json.targetType);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications – Get by Id (Invalid UUID)",
+      "id": "f3e37f7c-9f77-4c9a-9d4b-invalid-uuid",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{notifications_base}}/api/notifications/not-a-uuid",
+          "host": ["{{notifications_base}}"],
+          "path": ["api", "notifications", "not-a-uuid"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400/422 for invalid UUID', function () {",
+              "  pm.expect([400, 422]).to.include(pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications – Get by Id (Not Found)",
+      "id": "7d1a19a4-1b72-4f2f-9ab9-not-found",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{notifications_base}}/api/notifications/00000000-0000-0000-0000-000000000000",
+          "host": ["{{notifications_base}}"],
+          "path": ["api", "notifications", "00000000-0000-0000-0000-000000000000"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404 when notification does not exist', function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "id": "b9e5f7a2-5f1e-4bc3-8c0d-var-notifs-base",
+      "key": "notifications_base",
+      "value": "http://localhost:8092",
+      "type": "string"
+    },
+    {
+      "id": "f1c7c98b-9c7a-4d1d-9a81-var-notif-id",
+      "key": "notification_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
