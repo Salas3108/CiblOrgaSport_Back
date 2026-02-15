@@ -650,7 +650,7 @@
               },
               "status": "Forbidden",
               "code": 403,
-              "_postman_previewlanguage": null,
+              "_postman_previewlanguage": "Text",
               "header": [
                 {
                   "key": "Vary",
@@ -963,50 +963,6 @@
               ],
               "path": [
                 "epreuves"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Epreuves – List by Athlete",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response is array\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an('array');",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "id": "c7db52b4-8c14-4dd1-8e0b-2a0a2a6ef2b9"
-              }
-            }
-          ],
-          "id": "c9d0f1e3-6a5b-4c11-9a1a-1c0d8c9f2a12",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "url": {
-              "raw": "{{event_base}}/epreuves/athletes/{{athlete_id}}",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "epreuves",
-                "athletes",
-                "{{athlete_id}}"
               ]
             }
           },
@@ -1363,6 +1319,291 @@
         }
       ],
       "id": "74d201a8-460b-44cf-9aaa-38d7dda0b478"
+    },
+    {
+      "name": "resultats-service",
+      "item": [
+        {
+          "name": "Create Resultat (COMMISSAIRE)/ athlete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8a3a6b33-6c9b-4e7b-a2d6-6c21f7a4b9a1",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('resultat_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "c9f24fa2-c849-44ff-b82f-a16684e96459",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "c8e2c690-3b4b-4b2e-bc6a-1a6d3f9d2a11",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classement\": 1,\n  \"medaille\": \"OR\",\n  \"qualification\": true,\n  \"valeurPrincipale\": \"47.21\",\n  \"unite\": \"secondes\",\n  \"detailsPerformance\": {\n    \"vent\": \"1.3\",\n    \"serie\": \"A\"\n  },\n  \"typePerformance\": \"TEMPS\",\n  \"athleteId\": {{athlete_id}},\n  \"epreuveId\": {{epreuve_id}}\n}"
+            },
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Resultat (COMMISSAIRE)/ equipe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8a3a6b33-6c9b-4e7b-a2d6-6c21f7a4b9a1",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('resultat_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "4bdc6a2a-7d3c-44ff-ba69-0c566cf8b7c4",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "e733c3e5-0394-4bc8-93d1-849eb10d2497",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classement\": 1,\n  \"medaille\": \"OR\",\n  \"qualification\": true,\n  \"valeurPrincipale\": \"47.21\",\n  \"unite\": \"secondes\",\n  \"detailsPerformance\": {\n    \"vent\": \"1.3\",\n    \"serie\": \"A\"\n  },\n  \"typePerformance\": \"TEMPS\",\n  \"equipeId\": {{equipe_id}},\n  \"epreuveId\": {{epreuve_id}}\n}"
+            },
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Resultat (COMMISSAIRE)",
+          "id": "4d2a1e3a-1f9a-4b6d-9f1f-27b1b1f8d2b8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/{{resultat_id}}/validation",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "{{resultat_id}}",
+                "validation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Resultat (COMMISSAIRE)",
+          "id": "a19a6e6d-6c9c-4b1b-88e8-59c2c7f2f11d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/{{resultat_id}}/publier",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "{{resultat_id}}",
+                "publier"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Classement Epreuve (COMMISSAIRE)",
+          "id": "b8d7c39c-8b0f-4df6-8f48-88c4d0a7c2e1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Classement Epreuve (PUBLIC)",
+          "id": "d61b8f0e-0a0e-4c8b-9d8d-4fdbf2b4f885",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultats Athlete (PUBLIC)",
+          "id": "e9d77b82-8617-4a65-8aef-4fb0df2a1d79",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/athletes/{{athlete_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "athletes",
+                "{{athlete_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultats Equipe (PUBLIC)",
+          "id": "f0fef2a1-1c5a-4d4a-9b8b-6b0b41c3f9a6",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/equipes/{{equipe_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "equipes",
+                "{{equipe_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "8e0b8c31-77d0-4b8b-b6aa-8f7d2f0ed3d3"
     },
     {
       "name": "billetterie",
@@ -1845,48 +2086,68 @@
   ],
   "variable": [
     {
-      "id": "773f8372-b2e9-4a6e-aaab-9768127c099d",
+      "id": "d57c79a7-9750-4236-8e71-0764dee04c32",
       "key": "api_base",
       "value": "http://localhost:3000"
     },
     {
-      "id": "2f14eb43-8b49-46bd-bbb3-c67fd7a7200a",
+      "id": "60a8d9f0-0286-4e7d-b239-050b264357e9",
       "key": "incident_base",
       "value": "http://localhost:8083"
     },
     {
-      "id": "e6bf3002-3421-45a1-b1f6-c4c3b0f5dcdd",
+      "id": "9953c71c-6fbc-4cb9-a1ee-86723c99619d",
       "key": "event_base",
       "value": "http://localhost:8084"
     },
     {
-      "id": "94593e48-782d-4f34-986d-e44a41bb1593",
+      "id": "2b8e9f5d-8e45-4c56-8b1f-7d7b5c2a1f2b",
+      "key": "resultats_base",
+      "value": "http://localhost:8088"
+    },
+    {
+      "id": "065213da-b6aa-4010-83c8-10aaa83823bd",
       "key": "auth_base",
       "value": "http://localhost:8080"
     },
     {
-      "id": "ae3e42dc-d376-4e16-a134-b636fd6cb26d",
+      "id": "80854244-2d80-411d-acf4-327806234df2",
       "key": "billetterie_base",
       "value": "http://localhost:8081"
     },
     {
-      "id": "eca8c7e8-91f9-4e5d-982f-60ed93bd7d03",
+      "id": "af19bdde-4624-4d2c-bcfa-a78d20bef82e",
       "key": "abonnement_base",
       "value": "http://localhost:8082"
     },
     {
-      "id": "c8f2a7de-10f3-4c0f-90f3-6f8e5f6b1f4b",
-      "key": "athlete_id",
-      "value": "1"
-    },
-    {
-      "id": "62a19990-6eed-4d7a-8921-288889b6217e",
+      "id": "9f3aea40-d8a6-4744-a3db-39d1cc09bbe0",
       "key": "jwt",
       "value": "Bearer {{token}}"
     },
     {
-      "id": "82ebab04-bd35-455f-9acf-ff227d303c74",
+      "id": "18a7639d-3963-4bb2-bd03-303c2cc9023d",
       "key": "token",
+      "value": ""
+    },
+    {
+      "id": "7ef7a1a2-6b9d-4a59-9f8a-3b7c7a5c8e11",
+      "key": "epreuve_id",
+      "value": "1"
+    },
+    {
+      "id": "9f4d2b3a-9a1d-4f6d-8f1a-1c2e3d4f5a6b",
+      "key": "athlete_id",
+      "value": "1"
+    },
+    {
+      "id": "6c5b4a3f-2e1d-4c9b-8a7e-1f2d3c4b5a6e",
+      "key": "equipe_id",
+      "value": "1"
+    },
+    {
+      "id": "5a4b3c2d-1e0f-4d9c-8b7a-6e5d4c3b2a1f",
+      "key": "resultat_id",
       "value": ""
     }
   ]

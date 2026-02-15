@@ -513,34 +513,34 @@
   ],
   "variable": [
     {
-      "id": "f24dfadb-0676-4379-a421-82d6e28aea98",
+      "id": "b6c8ac7f-466f-42de-a222-35f720341cfd",
       "key": "baseUrl",
       "value": "http://localhost:8087",
       "type": "string"
     },
     {
-      "id": "fa1e365f-8956-44fb-bc1c-e2e2c62f6a73",
+      "id": "dc33ff4d-1dc5-4e1b-9904-e16e45b9566f",
       "key": "athleteId",
       "value": "2",
       "type": "string",
       "description": "ID utilisateur/athlete utilisé pour les requêtes"
     },
     {
-      "id": "7cf7402f-690c-40e4-9be6-d72e9a2c4dbd",
+      "id": "588058d8-aed8-4613-82ff-ee4c145db896",
       "key": "athleteUsername",
       "value": "athlete123",
       "type": "string",
       "description": "Username de l'athlete a creer"
     },
     {
-      "id": "96132ee1-c165-4456-81e4-08f18f3188e6",
+      "id": "85359a76-3816-46cc-a0af-66c849630df7",
       "key": "equipeId",
       "value": "1",
       "type": "string",
       "description": "ID equipe utilisé pour les requêtes"
     },
     {
-      "id": "f1889481-3a29-4fdf-a7ed-7dec56455f18",
+      "id": "f248184b-4c5d-4abe-a70e-7c50b2e6faa6",
       "key": "token",
       "value": "",
       "type": "string",
