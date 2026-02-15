@@ -2,6 +2,9 @@ package com.ciblorgasport.eventservice.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +32,7 @@ public class AdminEventController {
     private final CompetitionRepository competitionRepo;
     private final EpreuveRepository epreuveRepo;
     private final ResultatValideEventProducer resultatProducer;
+    private static final Logger log = LoggerFactory.getLogger(AdminEventController.class);
 
     @Autowired
     public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo, ResultatValideEventProducer resultatProducer) {
@@ -72,7 +76,6 @@ public class AdminEventController {
 
     @PostMapping("/competitions/{competitionId}/epreuves/{epreuveId}/validate")
     public void validateResult(@PathVariable Long competitionId, @PathVariable Long epreuveId, @RequestBody(required = false) java.util.Map<String, Object> payload) {
-        // minimal endpoint to allow publishing a ResultatValideEvent
         Long validatedBy = null;
         String message = "Résultat validé";
         if (payload != null) {
@@ -81,16 +84,20 @@ public class AdminEventController {
             Object m = payload.get("message");
             if (m instanceof String) message = (String) m;
         }
-        java.util.UUID competitionUuid = null;
-        // try to obtain competition uuid if competition entity has id mapping to UUID or just send null
+
+        // Try to resolve a publish key based on competition
+        String publishKey = null;
         try {
             Competition comp = competitionRepo.findById(competitionId).orElse(null);
             if (comp != null && comp.getId() != null) {
-                // competition id is Long in this model; forward as null in UUID field
+                publishKey = comp.getId().toString();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.warn("Cannot resolve competition publish key for competitionId={}", competitionId, e);
+        }
 
-        // publish event
-        resultatProducer.publishResultat(competitionUuid, epreuveId, message, validatedBy);
+        log.info("Publishing resultat validation: competitionId={}, epreuveId={}, validatedBy={}, message={}", competitionId, epreuveId, validatedBy, message);
+        // publish (UUID payload field may be null; key ensures partitioning)
+        resultatProducer.publishResultat(null, epreuveId, message, validatedBy);
     }
 }

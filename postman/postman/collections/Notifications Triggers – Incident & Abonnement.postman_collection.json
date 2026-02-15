@@ -1,0 +1,172 @@
+{
+  "info": {
+    "_postman_id": "b2b6b8f1-ntf-triggers-collection",
+    "name": "Notifications Triggers – Incident & Abonnement",
+    "description": "Déclenche des notifications via incident-service (create/update) et abonnement-service (subscribe/unsubscribe), puis vérifie notifications-service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Defaults for bases if not set in environment",
+          "pm.variables.set('incident_base', pm.environment.get('incident_base') || 'http://localhost:8086');",
+          "pm.variables.set('abonnement_base', pm.environment.get('abonnement_base') || 'http://localhost:8085');",
+          "pm.variables.set('notifications_base', pm.environment.get('notifications_base') || 'http://localhost:8092');",
+          "// Common IDs",
+          "pm.variables.set('competition_id', pm.environment.get('competition_id') || '1');",
+          "pm.variables.set('subscriber_user_id', pm.environment.get('subscriber_user_id') || '1');"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Incident – Create (triggers notification)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Incident de test\",\n  \"description\": \"Créé via Postman pour déclencher notification\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"status\": \"ACTIF\",\n  \"location\": \"Zone A\"\n}"
+        },
+        "url": { "raw": "{{incident_base}}/api/incidents" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200/201', function () { pm.expect([200,201]).to.include(pm.response.code); });",
+              "let json = {}; try { json = pm.response.json(); } catch(e) {}",
+              "pm.test('Incident has id', function () { pm.expect(json).to.have.property('id'); });",
+              "pm.environment.set('last_incident_id', json.id || '');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Incident – Update (triggers notification)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Incident de test – MAJ\",\n  \"description\": \"MAJ via Postman\",\n  \"type\": \"ORGANISATION\",\n  \"impactLevel\": \"ELEVE\",\n  \"status\": \"ACTIF\"\n}"
+        },
+        "url": { "raw": "{{incident_base}}/api/incidents/{{last_incident_id}}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "let json = {}; try { json = pm.response.json(); } catch(e) {}",
+              "pm.test('Incident updated', function () { pm.expect(json).to.have.property('id'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Abonnement – Subscribe (triggers notification to subscribers)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": {{subscriber_user_id}},\n  \"competitionId\": {{competition_id}}\n}"
+        },
+        "url": { "raw": "{{abonnement_base}}/api/abonnements/subscribe" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200/201', function () { pm.expect([200,201]).to.include(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications – Verify recent (after triggers)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{notifications_base}}/api/notifications",
+          "host": ["{{notifications_base}}"],
+          "path": ["api", "notifications"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "const arr = pm.response.json();",
+              "pm.test('Is array', function () { pm.expect(arr).to.be.an('array'); });",
+              "if (Array.isArray(arr) && arr.length > 0) {",
+              "  const recent = arr[0];",
+              "  pm.test('Recent item has core fields', function () {",
+              "    pm.expect(recent).to.have.property('id');",
+              "    pm.expect(recent).to.have.property('type');",
+              "    pm.expect(recent).to.have.property('message');",
+              "  });",
+              "  pm.environment.set('notification_id', recent.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Abonnement – Unsubscribe (cleanup)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": {{subscriber_user_id}},\n  \"competitionId\": {{competition_id}}\n}"
+        },
+        "url": { "raw": "{{abonnement_base}}/api/abonnements/unsubscribe" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200/204', function () { pm.expect([200,204]).to.include(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

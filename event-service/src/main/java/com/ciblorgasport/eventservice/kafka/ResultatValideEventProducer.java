@@ -1,6 +1,8 @@
 package com.ciblorgasport.eventservice.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,8 @@ import java.util.UUID;
 
 @Component
 public class ResultatValideEventProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(ResultatValideEventProducer.class);
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -34,8 +38,11 @@ public class ResultatValideEventProducer {
             evt.setValidatedByUserId(validatedBy);
 
             String payload = objectMapper.writeValueAsString(evt);
-            kafkaTemplate.send(resultatsTopic, competitionId != null ? competitionId.toString() : "", payload);
+            String key = competitionId != null ? competitionId.toString() : (epreuveId != null ? epreuveId.toString() : "");
+            log.info("Kafka publish -> topic={}, key={}, payload={}", resultatsTopic, key, payload);
+            kafkaTemplate.send(resultatsTopic, key, payload);
         } catch (Exception e) {
+            log.error("Cannot publish resultat event to topic {}", resultatsTopic, e);
             throw new IllegalStateException("Cannot publish resultat event", e);
         }
     }

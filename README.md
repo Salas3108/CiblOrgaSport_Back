@@ -174,33 +174,6 @@ Endpoints testés:
 - GET /api/notifications
 - GET /api/notifications/{id}
 
-Variables Postman:
-- notifications_base: URL du service de notifications (ex: http://localhost:8092)
-- token: JWT optionnel (si une auth est activée) ; non requis pour ces endpoints publics
-
-Utilisation:
-1. Démarrer Kafka + topics (`docker compose up -d zookeeper kafka kafka-init`).
-2. Démarrer notifications-service (`./mvnw spring-boot:run` dans `notifications-service`).
-3. Importer l’environnement `postman/CiblOrgaSport.postman_environment.json`.
-4. Importer la collection `postman/postman/collections/Notifications Service - CiblOrgaSport.postman_collection.json`.
-5. (Optionnel) Mettre à jour la variable `token` dans l’environnement.
-6. Exécuter les requêtes; adapter l’ID si besoin via la variable `notification_id` (auto-renseignée après la liste).
-
-Remarques:
-- La requête “Notifications – Get by Id (Invalid UUID)” vérifie le cas d’erreur 400.
-- La requête “Notifications – Get by Id (Not Found)” vérifie le cas d’erreur 404 lorsque l’ID n’existe pas.
-- Les tests valident les champs essentiels: id, type, message, targetType, createdAt.
-
-### Notifications-service – Tests Postman
-Pré-requis:
-- Kafka et topics démarrés (`docker-compose.yml` crée `notifications-topic`)
-- notifications-service démarré (port 8092 par défaut)
-
-Endpoints testés:
-- GET /actuator/health
-- GET /api/notifications
-- GET /api/notifications/{id}
-
 Utilisation:
 1. Démarrer Kafka + topics (`docker compose up -d zookeeper kafka kafka-init`).
 2. Démarrer notifications-service.

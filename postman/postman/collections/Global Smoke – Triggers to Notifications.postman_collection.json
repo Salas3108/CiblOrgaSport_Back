@@ -1,0 +1,102 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-global-smoke",
+    "name": "Global Smoke – Triggers to Notifications",
+    "description": "Déclenche des événements (incidents, abonnements) et vérifie l'arrivée de notifications.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.variables.set('incident_base', pm.environment.get('incident_base') || 'http://localhost:8083');",
+          "pm.variables.set('abonnement_base', pm.environment.get('abonnement_base') || 'http://localhost:8082');",
+          "pm.variables.set('notifications_base', pm.environment.get('notifications_base') || 'http://localhost:8092');",
+          "pm.variables.set('competition_id', pm.environment.get('competition_id') || '1');",
+          "pm.variables.set('subscriber_user_id', pm.environment.get('subscriber_user_id') || '1');",
+          "pm.variables.set('jwt', pm.environment.get('jwt') || 'Bearer ' + (pm.environment.get('token') || ''))"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Incident – Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "{{jwt}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"title\": \"Incident Smoke\", \"description\": \"E2E\", \"type\": \"TECHNIQUE\", \"impactLevel\": \"MOYEN\", \"status\": \"ACTIF\" }" },
+        "url": { "raw": "{{incident_base}}/api/incidents", "host": ["{{incident_base}}"], "path": ["api","incidents"] }
+      },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('201/200', () => pm.expect([200,201]).to.include(pm.response.code));",
+          "let json = {}; try { json = pm.response.json(); } catch(e) {}",
+          "pm.environment.set('last_incident_id', json.id || '');"
+        ] } }
+      ]
+    },
+    {
+      "name": "Abonnement – Subscribe",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "{{jwt}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"userId\": {{subscriber_user_id}}, \"competitionId\": {{competition_id}} }" },
+        "url": { "raw": "{{abonnement_base}}/api/abonnements/subscribe", "host": ["{{abonnement_base}}"], "path": ["api","abonnements","subscribe"] }
+      },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('200/201', () => pm.expect([200,201]).to.include(pm.response.code));"
+        ] } }
+      ]
+    },
+    {
+      "name": "Notifications – List and pick recent",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": { "raw": "{{notifications_base}}/api/notifications", "host": ["{{notifications_base}}"], "path": ["api","notifications"] }
+      },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('200', () => pm.response.to.have.status(200));",
+          "const arr = pm.response.json();",
+          "pm.test('Array', () => pm.expect(arr).to.be.an('array'));",
+          "if (Array.isArray(arr) && arr.length) {",
+          "  pm.environment.set('notification_id', arr[0].id);",
+          "  pm.test('Has id/type/message', () => {",
+          "    pm.expect(arr[0]).to.have.property('id');",
+          "    pm.expect(arr[0]).to.have.property('type');",
+          "    pm.expect(arr[0]).to.have.property('message');",
+          "  });",
+          "}"
+        ] } }
+      ]
+    },
+    {
+      "name": "Abonnement – Unsubscribe",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "{{jwt}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"userId\": {{subscriber_user_id}}, \"competitionId\": {{competition_id}} }" },
+        "url": { "raw": "{{abonnement_base}}/api/abonnements/unsubscribe", "host": ["{{abonnement_base}}"], "path": ["api","abonnements","unsubscribe"] }
+      },
+      "event": [
+        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+          "pm.test('200/204', () => pm.expect([200,204]).to.include(pm.response.code));"
+        ] } }
+      ]
+    }
+  ]
+}

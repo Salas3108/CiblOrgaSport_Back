@@ -106,6 +106,31 @@ class EpreuveControllerTest {
     }
 
     @Test
+    void createEpreuve_ShouldCallValidatorAndPersist() {
+        EpreuveDTO dto = new EpreuveDTO();
+        dto.setNom("Finale 100m");
+        Epreuve entity = new Epreuve();
+        entity.setNom("Finale 100m");
+        Epreuve saved = new Epreuve();
+        saved.setId(10L);
+        saved.setNom("Finale 100m");
+        EpreuveDTO savedDto = new EpreuveDTO();
+        savedDto.setId(10L);
+        savedDto.setNom("Finale 100m");
+
+        when(epreuveMapper.toEntity(dto)).thenReturn(entity);
+        when(epreuveRepository.save(entity)).thenReturn(saved);
+        when(epreuveMapper.toDto(saved)).thenReturn(savedDto);
+
+        ResponseEntity<EpreuveDTO> res = epreuveController.createEpreuve(dto);
+
+        assertEquals(HttpStatus.CREATED, res.getStatusCode());
+        assertEquals(10L, res.getBody().getId());
+        verify(epreuveValidator, times(1)).validate(dto);
+        verify(epreuveRepository, times(1)).save(entity);
+    }
+
+    @Test
     void getEpreuveById_WhenExists() {
         // Arrange
         Epreuve epreuve = new Epreuve();
