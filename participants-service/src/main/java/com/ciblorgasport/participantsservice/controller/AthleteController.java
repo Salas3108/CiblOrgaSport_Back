@@ -13,9 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ciblorgasport.participantsservice.dto.AthleteMapper;
-import com.ciblorgasport.participantsservice.dto.EquipeDetailDto;
+import com.ciblorgasport.participantsservice.dto.EquipeDto;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteDocsRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
@@ -53,7 +54,8 @@ public class AthleteController {
     public ResponseEntity<?> postInfo(@PathVariable Long id, @RequestBody UpdateAthleteInfoRequest request, HttpServletRequest httpRequest) {
         Long tokenUserId = extractUserIdFromRequest(httpRequest);
         if (tokenUserId == null || !tokenUserId.equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "forbidden: token user id does not match path id"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "forbidden: token user id does not match path id"));
         }
         return ResponseEntity.ok(athleteMapper.toDto(athleteService.updateInfo(id, request)));
     }
@@ -63,7 +65,8 @@ public class AthleteController {
     public ResponseEntity<?> postDoc(@PathVariable Long id, @RequestBody UpdateAthleteDocsRequest request, HttpServletRequest httpRequest) {
         Long tokenUserId = extractUserIdFromRequest(httpRequest);
         if (tokenUserId == null || !tokenUserId.equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "forbidden: token user id does not match path id"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "forbidden: token user id does not match path id"));
         }
         return ResponseEntity.ok(athleteMapper.toDto(athleteService.updateDocs(id, request)));
     }
@@ -73,7 +76,8 @@ public class AthleteController {
     public ResponseEntity<?> postRemarque(@PathVariable Long id, @RequestBody UpdateAthleteObservationRequest request, HttpServletRequest httpRequest) {
         Long tokenUserId = extractUserIdFromRequest(httpRequest);
         if (tokenUserId == null || !tokenUserId.equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "forbidden: token user id does not match path id"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "forbidden: token user id does not match path id"));
         }
         return ResponseEntity.ok(athleteMapper.toDto(athleteService.updateObservation(id, request)));
     }
@@ -83,23 +87,40 @@ public class AthleteController {
     public ResponseEntity<?> getEquipe(@PathVariable Long id, HttpServletRequest httpRequest) {
         Long tokenUserId = extractUserIdFromRequest(httpRequest);
         if (tokenUserId == null || !tokenUserId.equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "forbidden: token user id does not match path id"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "forbidden: token user id does not match path id"));
         }
-        EquipeDetailDto equipe = athleteService.getEquipeDetailForAthlete(id);
+
+        // Récupère l'équipe avec le nouveau DTO
+        EquipeDto equipe = athleteService.getEquipeForAthlete(id);
         if (equipe == null) {
-            return ResponseEntity.ok(Map.of("id", null, "nom", null, "members", List.of()));
+            return ResponseEntity.ok(Map.of(
+                    "id", null,
+                    "nom", null,
+                    "pays", null,
+                    "athleteIdUsernameMap", Map.of()
+            ));
         }
-        if (equipe.getMembers() != null) {
-            for (var member : equipe.getMembers()) {
-                if (member.getUsername() == null || member.getUsername().isBlank()) {
-                    String username = fetchUsernameFromAuth(member.getId());
-                    if (username != null && !username.isBlank()) {
-                        athleteService.updateUsernameIfMissing(member.getId(), username);
-                        member.setUsername(username);
-                    }
-                }
-            }
-        }
+
+        // Vérifie et complète les usernames manquants depuis auth-service
+        Map<Long, String> updatedMap = equipe.getAthleteIdUsernameMap().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            String username = entry.getValue();
+                            if (username == null || username.isBlank()) {
+                                username = fetchUsernameFromAuth(entry.getKey());
+                                if (username != null && !username.isBlank()) {
+                                    athleteService.updateUsernameIfMissing(entry.getKey(), username);
+                                } else {
+                                    username = "";
+                                }
+                            }
+                            return username;
+                        }
+                ));
+        equipe.setAthleteIdUsernameMap(updatedMap);
+
         return ResponseEntity.ok(equipe);
     }
 

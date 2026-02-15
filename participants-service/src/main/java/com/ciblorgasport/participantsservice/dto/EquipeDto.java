@@ -1,16 +1,18 @@
 package com.ciblorgasport.participantsservice.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * DTO Equipe.
+ * DTO Equipe avec username des athlètes inclus.
  */
 public class EquipeDto {
     private Long id;
     private String nom;
     private String pays;
-    private List<Long> athleteIds = new ArrayList<>();
+
+    // Map des IDs vers usernames
+    private Map<Long, String> athleteIdUsernameMap = new HashMap<>();
 
     public EquipeDto() {
     }
@@ -39,11 +41,11 @@ public class EquipeDto {
         this.pays = pays;
     }
 
-    public List<Long> getAthleteIds() {
-        return athleteIds;
+    public Map<Long, String> getAthleteIdUsernameMap() {
+        return athleteIdUsernameMap;
     }
 
-    public void setAthleteIds(List<Long> athleteIds) {
-        this.athleteIds = athleteIds;
+    public void setAthleteIdUsernameMap(Map<Long, String> athleteIdUsernameMap) {
+        this.athleteIdUsernameMap = athleteIdUsernameMap;
     }
 }

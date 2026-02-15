@@ -2,12 +2,13 @@ package com.ciblorgasport.participantsservice.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ciblorgasport.participantsservice.dto.AthleteMapper;
-import com.ciblorgasport.participantsservice.dto.CoequipierDto;
-import com.ciblorgasport.participantsservice.dto.EquipeDetailDto;
+import com.ciblorgasport.participantsservice.dto.EquipeDto;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteDocsRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
@@ -65,33 +66,28 @@ public class AthleteService {
     }
 
     @Transactional(readOnly = true)
-    public EquipeDetailDto getEquipeDetailForAthlete(Long athleteId) {
+    public EquipeDto getEquipeForAthlete(Long athleteId) {
         Athlete athlete = findByIdOrThrow(athleteId);
         Equipe equipe = athlete.getEquipe();
         if (equipe == null) {
             return null;
         }
-        EquipeDetailDto dto = new EquipeDetailDto();
+
+        EquipeDto dto = new EquipeDto();
         dto.setId(equipe.getId());
         dto.setNom(equipe.getNom());
         dto.setPays(equipe.getPays());
-        List<CoequipierDto> members = new ArrayList<>();
-        String currentUsername = athlete.getUsername();
+
         if (equipe.getAthletes() != null) {
-            for (Athlete member : equipe.getAthletes()) {
-                if (member.getId() != null && member.getId().equals(athleteId)) {
-                    continue;
-                }
-                if (currentUsername != null && !currentUsername.isBlank()
-                        && currentUsername.equalsIgnoreCase(member.getUsername())) {
-                    continue;
-                }
-                CoequipierDto coequipier = new CoequipierDto(member.getId(), member.getNom(), member.getPrenom(), member.getPays());
-                coequipier.setUsername(member.getUsername());
-                members.add(coequipier);
-            }
+            Map<Long, String> idUsernameMap = equipe.getAthletes().stream()
+                    .filter(a -> !a.getId().equals(athleteId)) // exclut l'athlète courant si nécessaire
+                    .collect(Collectors.toMap(
+                            Athlete::getId,
+                            a -> a.getUsername() != null ? a.getUsername() : ""
+                    ));
+            dto.setAthleteIdUsernameMap(idUsernameMap);
         }
-        dto.setMembers(members);
+
         return dto;
     }
 
