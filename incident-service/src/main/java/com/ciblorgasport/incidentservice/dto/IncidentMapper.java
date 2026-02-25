@@ -16,6 +16,7 @@ public class IncidentMapper {
         dto.setImpactLevel(i.getImpactLevel());
         dto.setType(i.getType());
         dto.setLocation(i.getLocation());
+        dto.setCompetitionId(i.getCompetitionId());
         dto.setStatus(i.getStatus());
         dto.setReportedBy(i.getReportedBy());
         dto.setReportedAt(i.getReportedAt());
@@ -32,6 +33,7 @@ public class IncidentMapper {
         i.setImpactLevel(dto.getImpactLevel());
         i.setType(dto.getType());
         i.setLocation(dto.getLocation());
+        i.setCompetitionId(dto.getCompetitionId());
         i.setStatus(dto.getStatus());
         i.setReportedBy(dto.getReportedBy());
         i.setReportedAt(dto.getReportedAt());
