@@ -1,13 +1,13 @@
 package com.ciblorgasport.notificationsservice.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -43,6 +43,9 @@ public class Notification {
 
     @Column(name = "source_event_id")
     private String sourceEventId;
+
+    @Column(name = "lu", nullable = false)
+    private boolean lu = false;
 
     public Long getIdNotification() {
         return idNotification;
@@ -98,5 +101,13 @@ public class Notification {
 
     public void setSourceEventId(String sourceEventId) {
         this.sourceEventId = sourceEventId;
+    }
+
+    public boolean isLu() {
+        return lu;
+    }
+
+    public void setLu(boolean lu) {
+        this.lu = lu;
     }
 }

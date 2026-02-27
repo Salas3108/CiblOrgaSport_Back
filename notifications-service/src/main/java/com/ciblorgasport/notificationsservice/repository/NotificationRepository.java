@@ -15,4 +15,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 			@Param("sourceEventId") String sourceEventId,
 			@Param("recipientIds") List<Long> recipientIds
 	);
+
+	List<Notification> findByIdSpectateurOrderByDateEnvoiDesc(Long idSpectateur);
+
+	List<Notification> findByIdSpectateurAndLuFalseOrderByDateEnvoiDesc(Long idSpectateur);
+
+	long countByIdSpectateurAndLuFalse(Long idSpectateur);
 }

@@ -32,10 +32,11 @@ public class KafkaConsumerConfig {
             KafkaProperties kafkaProperties
     ) {
         Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties(null));
+        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, IncidentCreatedEventV1.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ciblorgasport.notificationsservice.kafka.event");
 
-        JsonDeserializer<IncidentCreatedEventV1> valueDeserializer = new JsonDeserializer<>(IncidentCreatedEventV1.class);
-        valueDeserializer.addTrustedPackages("com.ciblorgasport.notificationsservice.kafka.event");
-        valueDeserializer.setUseTypeHeaders(false);
+        JsonDeserializer<IncidentCreatedEventV1> valueDeserializer = new JsonDeserializer<>();
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
     }
@@ -62,7 +63,7 @@ public class KafkaConsumerConfig {
     public DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<Object, Object> kafkaTemplate) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
                 kafkaTemplate,
-            (record, ex) -> new TopicPartition(KafkaTopics.INCIDENT_DLQ_TOPIC, record.partition())
+                (record, ex) -> new TopicPartition(KafkaTopics.INCIDENT_DLQ_TOPIC, record.partition())
         );
 
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));

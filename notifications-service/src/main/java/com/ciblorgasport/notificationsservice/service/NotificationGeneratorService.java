@@ -1,11 +1,13 @@
 package com.ciblorgasport.notificationsservice.service;
 
+import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
 import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
 import com.ciblorgasport.notificationsservice.model.Notification;
 import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
 import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +24,14 @@ public class NotificationGeneratorService {
 
     private final AbonnementRepository abonnementRepository;
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public NotificationGeneratorService(AbonnementRepository abonnementRepository, NotificationRepository notificationRepository) {
+    public NotificationGeneratorService(AbonnementRepository abonnementRepository,
+                                        NotificationRepository notificationRepository,
+                                        SimpMessagingTemplate messagingTemplate) {
         this.abonnementRepository = abonnementRepository;
         this.notificationRepository = notificationRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Transactional
@@ -87,6 +93,15 @@ public class NotificationGeneratorService {
         }).collect(Collectors.toList());
 
         notificationRepository.saveAll(notifications);
+
+        // Push temps réel via WebSocket : chaque spectateur reçoit sa notification
+        // sur son topic personnel /topic/notifications/{spectateurId}
+        notifications.forEach(saved ->
+                messagingTemplate.convertAndSend(
+                        "/topic/notifications/" + saved.getIdSpectateur(),
+                        NotificationDTO.from(saved)
+                )
+        );
     }
 
     private String resolveSourceEventId(IncidentCreatedEventV1 event) {
