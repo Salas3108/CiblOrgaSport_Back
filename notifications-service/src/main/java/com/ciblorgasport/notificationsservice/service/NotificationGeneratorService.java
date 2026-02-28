@@ -1,21 +1,24 @@
 package com.ciblorgasport.notificationsservice.service;
 
-import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
-import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
-import com.ciblorgasport.notificationsservice.model.Notification;
-import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
-import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
+import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
+import com.ciblorgasport.notificationsservice.model.Notification;
+import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
+import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
 
 @Service
 public class NotificationGeneratorService {
@@ -92,16 +95,24 @@ public class NotificationGeneratorService {
             return notification;
         }).collect(Collectors.toList());
 
-        notificationRepository.saveAll(notifications);
+        List<Notification> saved = notificationRepository.saveAll(notifications);
+        log.debug("Persisted {} notification(s) for sourceEventId={}", saved.size(), sourceEventId);
 
-        // Push temps réel via WebSocket : chaque spectateur reçoit sa notification
-        // sur son topic personnel /topic/notifications/{spectateurId}
-        notifications.forEach(saved ->
-                messagingTemplate.convertAndSend(
-                        "/topic/notifications/" + saved.getIdSpectateur(),
-                        NotificationDTO.from(saved)
-                )
-        );
+        // Push WebSocket APRÈS le commit de la transaction
+        // (évite d'envoyer si la transaction rollback)
+        List<NotificationDTO> dtos = saved.stream().map(NotificationDTO::from).toList();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                dtos.forEach(dto -> {
+                    log.debug("WS push → /topic/notifications/{} notifId={}", dto.getIdSpectateur(), dto.getId());
+                    messagingTemplate.convertAndSend(
+                            "/topic/notifications/" + dto.getIdSpectateur(),
+                            dto
+                    );
+                });
+            }
+        });
     }
 
     private String resolveSourceEventId(IncidentCreatedEventV1 event) {
