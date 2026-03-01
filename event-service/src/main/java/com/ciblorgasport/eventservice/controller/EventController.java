@@ -71,6 +71,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteEvent(@PathVariable Long id) {
         eventRepository.deleteById(id);
     }

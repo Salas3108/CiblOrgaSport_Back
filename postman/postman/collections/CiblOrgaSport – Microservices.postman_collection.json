@@ -889,6 +889,7 @@
                   "});",
                   "",
                   "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
                   "pm.test(\"La réponse est un tableau\", function () {",
                   "    pm.expect(jsonData).to.be.an('array');",
                   "});",
@@ -936,6 +937,7 @@
             {
               "listen": "test",
               "script": {
+                "id": "af3aaedf-e9cd-485d-8ec6-fb6585f57000",
                 "exec": [
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -955,7 +957,20 @@
                   "}"
                 ],
                 "type": "text/javascript",
-                "id": "af3aaedf-e9cd-485d-8ec6-fb6585f57000"
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "0d0b5638-28fa-4ca1-b3be-816a191e8308",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -974,7 +989,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Championnat National d'Athlétisme\",\n  \"dateDebut\": \"2025-06-15\",\n  \"dateFin\": \"2025-06-20\",\n  \"description\": \"Championnat national d'athlétisme 2025\",\n  \"paysHote\": \"France\"\n}"
+              "raw": "{\n  \"name\": \"Championnat National de Natation\",\n  \"dateDebut\": \"2026-03-15\",\n  \"dateFin\": \"2026-06-20\",\n  \"description\": \"xx\",\n  \"paysHote\": \"France\"\n}"
             },
             "url": {
               "raw": "{{event_base}}/events",
@@ -1044,6 +1059,37 @@
         },
         {
           "name": "Competitions – List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
+                  "pm.test(\"La réponse est un tableau\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.test(\"La competition contient la nouvelle structure\", function () {",
+                  "        const competition = jsonData[0];",
+                  "        pm.expect(competition).to.have.property('id');",
+                  "        pm.expect(competition).to.have.property('discipline');",
+                  "        pm.expect(allowedDisciplines).to.include(competition.discipline);",
+                  "        pm.expect(competition).to.have.property('event');",
+                  "        pm.expect(competition.event).to.be.an('object');",
+                  "        pm.expect(competition.event).to.have.property('id');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "id": "bc0897ba-f5c2-4eb5-9862-e6eb045964a6",
           "request": {
             "method": "GET",
@@ -1071,18 +1117,41 @@
             {
               "listen": "test",
               "script": {
+                "id": "584ec062-f5d8-4081-94da-c5011a36ebc3",
                 "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   "",
                   "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
+                  "pm.test(\"Competition contient la nouvelle structure\", function () {",
+                  "    pm.expect(jsonData).to.have.property('discipline');",
+                  "    pm.expect(allowedDisciplines).to.include(jsonData.discipline);",
+                  "    pm.expect(jsonData).to.have.property('event');",
+                  "    pm.expect(jsonData.event).to.be.an('object');",
+                  "    pm.expect(jsonData.event).to.have.property('id');",
+                  "});",
+                  "",
                   "if (jsonData && jsonData.id) {",
                   "    pm.environment.set('competition_id', jsonData.id);",
                   "}"
                 ],
                 "type": "text/javascript",
-                "id": "584ec062-f5d8-4081-94da-c5011a36ebc3"
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "f40cff8a-70c7-4097-8113-b79ecbef2a2a",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -1101,7 +1170,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"100m Sprint Hommes\",\n  \"type\": \"ATHLETICS\",\n  \"category\": \"SENIOR\",\n  \"eventId\": \"{{event_id}}\"\n}"
+              "raw": "{\n  \"discipline\": \"WATER_POLO\",\n  \"event\": {\n    \"id\": {{event_id}}\n  }\n}"
             },
             "url": {
               "raw": "{{event_base}}/competitions",
@@ -1116,97 +1185,7 @@
           "response": []
         },
         {
-          "name": "Admin – List Events",
-          "id": "6adf0fe7-59d9-41a8-bbb0-c7e4f2b51121",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "url": {
-              "raw": "{{event_base}}/admin/events",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "admin",
-                "events"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Admin – Create Event",
-          "id": "b93be712-b655-468e-9640-465efd74d6ff",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"name\": \"Grand Prix\" }"
-            },
-            "url": {
-              "raw": "{{event_base}}/admin/events",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "admin",
-                "events"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Admin – Add Competition to Event",
-          "id": "9e6230f1-32bc-4d99-a676-da90ec762c37",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Marathon Mixte\",\n  \"type\": \"ATHLETICS\",\n  \"category\": \"SENIOR\"\n}"
-            },
-            "url": {
-              "raw": "{{event_base}}/admin/events/{{event_id}}/competitions",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "admin",
-                "events",
-                "{{event_id}}",
-                "competitions"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Admin – Add Epreuve to Competition",
+          "name": "Epreuves – Create (avec competitionId)",
           "id": "6bd41814-390c-4cec-a9e6-264800ade99c",
           "request": {
             "method": "POST",
@@ -1222,19 +1201,89 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Finale 100m Sprint\",\n  \"type\": \"FINALE\",\n  \"dateHeure\": \"2025-06-15T14:30:00Z\"\n}"
+              "raw": "{\n  \"nom\": \"Finale 100m Sprint\",\n  \"type\": \"FINALE\",\n  \"competitionId\": {{competition_id}}\n}"
             },
             "url": {
-              "raw": "{{event_base}}/admin/events/competitions/{{competition_id}}/epreuves",
+              "raw": "{{event_base}}/epreuves",
               "host": [
                 "{{event_base}}"
               ],
               "path": [
-                "admin",
-                "events",
-                "competitions",
-                "{{competition_id}}",
                 "epreuves"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Events – Delete (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "7720fdf4-f5d4-45e6-aefe-a9de23eb2f11",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/events/{{event_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "events",
+                "{{event_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Competitions – Delete (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "d4b6458f-c0b1-46f4-aa2d-c004993f10e8",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/competitions/{{competition_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "competitions",
+                "{{competition_id}}"
               ]
             }
           },
