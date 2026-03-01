@@ -1,0 +1,187 @@
+{
+  "info": {
+    "_postman_id": "9e94d1b6-6df1-4f9b-9b1f-8c30a1b2d2c2",
+    "name": "Volunteer Service - CiblOrgaSport",
+    "description": "Collection pour tester le microservice volunteer-service (import admin + taches a venir volontaire + recap admin)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "volunteer_base",
+      "value": "http://localhost:8090"
+    },
+    {
+      "key": "volunteer_id",
+      "value": "9"
+    },
+    {
+      "key": "from_date",
+      "value": "2026-03-01"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin - Import Programs",
+      "id": "3b9a5a1d-1b6b-4a57-8a86-3f1f6b6c8c12",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{jwt}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  {\n    \"volunteerId\": {{volunteer_id}},\n    \"volunteerName\": \"Sara Benali\",\n    \"taskDate\": \"2026-02-25\",\n    \"startTime\": \"09:00:00\",\n    \"endTime\": \"12:00:00\",\n    \"location\": \"Site A\",\n    \"role\": \"Accueil\"\n  }\n]"
+        },
+        "url": {
+          "raw": "{{volunteer_base}}/api/v1/admin/programs/import",
+          "host": [
+            "{{volunteer_base}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "programs",
+            "import"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "pm.test(\"Response is an array\", function () {",
+              "  pm.expect(Array.isArray(data)).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"At least one imported task is returned\", function () {",
+              "  pm.expect(data.length).to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Volunteer - Upcoming Tasks",
+      "id": "b48c6522-1c2f-4b42-9c01-0b35e87e2bb3",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{volunteer_base}}/api/v1/volunteers/{{volunteer_id}}/today?date={{from_date}}",
+          "host": [
+            "{{volunteer_base}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "volunteers",
+            "{{volunteer_id}}",
+            "today"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{from_date}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "pm.test(\"Response is an array\", function () {",
+              "  pm.expect(Array.isArray(data)).to.eql(true);",
+              "});",
+              "",
+              "const fromDate = pm.variables.get(\"from_date\");",
+              "pm.test(\"Every task is on/after from_date\", function () {",
+              "  const ok = data.every(task => task.taskDate >= fromDate);",
+              "  pm.expect(ok).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Admin - All Tasks Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{volunteer_base}}/api/v1/admin/programs/all",
+          "host": [
+            "{{volunteer_base}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "programs",
+            "all"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "pm.test(\"Response is an array\", function () {",
+              "  pm.expect(Array.isArray(data)).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"Each task has volunteerId and taskDate\", function () {",
+              "  const ok = data.every(task => task.volunteerId !== undefined && !!task.taskDate);",
+              "  pm.expect(ok).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}

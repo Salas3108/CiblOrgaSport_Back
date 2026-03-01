@@ -69,6 +69,17 @@ public class AuthController {
             }
         }
 
+        // ADMIN : récupérer la liste des volontaires (validés ou non)
+        @GetMapping("/admin/volunteers")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<?> getVolunteers(@RequestParam(required = false) Boolean validated) {
+            if (validated == null) {
+                return ResponseEntity.ok(userRepository.findByRole(com.ciblorgasport.authservice.entity.Role.VOLONTAIRE));
+            } else {
+                return ResponseEntity.ok(userRepository.findByRoleAndValidated(com.ciblorgasport.authservice.entity.Role.VOLONTAIRE, validated));
+            }
+        }
+
         // INTERNAL : list athletes (id + username) for participants sync
         @GetMapping("/internal/athletes")
         public ResponseEntity<List<InternalAthleteSummary>> listAthletesInternal() {
