@@ -95,6 +95,7 @@ class LieuControllerTest {
         updateDetails.setVille("New City");
         updateDetails.setCodePostal("75000");
         updateDetails.setPays("France");
+        updateDetails.setCapaciteSpectateurs(12000);
         
         when(lieuRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(lieuRepository.save(any(Lieu.class))).thenReturn(existing);
@@ -104,6 +105,7 @@ class LieuControllerTest {
 
         // Assert
         assertNotNull(result);
+        assertEquals(12000, existing.getCapaciteSpectateurs());
         verify(lieuRepository, times(1)).save(any(Lieu.class));
     }
 

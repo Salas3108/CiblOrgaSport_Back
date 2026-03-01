@@ -6,7 +6,6 @@ import com.ciblorgasport.eventservice.dto.EventMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.dao.DataIntegrityViolationException;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,9 +25,6 @@ public class EventController {
     @Autowired
     private EventMapper eventMapper;
 
-    @Autowired
-    private LieuRepository lieuRepository;
-
     @GetMapping
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
@@ -40,11 +36,6 @@ public class EventController {
         // validation simple côté contrôleur
         if (eventDto.getName() == null || eventDto.getName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing required field 'name'");
-        }
-        // valider le lieu si fourni
-        if (eventDto.getLieuId() != null) {
-            lieuRepository.findById(eventDto.getLieuId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + eventDto.getLieuId()));
         }
 
         Event entity = eventMapper.toEntity(eventDto);
@@ -70,8 +61,10 @@ public class EventController {
         return eventRepository.findById(id)
                 .map(existing -> {
                     existing.setName(updateDetails.getName());
-                    existing.setDate(updateDetails.getDate());
-                    // ...apply other updatable fields as needed...
+                    existing.setDateDebut(updateDetails.getDateDebut());
+                    existing.setDateFin(updateDetails.getDateFin());
+                    existing.setDescription(updateDetails.getDescription());
+                    existing.setPaysHote(updateDetails.getPaysHote());
                     return eventRepository.save(existing);
                 })
                 .orElse(null);

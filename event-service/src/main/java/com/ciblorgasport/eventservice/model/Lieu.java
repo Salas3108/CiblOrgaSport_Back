@@ -12,6 +12,7 @@ public class Lieu {
     private String ville;
     private String codePostal;
     private String pays;
+    private Integer capaciteSpectateurs;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -25,4 +26,6 @@ public class Lieu {
     public void setCodePostal(String codePostal) { this.codePostal = codePostal; }
     public String getPays() { return pays; }
     public void setPays(String pays) { this.pays = pays; }
+    public Integer getCapaciteSpectateurs() { return capaciteSpectateurs; }
+    public void setCapaciteSpectateurs(Integer capaciteSpectateurs) { this.capaciteSpectateurs = capaciteSpectateurs; }
 }

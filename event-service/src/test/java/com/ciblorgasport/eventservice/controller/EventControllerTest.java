@@ -4,7 +4,6 @@ import com.ciblorgasport.eventservice.model.Event;
 import com.ciblorgasport.eventservice.repository.EventRepository;
 import com.ciblorgasport.eventservice.dto.EventDTO;
 import com.ciblorgasport.eventservice.dto.EventMapper;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,9 +31,6 @@ class EventControllerTest {
 
     @Mock
     private EventMapper eventMapper;
-
-    @Mock
-    private LieuRepository lieuRepository;
 
     @InjectMocks
     private EventController eventController;
@@ -99,11 +95,17 @@ class EventControllerTest {
         // Arrange
         EventDTO dto = new EventDTO();
         dto.setName("New Event");
-        dto.setDate(LocalDate.now());
+        dto.setDateDebut(LocalDate.now());
+        dto.setDateFin(LocalDate.now().plusDays(2));
+        dto.setDescription("Description");
+        dto.setPaysHote("France");
 
         Event entity = new Event();
         entity.setName(dto.getName());
-        entity.setDate(dto.getDate());
+        entity.setDateDebut(dto.getDateDebut());
+        entity.setDateFin(dto.getDateFin());
+        entity.setDescription(dto.getDescription());
+        entity.setPaysHote(dto.getPaysHote());
 
         Event savedEvent = new Event();
         savedEvent.setId(1L);
@@ -137,7 +139,10 @@ class EventControllerTest {
         
         Event updateDetails = new Event();
         updateDetails.setName("Updated Name");
-        updateDetails.setDate(LocalDate.now());
+        updateDetails.setDateDebut(LocalDate.now());
+        updateDetails.setDateFin(LocalDate.now().plusDays(1));
+        updateDetails.setDescription("Updated description");
+        updateDetails.setPaysHote("Maroc");
         
         when(eventRepository.findById(1L)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(any(Event.class))).thenReturn(existingEvent);
@@ -175,19 +180,6 @@ class EventControllerTest {
 
         // Assert
         verify(eventRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void createEvent_WhenLieuNotFound_ShouldThrowBadRequest() {
-        EventDTO dto = new EventDTO();
-        dto.setName("Test Event");
-        dto.setLieuId(999L);
-
-        when(lieuRepository.findById(999L)).thenReturn(Optional.empty());
-
-        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(dto));
-        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
-        assertTrue(ex.getReason().contains("Lieu not found"));
     }
 
     @Test

@@ -39,6 +39,7 @@ public class LieuController {
             lieu.setVille(lieuDetails.getVille());
             lieu.setCodePostal(lieuDetails.getCodePostal());
             lieu.setPays(lieuDetails.getPays());
+            lieu.setCapaciteSpectateurs(lieuDetails.getCapaciteSpectateurs());
             return lieuRepository.save(lieu);
         }
         return null;

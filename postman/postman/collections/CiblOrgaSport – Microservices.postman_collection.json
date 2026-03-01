@@ -834,6 +834,11 @@
                   "});",
                   "",
                   "const jsonData = pm.response.json();",
+                  "pm.test(\"Lieu contient capaciteSpectateurs\", function () {",
+                  "    pm.expect(jsonData).to.have.property('capaciteSpectateurs');",
+                  "    pm.expect(jsonData.capaciteSpectateurs).to.eql(80000);",
+                  "});",
+                  "",
                   "if (jsonData && jsonData.id) {",
                   "    pm.environment.set('lieu_id', jsonData.id);",
                   "}"
@@ -858,7 +863,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"ville\": \"Paris\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"capacite\": 80000\n}"
+              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"ville\": \"Paris\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"capaciteSpectateurs\": 80000\n}"
             },
             "url": {
               "raw": "{{event_base}}/lieux",
@@ -874,6 +879,36 @@
         },
         {
           "name": "Events – List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"La réponse est un tableau\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.test(\"Le premier event a la nouvelle structure\", function () {",
+                  "        const event = jsonData[0];",
+                  "        pm.expect(event).to.have.property('id');",
+                  "        pm.expect(event).to.have.property('name');",
+                  "        pm.expect(event).to.have.property('dateDebut');",
+                  "        pm.expect(event).to.have.property('dateFin');",
+                  "        pm.expect(event).to.have.property('description');",
+                  "        pm.expect(event).to.have.property('paysHote');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "id": "67bdb732-8d4f-4ea2-aeac-339947b7fe2c",
           "request": {
             "method": "GET",
@@ -907,6 +942,14 @@
                   "});",
                   "",
                   "const jsonData = pm.response.json();",
+                  "pm.test(\"Event contient les nouveaux champs\", function () {",
+                  "    pm.expect(jsonData).to.have.property('dateDebut');",
+                  "    pm.expect(jsonData).to.have.property('dateFin');",
+                  "    pm.expect(jsonData).to.have.property('description');",
+                  "    pm.expect(jsonData).to.have.property('paysHote');",
+                  "    pm.expect(jsonData.paysHote).to.eql('France');",
+                  "});",
+                  "",
                   "if (jsonData && jsonData.id) {",
                   "    pm.environment.set('event_id', jsonData.id);",
                   "}"
@@ -931,7 +974,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Championnat National d'Athlétisme\",\n  \"date\": \"2025-06-15T10:00:00Z\",\n  \"lieuId\": \"{{lieu_id}}\",\n  \"description\": \"Championnat national d'athlétisme 2025\"\n}"
+              "raw": "{\n  \"name\": \"Championnat National d'Athlétisme\",\n  \"dateDebut\": \"2025-06-15\",\n  \"dateFin\": \"2025-06-20\",\n  \"description\": \"Championnat national d'athlétisme 2025\",\n  \"paysHote\": \"France\"\n}"
             },
             "url": {
               "raw": "{{event_base}}/events",
