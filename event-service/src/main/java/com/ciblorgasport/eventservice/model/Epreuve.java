@@ -1,6 +1,5 @@
 package com.ciblorgasport.eventservice.model;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import com.ciblorgasport.eventservice.model.Competition;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,6 +10,7 @@ import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 import com.ciblorgasport.eventservice.model.enums.GenreEpreuve;
 import com.ciblorgasport.eventservice.model.enums.NiveauEpreuve;
+import com.ciblorgasport.eventservice.model.enums.StatutEpreuve;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -22,9 +22,8 @@ public class Epreuve {
     private Long id;
     private String nom;
     private String description;
-    private LocalDate date;
-    private LocalTime heureDebut;
-    private LocalTime heureFin;
+    private LocalDateTime dateHeure;
+    private Integer dureeMinutes;
     @ManyToOne
     @JoinColumn(name = "competition_id")
     @JsonIgnoreProperties({"event"}) // Inclut competition sans l'event pour éviter trop de niveaux
@@ -42,6 +41,9 @@ public class Epreuve {
 
     @Enumerated(EnumType.STRING)
     private NiveauEpreuve niveauEpreuve;
+
+    @Enumerated(EnumType.STRING)
+    private StatutEpreuve statut = StatutEpreuve.PLANIFIE;
 
     @Column(name = "equipe_id")
     private Long equipeId;
@@ -69,26 +71,14 @@ public class Epreuve {
     public void setGenreEpreuve(GenreEpreuve genreEpreuve) { this.genreEpreuve = genreEpreuve; }
     public NiveauEpreuve getNiveauEpreuve() { return niveauEpreuve; }
     public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
+    public StatutEpreuve getStatut() { return statut; }
+    public void setStatut(StatutEpreuve statut) { this.statut = statut; }
     public Long getEquipeId() { return equipeId; }
     public void setEquipeId(Long equipeId) { this.equipeId = equipeId; }
     public Set<Long> getAthleteIds() { return athleteIds; }
     public void setAthleteIds(Set<Long> athleteIds) { this.athleteIds = athleteIds; }
-	public LocalDate getDate() {
-		return date;
-	}
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-	public LocalTime getHeureDebut() {
-		return heureDebut;
-	}
-	public void setHeureDebut(LocalTime heureDebut) {
-		this.heureDebut = heureDebut; 
-	}
-	public LocalTime getHeureFin() {
-		return heureFin;
-	}
-	public void setHeureFin(LocalTime heureFin) {
-		this.heureFin = heureFin;
-	}
+    public LocalDateTime getDateHeure() { return dateHeure; }
+    public void setDateHeure(LocalDateTime dateHeure) { this.dateHeure = dateHeure; }
+    public Integer getDureeMinutes() { return dureeMinutes; }
+    public void setDureeMinutes(Integer dureeMinutes) { this.dureeMinutes = dureeMinutes; }
 }

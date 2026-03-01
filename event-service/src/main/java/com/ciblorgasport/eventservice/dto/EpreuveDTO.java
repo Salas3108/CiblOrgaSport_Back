@@ -1,14 +1,16 @@
 package com.ciblorgasport.eventservice.dto;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Set;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 import com.ciblorgasport.eventservice.model.enums.GenreEpreuve;
 import com.ciblorgasport.eventservice.model.enums.NiveauEpreuve;
+import com.ciblorgasport.eventservice.model.enums.StatutEpreuve;
+import com.ciblorgasport.eventservice.dto.deserializer.FlexibleLongDeserializer;
 
 public class EpreuveDTO {
     private Long id;
@@ -17,9 +19,13 @@ public class EpreuveDTO {
     private String nom;
 
     private String description;
-    private LocalDate date;
-    private LocalTime heureDebut;
-    private LocalTime heureFin;
+    @NotNull
+    private LocalDateTime dateHeure;
+
+    @NotNull
+    private Integer dureeMinutes;
+
+    private StatutEpreuve statut;
 
     @NotNull
     private TypeEpreuve typeEpreuve;
@@ -33,11 +39,18 @@ public class EpreuveDTO {
     // remplacez :
     // private Set<Long> participantIds;
     // par :
+    @JsonDeserialize(using = FlexibleLongDeserializer.class)
     private Long equipeId;
 
     // optional: when creating/updating in non-admin path you can specify competition id
+    @JsonDeserialize(using = FlexibleLongDeserializer.class)
     private Long competitionId;
 
+    // optional: specify epreuve location
+    @JsonDeserialize(using = FlexibleLongDeserializer.class)
+    private Long lieuId;
+
+    @JsonDeserialize(contentUsing = FlexibleLongDeserializer.class)
     private Set<Long> athleteIds;
 
     public Long getId() { return id; }
@@ -49,14 +62,14 @@ public class EpreuveDTO {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public LocalDateTime getDateHeure() { return dateHeure; }
+    public void setDateHeure(LocalDateTime dateHeure) { this.dateHeure = dateHeure; }
 
-    public LocalTime getHeureDebut() { return heureDebut; }
-    public void setHeureDebut(LocalTime heureDebut) { this.heureDebut = heureDebut; }
+    public Integer getDureeMinutes() { return dureeMinutes; }
+    public void setDureeMinutes(Integer dureeMinutes) { this.dureeMinutes = dureeMinutes; }
 
-    public LocalTime getHeureFin() { return heureFin; }
-    public void setHeureFin(LocalTime heureFin) { this.heureFin = heureFin; }
+    public StatutEpreuve getStatut() { return statut; }
+    public void setStatut(StatutEpreuve statut) { this.statut = statut; }
 
     public TypeEpreuve getTypeEpreuve() { return typeEpreuve; }
     public void setTypeEpreuve(TypeEpreuve typeEpreuve) { this.typeEpreuve = typeEpreuve; }
@@ -72,6 +85,9 @@ public class EpreuveDTO {
 
     public Long getCompetitionId() { return competitionId; }
     public void setCompetitionId(Long competitionId) { this.competitionId = competitionId; }
+
+    public Long getLieuId() { return lieuId; }
+    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
 
     public Set<Long> getAthleteIds() {
         return athleteIds;

@@ -18,8 +18,10 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.model.Competition;
+import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
+import com.ciblorgasport.eventservice.repository.LieuRepository;
 
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
@@ -33,6 +35,9 @@ public class EpreuveController {
 
     @Autowired
     private CompetitionRepository competitionRepository;
+
+    @Autowired
+    private LieuRepository lieuRepository;
 
     @Autowired
     private EpreuveMapper epreuveMapper;
@@ -57,6 +62,11 @@ public class EpreuveController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDto.getCompetitionId()));
             entity.setCompetition(comp);
         }
+        if (epreuveDto.getLieuId() != null) {
+            Lieu lieu = lieuRepository.findById(epreuveDto.getLieuId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDto.getLieuId()));
+            entity.setLieu(lieu);
+        }
         Epreuve saved = epreuveRepository.save(entity);
         return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
     }
@@ -79,6 +89,11 @@ public class EpreuveController {
             Competition comp = competitionRepository.findById(epreuveDetails.getCompetitionId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
             existing.setCompetition(comp);
+        }
+        if (epreuveDetails.getLieuId() != null) {
+            Lieu lieu = lieuRepository.findById(epreuveDetails.getLieuId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDetails.getLieuId()));
+            existing.setLieu(lieu);
         }
         Epreuve updated = epreuveRepository.save(existing);
         return ResponseEntity.ok(epreuveMapper.toDto(updated));

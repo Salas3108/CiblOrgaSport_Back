@@ -14,10 +14,14 @@ public class EpreuveValidator {
         if (dto.getTypeEpreuve() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "typeEpreuve is required");
         if (dto.getGenreEpreuve() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "genreEpreuve is required");
         if (dto.getNiveauEpreuve() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "niveauEpreuve is required");
+        if (dto.getDateHeure() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dateHeure is required");
+        if (dto.getDureeMinutes() == null || dto.getDureeMinutes() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dureeMinutes must be a positive value");
+        }
 
-        // time validation
-        if (dto.getHeureDebut() != null && dto.getHeureFin() != null && dto.getHeureFin().isBefore(dto.getHeureDebut())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "heureFin must be after heureDebut");
+        // lieuId must be positive if provided
+        if (dto.getLieuId() != null && dto.getLieuId() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "lieuId must be a positive id");
         }
 
         // equipeId must be positive if provided
@@ -41,8 +45,8 @@ public class EpreuveValidator {
 
         // rules per type
         if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE) {
-            if (dto.getAthleteIds() == null || dto.getAthleteIds().size() != 1) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must have exactly one athlete id");
+            if (dto.getAthleteIds() == null || dto.getAthleteIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must have at least one athlete id");
             }
             if (dto.getEquipeId() != null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeId");

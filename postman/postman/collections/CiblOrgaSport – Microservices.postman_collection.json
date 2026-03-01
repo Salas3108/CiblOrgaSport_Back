@@ -1028,6 +1028,49 @@
         },
         {
           "name": "Epreuves – Create",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const source = pm.variables.get('athlete_ids') || pm.environment.get('athlete_ids') || pm.collectionVariables.get('athlete_ids') || '2,3,6,7';",
+                  "const parsed = String(source)",
+                  "    .split(',')",
+                  "    .map(v => v.trim())",
+                  "    .filter(v => v.length > 0)",
+                  "    .map(v => Number(v))",
+                  "    .filter(v => Number.isFinite(v));",
+                  "pm.variables.set('athlete_ids_payload', JSON.stringify(parsed));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Epreuve contient les nouveaux champs\", function () {",
+                  "    pm.expect(jsonData).to.have.property('dateHeure');",
+                  "    pm.expect(jsonData).to.have.property('dureeMinutes');",
+                  "    pm.expect(jsonData).to.have.property('statut');",
+                  "    pm.expect(jsonData).to.have.property('competitionId');",
+                  "    pm.expect(jsonData.competitionId).to.eql(Number(pm.environment.get('competition_id')));",
+                  "    pm.expect(jsonData).to.have.property('lieuId');",
+                  "});",
+                  "",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('epreuve_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "id": "9dfce607-6845-44f3-b8d1-3bd14b2f3f28",
           "request": {
             "method": "POST",
@@ -1043,7 +1086,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{ \"nom\": \"Finale 100m\" }"
+              "raw": "{\n  \"nom\": \"Finale 100m\",\n  \"description\": \"Epreuve individuelle de sprint\",\n  \"dateHeure\": \"2026-06-20T14:30:00\",\n  \"dureeMinutes\": 45,\n  \"statut\": \"PLANIFIE\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MASCULIN\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": {{athlete_ids_payload}}\n}"
             },
             "url": {
               "raw": "{{event_base}}/epreuves",
@@ -1185,10 +1228,50 @@
           "response": []
         },
         {
-          "name": "Epreuves – Create (avec competitionId)",
-          "id": "6bd41814-390c-4cec-a9e6-264800ade99c",
+          "name": "Epreuves – Update (ADMIN)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const source = pm.variables.get('athlete_ids') || pm.environment.get('athlete_ids') || pm.collectionVariables.get('athlete_ids') || '2,3,6,7';",
+                  "const parsed = String(source)",
+                  "    .split(',')",
+                  "    .map(v => v.trim())",
+                  "    .filter(v => v.length > 0)",
+                  "    .map(v => Number(v))",
+                  "    .filter(v => Number.isFinite(v));",
+                  "pm.variables.set('athlete_ids_payload', JSON.stringify(parsed));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Epreuve mise à jour avec nouvelle structure\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('dateHeure');",
+                  "    pm.expect(jsonData).to.have.property('dureeMinutes');",
+                  "    pm.expect(jsonData).to.have.property('statut');",
+                  "    pm.expect(jsonData).to.have.property('lieuId');",
+                  "    pm.expect(jsonData.lieuId).to.eql(Number(pm.environment.get('lieu_id')));",
+                  "    pm.expect(jsonData.statut).to.eql('EN_COURS');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "c1f4efda-2c40-45ef-a52b-c0507690f3e5",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -1201,15 +1284,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Finale 100m Sprint\",\n  \"type\": \"FINALE\",\n  \"competitionId\": {{competition_id}}\n}"
+              "raw": "{\n  \"nom\": \"Finale 100m Sprint - MAJ\",\n  \"description\": \"Epreuve en cours\",\n  \"dateHeure\": \"2026-06-20T18:30:00\",\n  \"dureeMinutes\": 70,\n  \"statut\": \"EN_COURS\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MIXTE\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": {{athlete_ids_payload}}\n}"
             },
             "url": {
-              "raw": "{{event_base}}/epreuves",
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}",
               "host": [
                 "{{event_base}}"
               ],
               "path": [
-                "epreuves"
+                "epreuves",
+                "{{epreuve_id}}"
               ]
             }
           },
@@ -2231,6 +2315,11 @@
       "id": "9f4d2b3a-9a1d-4f6d-8f1a-1c2e3d4f5a6b",
       "key": "athlete_id",
       "value": "1"
+    },
+    {
+      "id": "d3aab4f2-7d21-4a58-a5f6-3e8a2b0b7a12",
+      "key": "athlete_ids",
+      "value": "2,3,6,7"
     },
     {
       "id": "6c5b4a3f-2e1d-4c9b-8a7e-1f2d3c4b5a6e",
