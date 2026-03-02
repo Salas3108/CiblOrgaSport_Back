@@ -50,6 +50,15 @@ public class CommissaireController {
         return ResponseEntity.ok(athletes);
     }
 
+    // COMMISSAIRE : get validated athletes
+    @GetMapping("/athletes/valides")
+    public ResponseEntity<List<AthleteDto>> getValidatedAthletes() {
+        List<AthleteDto> athletes = athleteService.findValidated().stream()
+                .map(athleteMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(athletes);
+    }
+
     // COMMISSAIRE : get info
     @GetMapping("/athletes/{id}/info")
     public ResponseEntity<AthleteDto> getInfo(@PathVariable Long id) {

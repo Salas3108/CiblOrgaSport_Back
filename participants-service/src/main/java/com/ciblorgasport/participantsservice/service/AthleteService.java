@@ -38,6 +38,10 @@ public class AthleteService {
         return athleteRepository.findAll();
     }
 
+    public List<Athlete> findValidated() {
+        return athleteRepository.findByValideTrue();
+    }
+
     public Athlete findByIdOrThrow(Long id) {
         return athleteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Athlète introuvable: " + id));

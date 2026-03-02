@@ -1,6 +1,6 @@
 package com.ciblorgasport.eventservice.model.enums;
 
-public enum CompetitionType {
+public enum Discipline {
     NATATION,
     WATER_POLO,
     NATATION_ARTISTIQUE,

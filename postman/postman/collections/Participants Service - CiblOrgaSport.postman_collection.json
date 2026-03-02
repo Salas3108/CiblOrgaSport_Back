@@ -250,6 +250,57 @@
       "response": []
     },
     {
+      "name": "Commissaire - List Athletes Valides",
+      "id": "2ec9014f-2d1a-4c32-bfce-5d8a6b44e8a1",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/commissaire/athletes/valides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "commissaire",
+            "athletes",
+            "valides"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const data = pm.response.json();",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    pm.expect(Array.isArray(data)).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"All athletes are validated\", function () {",
+              "    data.forEach((athlete) => {",
+              "        pm.expect(athlete.valide).to.eql(true);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
       "name": "Athlete - Post Info (upsert)",
       "id": "611cbc38-be11-4209-a2fb-70a330505e51",
       "request": {

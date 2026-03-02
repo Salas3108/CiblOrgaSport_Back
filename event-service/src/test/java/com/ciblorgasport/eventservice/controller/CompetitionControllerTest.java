@@ -2,7 +2,7 @@ package com.ciblorgasport.eventservice.controller;
 
 import com.ciblorgasport.eventservice.model.Competition;
 import com.ciblorgasport.eventservice.model.Event;
-import com.ciblorgasport.eventservice.model.enums.CompetitionType;
+import com.ciblorgasport.eventservice.model.enums.Discipline;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import com.ciblorgasport.eventservice.repository.EventRepository;
 import org.junit.jupiter.api.Test;
@@ -53,11 +53,11 @@ class CompetitionControllerTest {
     void createCompetition_ShouldSaveCompetition() {
         // Arrange
         Competition competition = new Competition();
-        competition.setDiscipline(CompetitionType.NATATION);
+        competition.setDiscipline(Discipline.NATATION);
         
         Competition savedCompetition = new Competition();
         savedCompetition.setId(1L);
-        savedCompetition.setDiscipline(CompetitionType.NATATION);
+        savedCompetition.setDiscipline(Discipline.NATATION);
         
         when(competitionRepository.save(competition)).thenReturn(savedCompetition);
 
@@ -75,7 +75,7 @@ class CompetitionControllerTest {
         // Arrange
         Competition competition = new Competition();
         competition.setId(1L);
-        competition.setDiscipline(CompetitionType.EAU_LIBRE);
+        competition.setDiscipline(Discipline.EAU_LIBRE);
         
         when(competitionRepository.findById(1L)).thenReturn(Optional.of(competition));
 
@@ -84,7 +84,7 @@ class CompetitionControllerTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(CompetitionType.EAU_LIBRE, result.getDiscipline());
+        assertEquals(Discipline.EAU_LIBRE, result.getDiscipline());
         verify(competitionRepository, times(1)).findById(1L);
     }
 
@@ -93,13 +93,13 @@ class CompetitionControllerTest {
         // Arrange
         Competition existing = new Competition();
         existing.setId(1L);
-        existing.setDiscipline(CompetitionType.NATATION);
+        existing.setDiscipline(Discipline.NATATION);
         
         Competition updateDetails = new Competition();
         Event event = new Event();
         event.setId(10L);
         updateDetails.setEvent(event);
-        updateDetails.setDiscipline(CompetitionType.WATER_POLO);
+        updateDetails.setDiscipline(Discipline.WATER_POLO);
         
         when(competitionRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(eventRepository.findById(10L)).thenReturn(Optional.of(event));
@@ -110,7 +110,7 @@ class CompetitionControllerTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(CompetitionType.WATER_POLO, existing.getDiscipline());
+        assertEquals(Discipline.WATER_POLO, existing.getDiscipline());
         assertNotNull(existing.getEvent());
         assertEquals(10L, existing.getEvent().getId());
         verify(competitionRepository, times(1)).save(any(Competition.class));

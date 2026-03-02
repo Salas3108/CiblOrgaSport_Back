@@ -43,4 +43,26 @@ class CommissaireControllerListAthletesTest {
         assertEquals("Dupont", response.getBody().get(0).getNom());
         assertEquals(2L, response.getBody().get(1).getId());
     }
+
+    @Test
+    void getValidatedAthletes_returns_only_validated_athletes() {
+        AthleteService athleteService = mock(AthleteService.class);
+        AthleteMapper athleteMapper = new AthleteMapper();
+        MessageMapper messageMapper = mock(MessageMapper.class);
+
+        CommissaireController controller = new CommissaireController(athleteService, athleteMapper, messageMapper);
+
+        Athlete validated = new Athlete(2L, "Titouche", "Salim", LocalDate.parse("2000-07-26"), "Algerie", true,
+                null, "OK");
+
+        when(athleteService.findValidated()).thenReturn(List.of(validated));
+
+        ResponseEntity<List<com.ciblorgasport.participantsservice.dto.AthleteDto>> response = controller.getValidatedAthletes();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals(2L, response.getBody().get(0).getId());
+        assertEquals(true, response.getBody().get(0).isValide());
+    }
 }
