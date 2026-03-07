@@ -1,0 +1,956 @@
+{
+  "info": {
+    "name": "Geolocation Service — CiblOrgaSport",
+    "description": "Collection complète pour tester le microservice de géolocalisation (port 8091).\n\nFlux de test recommandé :\n1. Auth > Login Admin → token sauvegardé automatiquement\n2. Admin Config > Activer géoloc pour athlète\n3. Auth > Login Athlete → token sauvegardé automatiquement\n4. Athlete > Enregistrer position\n5. Commissaire > Lire position / épreuve / historique\n6. Fan Zones > CRUD + recherche proximité",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8091",
+      "type": "string"
+    },
+    {
+      "key": "authUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "athleteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "commissaireToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "athleteId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "epreuveId",
+      "value": "45",
+      "type": "string"
+    },
+    {
+      "key": "fanzoneId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth (login pour récupérer les tokens)",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "    console.log('Admin token sauvegardé');",
+                  "}",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Token présent', () => pm.expect(pm.response.json()).to.have.property('token'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {"raw": "{{authUrl}}/auth/login", "host": ["{{authUrl}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Login Athlete (userId=1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('athleteToken', json.token);",
+                  "    console.log('Athlete token sauvegardé');",
+                  "}",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"leon.dupont\",\n  \"password\": \"athlete123\"\n}"
+            },
+            "url": {"raw": "{{authUrl}}/auth/login", "host": ["{{authUrl}}"], "path": ["auth", "login"]}
+          }
+        },
+        {
+          "name": "Login Commissaire",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('commissaireToken', json.token);",
+                  "    console.log('Commissaire token sauvegardé');",
+                  "}",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"commissaire1\",\n  \"password\": \"commis123\"\n}"
+            },
+            "url": {"raw": "{{authUrl}}/auth/login", "host": ["{{authUrl}}"], "path": ["auth", "login"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ Admin — Configuration Athlète",
+      "item": [
+        {
+          "name": "Activer géoloc pour athlète (+ définir nom)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Géolocalisation activée pour athleteId=' + pm.collectionVariables.get('athleteId'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"geolocActive\": true,\n  \"nom\": \"Léon Dupont\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
+            }
+          }
+        },
+        {
+          "name": "Désactiver géoloc pour athlète",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"geolocActive\": false,\n  \"nom\": \"Léon Dupont\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
+            }
+          }
+        },
+        {
+          "name": "Activer géoloc — accès refusé (non ADMIN) [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{commissaireToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"geolocActive\": true,\n  \"nom\": \"Test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📍 Positions Athlètes",
+      "item": [
+        {
+          "name": "POST — Enregistrer position (ATHLETE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Body contient athleteId', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('athleteId');",
+                  "    pm.expect(json).to.have.property('latitude');",
+                  "    pm.expect(json).to.have.property('longitude');",
+                  "    pm.expect(json).to.have.property('timestamp');",
+                  "    pm.expect(json).to.have.property('epreuveId');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{athleteToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "POST — Position sans token [attendu 401]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "POST — Position par Commissaire [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Format erreur correct', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('status');",
+                  "    pm.expect(json.status).to.eql(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{commissaireToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "POST — Body invalide (latitude manquante) [attendu 400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Message erreur présent', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{athleteToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "GET — Dernière position (COMMISSAIRE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Champs obligatoires présents', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.all.keys('id', 'athleteId', 'latitude', 'longitude', 'timestamp', 'epreuveId');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "GET — Dernière position par Athlete [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{athleteToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "GET — Dernière position athlète inexistant [attendu 404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Format erreur correct', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql(404);",
+                  "    pm.expect(json).to.have.property('message');",
+                  "    pm.expect(json).to.have.property('timestamp');",
+                  "    pm.expect(json).to.have.property('path');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/99999/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "99999", "position"]
+            }
+          }
+        },
+        {
+          "name": "GET — Positions de tous les athlètes d'une épreuve (COMMISSAIRE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/epreuves/{{epreuveId}}/athletes/positions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "epreuves", "{{epreuveId}}", "athletes", "positions"]
+            }
+          }
+        },
+        {
+          "name": "GET — Historique positions athlète (COMMISSAIRE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/history?dateDebut=2026-01-01T00:00:00&dateFin=2026-12-31T23:59:59",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "history"],
+              "query": [
+                {"key": "dateDebut", "value": "2026-01-01T00:00:00"},
+                {"key": "dateFin", "value": "2026-12-31T23:59:59"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE — Supprimer toutes positions (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/positions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "positions"]
+            }
+          }
+        },
+        {
+          "name": "DELETE — Supprimer positions par Commissaire [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/positions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "positions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏟️ Fan Zones",
+      "item": [
+        {
+          "name": "POST — Créer fan zone (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Fan zone créée avec ID', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.nom).to.eql('Zone Olympique Bassin');",
+                  "    pm.collectionVariables.set('fanzoneId', json.id);",
+                  "    console.log('fanzoneId sauvegardé : ' + json.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Zone Olympique Bassin\",\n  \"description\": \"Fan zone principale près du bassin olympique\",\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"capaciteMax\": 5000,\n  \"adresse\": \"1 Av. Pierre de Coubertin, Paris\",\n  \"services\": [\"ECRAN_GEANT\", \"RESTAURATION\", \"BOUTIQUE\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones"]
+            }
+          }
+        },
+        {
+          "name": "POST — Créer fan zone sans nom [attendu 400]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Message de validation présent', () => {",
+                  "    pm.expect(pm.response.json().message).to.include('nom');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones"]
+            }
+          }
+        },
+        {
+          "name": "POST — Créer fan zone par Commissaire [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{commissaireToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Zone Test\",\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones"]
+            }
+          }
+        },
+        {
+          "name": "GET — Liste toutes les fan zones (PUBLIC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "if (pm.response.json().length > 0) {",
+                  "    pm.test('Structure fan zone correcte', () => {",
+                  "        const fz = pm.response.json()[0];",
+                  "        pm.expect(fz).to.have.all.keys('id', 'nom', 'latitude', 'longitude', 'description', 'capaciteMax', 'adresse', 'services', 'distance');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones"]
+            }
+          }
+        },
+        {
+          "name": "GET — Fan zones à proximité rayon 500m (PUBLIC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "const zones = pm.response.json();",
+                  "if (zones.length > 1) {",
+                  "    pm.test('Triées par distance croissante', () => {",
+                  "        for (let i = 0; i < zones.length - 1; i++) {",
+                  "            pm.expect(zones[i].distance).to.be.at.most(zones[i+1].distance);",
+                  "        }",
+                  "    });",
+                  "}",
+                  "zones.forEach(z => {",
+                  "    pm.test('Zone dans le rayon (distance <= 500m)', () => {",
+                  "        pm.expect(z.distance).to.be.at.most(500);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/nearby?lat=48.8566&lng=2.3522&rayon=500",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "nearby"],
+              "query": [
+                {"key": "lat", "value": "48.8566"},
+                {"key": "lng", "value": "2.3522"},
+                {"key": "rayon", "value": "500"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET — Fan zones à proximité rayon 10km (PUBLIC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/nearby?lat=48.8566&lng=2.3522&rayon=10000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "nearby"],
+              "query": [
+                {"key": "lat", "value": "48.8566"},
+                {"key": "lng", "value": "2.3522"},
+                {"key": "rayon", "value": "10000"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET — Fan zones rayon défaut (500m, sans param rayon)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/nearby?lat=48.8566&lng=2.3522",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "nearby"],
+              "query": [
+                {"key": "lat", "value": "48.8566"},
+                {"key": "lng", "value": "2.3522"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE — Supprimer fan zone (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/{{fanzoneId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "{{fanzoneId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE — Fan zone inexistante [attendu 404]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Format erreur correct', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql(404);",
+                  "    pm.expect(json).to.have.property('message');",
+                  "    pm.expect(json).to.have.property('timestamp');",
+                  "    pm.expect(json).to.have.property('path');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "99999"]
+            }
+          }
+        },
+        {
+          "name": "DELETE — Fan zone par Athlete [attendu 403]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{athleteToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/fanzones/{{fanzoneId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "fanzones", "{{fanzoneId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔒 Sécurité — Vérifications transversales",
+      "item": [
+        {
+          "name": "Toute route protégée sans token [attendu 401]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "Toute route protégée avec token invalide [attendu 401]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer token.invalide.xxx"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "{{athleteId}}", "position"]
+            }
+          }
+        },
+        {
+          "name": "Format erreur uniforme — vérification structure",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Format erreur uniforme', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('status');",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json).to.have.property('message');",
+                  "    pm.expect(json).to.have.property('timestamp');",
+                  "    pm.expect(json).to.have.property('path');",
+                  "    pm.expect(json.status).to.eql(404);",
+                  "    pm.expect(json.error).to.eql('Ressource introuvable');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/geo/athletes/99999/position",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geo", "athletes", "99999", "position"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
