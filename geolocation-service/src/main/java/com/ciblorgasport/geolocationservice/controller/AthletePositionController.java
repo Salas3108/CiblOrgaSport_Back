@@ -1,6 +1,5 @@
 package com.ciblorgasport.geolocationservice.controller;
 
-import com.ciblorgasport.geolocationservice.dto.AthleteGeoConfigRequest;
 import com.ciblorgasport.geolocationservice.dto.PositionRequest;
 import com.ciblorgasport.geolocationservice.dto.PositionResponse;
 import com.ciblorgasport.geolocationservice.service.AthletePositionService;
@@ -23,10 +22,7 @@ public class AthletePositionController {
         this.positionService = positionService;
     }
 
-    /**
-     * Enregistre la position GPS d'un athlète.
-     * Accès : ATHLETE (son propre ID uniquement, vérifié dans le service via JWT userId).
-     */
+    /** Enregistre la position GPS de l'athlète (son propre ID uniquement via JWT). */
     @PostMapping("/athletes/{athleteId}/position")
     @PreAuthorize("hasRole('ATHLETE')")
     public ResponseEntity<PositionResponse> recordPosition(
@@ -35,34 +31,17 @@ public class AthletePositionController {
             @RequestHeader("Authorization") String authHeader) {
 
         String token = extractToken(authHeader);
-        PositionResponse response = positionService.recordPosition(athleteId, request, token);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(positionService.recordPosition(athleteId, request, token));
     }
 
-    /**
-     * Retourne la dernière position connue d'un athlète.
-     * Accès : COMMISSAIRE, ADMIN.
-     */
+    /** Dernière position connue d'un athlète. Accès : COMMISSAIRE, ADMIN. */
     @GetMapping("/athletes/{athleteId}/position")
     @PreAuthorize("hasAnyRole('COMMISSAIRE', 'ADMIN')")
     public ResponseEntity<PositionResponse> getLastPosition(@PathVariable Long athleteId) {
         return ResponseEntity.ok(positionService.getLastPosition(athleteId));
     }
 
-    /**
-     * Retourne les positions actuelles de tous les athlètes d'une épreuve en cours.
-     * Accès : COMMISSAIRE, ADMIN.
-     */
-    @GetMapping("/epreuves/{epreuveId}/athletes/positions")
-    @PreAuthorize("hasAnyRole('COMMISSAIRE', 'ADMIN')")
-    public ResponseEntity<List<PositionResponse>> getEpreuvePositions(@PathVariable Long epreuveId) {
-        return ResponseEntity.ok(positionService.getEpreuvePositions(epreuveId));
-    }
-
-    /**
-     * Retourne l'historique des positions d'un athlète entre deux dates.
-     * Accès : COMMISSAIRE, ADMIN.
-     */
+    /** Historique des positions d'un athlète entre deux dates. Accès : COMMISSAIRE, ADMIN. */
     @GetMapping("/athletes/{athleteId}/history")
     @PreAuthorize("hasAnyRole('COMMISSAIRE', 'ADMIN')")
     public ResponseEntity<List<PositionResponse>> getHistory(
@@ -73,29 +52,12 @@ public class AthletePositionController {
         return ResponseEntity.ok(positionService.getHistory(athleteId, dateDebut, dateFin));
     }
 
-    /**
-     * Supprime toutes les positions d'un athlète (nettoyage post-compétition / RGPD).
-     * Accès : ADMIN.
-     */
+    /** Supprime toutes les positions d'un athlète (RGPD). Accès : ADMIN. */
     @DeleteMapping("/athletes/{athleteId}/positions")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePositions(@PathVariable Long athleteId) {
         positionService.deletePositions(athleteId);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Crée ou met à jour la configuration de géolocalisation d'un athlète.
-     * Accès : ADMIN.
-     */
-    @PatchMapping("/admin/athletes/{athleteId}/config")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> upsertConfig(
-            @PathVariable Long athleteId,
-            @RequestBody AthleteGeoConfigRequest configRequest) {
-
-        positionService.upsertConfig(athleteId, configRequest.isGeolocActive(), configRequest.getNom());
-        return ResponseEntity.ok().build();
     }
 
     private String extractToken(String authHeader) {

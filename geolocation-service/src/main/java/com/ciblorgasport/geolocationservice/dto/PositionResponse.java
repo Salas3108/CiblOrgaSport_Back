@@ -9,17 +9,15 @@ public class PositionResponse {
     private Double latitude;
     private Double longitude;
     private LocalDateTime timestamp;
-    private Long epreuveId;
 
     public PositionResponse() {}
 
-    public PositionResponse(Long id, Long athleteId, Double latitude, Double longitude, LocalDateTime timestamp, Long epreuveId) {
+    public PositionResponse(Long id, Long athleteId, Double latitude, Double longitude, LocalDateTime timestamp) {
         this.id = id;
         this.athleteId = athleteId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.timestamp = timestamp;
-        this.epreuveId = epreuveId;
     }
 
     public Long getId() { return id; }
@@ -36,7 +34,4 @@ public class PositionResponse {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-
-    public Long getEpreuveId() { return epreuveId; }
-    public void setEpreuveId(Long epreuveId) { this.epreuveId = epreuveId; }
 }

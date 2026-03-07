@@ -3,7 +3,6 @@ package com.ciblorgasport.geolocationservice.controller;
 import com.ciblorgasport.geolocationservice.config.SecurityConfig;
 import com.ciblorgasport.geolocationservice.dto.PositionRequest;
 import com.ciblorgasport.geolocationservice.dto.PositionResponse;
-import com.ciblorgasport.geolocationservice.exception.GeolocDisabledException;
 import com.ciblorgasport.geolocationservice.exception.GlobalExceptionHandler;
 import com.ciblorgasport.geolocationservice.exception.ResourceNotFoundException;
 import com.ciblorgasport.geolocationservice.security.AuthTokenFilter;
@@ -58,10 +57,9 @@ class AthletePositionControllerTest {
         PositionRequest req = new PositionRequest();
         req.setLatitude(48.8566);
         req.setLongitude(2.3522);
-        req.setEpreuveId(45L);
 
-        PositionResponse resp = new PositionResponse(1L, 1L, 48.8566, 2.3522, LocalDateTime.now(), 45L);
-        when(jwtUtils.validateJwtToken(any())).thenReturn(false); // filtre n'intervient pas dans WithMockUser
+        PositionResponse resp = new PositionResponse(1L, 1L, 48.8566, 2.3522, LocalDateTime.now());
+        when(jwtUtils.validateJwtToken(any())).thenReturn(false);
         when(positionService.recordPosition(eq(1L), any(), any())).thenReturn(resp);
 
         mockMvc.perform(post("/api/geo/athletes/1/position")
@@ -79,7 +77,6 @@ class AthletePositionControllerTest {
         PositionRequest req = new PositionRequest();
         req.setLatitude(48.8566);
         req.setLongitude(2.3522);
-        req.setEpreuveId(45L);
 
         mockMvc.perform(post("/api/geo/athletes/1/position")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -90,27 +87,7 @@ class AthletePositionControllerTest {
 
     @Test
     @WithMockUser(roles = "ATHLETE")
-    void postPosition_geolocDisabled_403() throws Exception {
-        PositionRequest req = new PositionRequest();
-        req.setLatitude(48.8566);
-        req.setLongitude(2.3522);
-        req.setEpreuveId(45L);
-
-        when(positionService.recordPosition(eq(1L), any(), any()))
-                .thenThrow(new GeolocDisabledException("Géolocalisation désactivée"));
-
-        mockMvc.perform(post("/api/geo/athletes/1/position")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer test-token")
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(403));
-    }
-
-    @Test
-    @WithMockUser(roles = "ATHLETE")
     void postPosition_invalidBody_400() throws Exception {
-        // latitude manquante
         mockMvc.perform(post("/api/geo/athletes/1/position")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer test-token")
@@ -123,7 +100,7 @@ class AthletePositionControllerTest {
     @Test
     @WithMockUser(roles = "COMMISSAIRE")
     void getLastPosition_commissaire_200() throws Exception {
-        PositionResponse resp = new PositionResponse(1L, 1L, 48.8566, 2.3522, LocalDateTime.now(), 45L);
+        PositionResponse resp = new PositionResponse(1L, 1L, 48.8566, 2.3522, LocalDateTime.now());
         when(positionService.getLastPosition(1L)).thenReturn(resp);
 
         mockMvc.perform(get("/api/geo/athletes/1/position"))
@@ -134,7 +111,7 @@ class AthletePositionControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getLastPosition_admin_200() throws Exception {
-        PositionResponse resp = new PositionResponse(1L, 1L, 48.0, 2.0, LocalDateTime.now(), 45L);
+        PositionResponse resp = new PositionResponse(1L, 1L, 48.0, 2.0, LocalDateTime.now());
         when(positionService.getLastPosition(1L)).thenReturn(resp);
 
         mockMvc.perform(get("/api/geo/athletes/1/position"))
@@ -159,28 +136,13 @@ class AthletePositionControllerTest {
                 .andExpect(jsonPath("$.status").value(404));
     }
 
-    // ---- GET /api/geo/epreuves/{epreuveId}/athletes/positions ----
-
-    @Test
-    @WithMockUser(roles = "COMMISSAIRE")
-    void getEpreuvePositions_200() throws Exception {
-        when(positionService.getEpreuvePositions(45L)).thenReturn(List.of(
-                new PositionResponse(1L, 1L, 48.0, 2.0, LocalDateTime.now(), 45L),
-                new PositionResponse(2L, 2L, 48.1, 2.1, LocalDateTime.now(), 45L)
-        ));
-
-        mockMvc.perform(get("/api/geo/epreuves/45/athletes/positions"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
-    }
-
     // ---- GET /api/geo/athletes/{athleteId}/history ----
 
     @Test
     @WithMockUser(roles = "COMMISSAIRE")
     void getHistory_200() throws Exception {
         when(positionService.getHistory(any(), any(), any())).thenReturn(List.of(
-                new PositionResponse(1L, 1L, 48.0, 2.0, LocalDateTime.now(), 45L)
+                new PositionResponse(1L, 1L, 48.0, 2.0, LocalDateTime.now())
         ));
 
         mockMvc.perform(get("/api/geo/athletes/1/history")

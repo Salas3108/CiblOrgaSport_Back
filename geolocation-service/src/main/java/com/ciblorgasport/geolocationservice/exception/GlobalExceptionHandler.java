@@ -27,13 +27,6 @@ public class GlobalExceptionHandler {
                 .body(build(HttpStatus.NOT_FOUND, "Ressource introuvable", ex.getMessage(), request));
     }
 
-    @ExceptionHandler(GeolocDisabledException.class)
-    public ResponseEntity<ErrorResponse> handleGeolocDisabled(GeolocDisabledException ex, HttpServletRequest request) {
-        logger.warn("Accès refusé — géolocalisation désactivée : {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(build(HttpStatus.FORBIDDEN, "Accès refusé", ex.getMessage(), request));
-    }
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
         logger.warn("Accès refusé — tentative non autorisée sur {} : {}", request.getRequestURI(), ex.getMessage());

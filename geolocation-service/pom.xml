@@ -123,6 +123,13 @@
                 <version>3.2.5</version>
                 <configuration>
                     <skipTests>false</skipTests>
+                    <argLine>
+                        -XX:+EnableDynamicAgentLoading
+                        -Djdk.attach.allowAttachSelf=true
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
         </plugins>

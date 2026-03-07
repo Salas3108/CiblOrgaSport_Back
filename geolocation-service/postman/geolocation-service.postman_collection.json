@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Geolocation Service — CiblOrgaSport",
-    "description": "Collection complète pour tester le microservice de géolocalisation (port 8091).\n\nFlux de test recommandé :\n1. Auth > Login Admin → token sauvegardé automatiquement\n2. Admin Config > Activer géoloc pour athlète\n3. Auth > Login Athlete → token sauvegardé automatiquement\n4. Athlete > Enregistrer position\n5. Commissaire > Lire position / épreuve / historique\n6. Fan Zones > CRUD + recherche proximité",
+    "description": "Collection complète pour tester le microservice de géolocalisation (port 8091).\n\nFlux de test recommandé :\n1. Auth > Login Admin → token sauvegardé automatiquement\n2. Auth > Login Athlete → token sauvegardé automatiquement\n3. Auth > Login Commissaire → token sauvegardé automatiquement\n4. Positions Athlètes > Enregistrer position (ATHLETE)\n5. Positions Athlètes > GET Dernière position (COMMISSAIRE)\n6. Fan Zones > POST Créer, GET liste/proximité, DELETE",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -36,11 +36,6 @@
       "type": "string"
     },
     {
-      "key": "epreuveId",
-      "value": "45",
-      "type": "string"
-    },
-    {
       "key": "fanzoneId",
       "value": "1",
       "type": "string"
@@ -48,7 +43,7 @@
   ],
   "item": [
     {
-      "name": "🔐 Auth (login pour récupérer les tokens)",
+      "name": "Auth (login pour récupérer les tokens)",
       "item": [
         {
           "name": "Login Admin",
@@ -138,103 +133,7 @@
       ]
     },
     {
-      "name": "⚙️ Admin — Configuration Athlète",
-      "item": [
-        {
-          "name": "Activer géoloc pour athlète (+ définir nom)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "console.log('Géolocalisation activée pour athleteId=' + pm.collectionVariables.get('athleteId'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"geolocActive\": true,\n  \"nom\": \"Léon Dupont\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
-            }
-          }
-        },
-        {
-          "name": "Désactiver géoloc pour athlète",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{adminToken}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"geolocActive\": false,\n  \"nom\": \"Léon Dupont\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
-            }
-          }
-        },
-        {
-          "name": "Activer géoloc — accès refusé (non ADMIN) [attendu 403]",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 403', () => pm.response.to.have.status(403));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{commissaireToken}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"geolocActive\": true,\n  \"nom\": \"Test\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/geo/admin/athletes/{{athleteId}}/config",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "geo", "admin", "athletes", "{{athleteId}}", "config"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "📍 Positions Athlètes",
+      "name": "Positions Athlètes",
       "item": [
         {
           "name": "POST — Enregistrer position (ATHLETE)",
@@ -244,13 +143,12 @@
               "script": {
                 "exec": [
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Body contient athleteId', () => {",
+                  "pm.test('Body contient les champs attendus', () => {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('athleteId');",
                   "    pm.expect(json).to.have.property('latitude');",
                   "    pm.expect(json).to.have.property('longitude');",
                   "    pm.expect(json).to.have.property('timestamp');",
-                  "    pm.expect(json).to.have.property('epreuveId');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -265,7 +163,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
@@ -292,7 +190,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
@@ -327,7 +225,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+              "raw": "{\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
@@ -361,7 +259,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"longitude\": 2.3522,\n  \"epreuveId\": {{epreuveId}}\n}"
+              "raw": "{\n  \"longitude\": 2.3522\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/geo/athletes/{{athleteId}}/position",
@@ -380,7 +278,7 @@
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
                   "pm.test('Champs obligatoires présents', () => {",
                   "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.all.keys('id', 'athleteId', 'latitude', 'longitude', 'timestamp', 'epreuveId');",
+                  "    pm.expect(json).to.have.all.keys('id', 'athleteId', 'latitude', 'longitude', 'timestamp');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -447,32 +345,6 @@
               "raw": "{{baseUrl}}/api/geo/athletes/99999/position",
               "host": ["{{baseUrl}}"],
               "path": ["api", "geo", "athletes", "99999", "position"]
-            }
-          }
-        },
-        {
-          "name": "GET — Positions de tous les athlètes d'une épreuve (COMMISSAIRE)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Réponse est un tableau', () => {",
-                  "    pm.expect(pm.response.json()).to.be.an('array');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [{"key": "Authorization", "value": "Bearer {{commissaireToken}}"}],
-            "url": {
-              "raw": "{{baseUrl}}/api/geo/epreuves/{{epreuveId}}/athletes/positions",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "geo", "epreuves", "{{epreuveId}}", "athletes", "positions"]
             }
           }
         },
@@ -555,7 +427,7 @@
       ]
     },
     {
-      "name": "🏟️ Fan Zones",
+      "name": "Fan Zones",
       "item": [
         {
           "name": "POST — Créer fan zone (ADMIN)",
@@ -870,7 +742,7 @@
       ]
     },
     {
-      "name": "🔒 Sécurité — Vérifications transversales",
+      "name": "Securite — Verifications transversales",
       "item": [
         {
           "name": "Toute route protégée sans token [attendu 401]",
