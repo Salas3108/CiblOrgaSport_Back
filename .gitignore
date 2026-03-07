@@ -29,8 +29,8 @@ Thumbs.db
 *.log
 
 # Application properties
-application*.yml
-application*.yaml
+#application*.yml
+#application*.yaml
 
 # D'autres fichiers inutiles
 *.jar

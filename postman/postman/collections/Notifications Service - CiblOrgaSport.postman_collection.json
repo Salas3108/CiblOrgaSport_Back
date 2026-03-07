@@ -1,0 +1,239 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-notifications01",
+    "name": "Notifications Service - CiblOrgaSport",
+    "description": "Endpoints REST du notifications-service (port 8089). Les notifications sont créées automatiquement via Kafka quand un incident est publié. Le push temps réel se fait en WebSocket STOMP sur ws://localhost:8089/ws → topic /topic/notifications/{spectateurId}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "notif_base",
+      "value": "http://localhost:8089"
+    },
+    {
+      "key": "spectateur_id",
+      "value": "1"
+    },
+    {
+      "key": "notification_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Historique",
+      "item": [
+        {
+          "name": "Toutes les notifications d'un spectateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse est un tableau\", () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});",
+                  "const data = pm.response.json();",
+                  "if (data.length > 0) {",
+                  "    pm.environment.set('notification_id', data[0].id);",
+                  "    pm.collectionVariables.set('notification_id', data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "id": "notif-001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}"]
+            },
+            "description": "Retourne toutes les notifications du spectateur triées par date décroissante."
+          },
+          "response": []
+        },
+        {
+          "name": "Notifications non lues",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Toutes les entrées sont non lues\", () => {",
+                  "    const data = pm.response.json();",
+                  "    data.forEach(n => pm.expect(n.lu).to.equal(false));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "notif-002",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/non-lues",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "non-lues"]
+            },
+            "description": "Retourne uniquement les notifications avec lu=false."
+          },
+          "response": []
+        },
+        {
+          "name": "Compteur non lues (badge)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Champ nonLues présent\", () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('nonLues');",
+                  "    pm.expect(data.nonLues).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "notif-003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/compteur",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "compteur"]
+            },
+            "description": "Retourne { \"nonLues\": N }. Utile pour afficher un badge dans l'UI."
+          },
+          "response": []
+        }
+      ],
+      "id": "notif-folder-historique"
+    },
+    {
+      "name": "Actions",
+      "item": [
+        {
+          "name": "Marquer une notification comme lue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lu=true dans la réponse\", () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.lu).to.equal(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "notif-004",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}/lue",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "{{notification_id}}", "lue"]
+            },
+            "description": "Marque la notification identifiée par notification_id comme lue (lu=true)."
+          },
+          "response": []
+        },
+        {
+          "name": "Tout marquer comme lu",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Champ mis_a_jour présent\", () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('mis_a_jour');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "id": "notif-005",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/tout-lire",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "tout-lire"]
+            },
+            "description": "Marque toutes les notifications non lues du spectateur comme lues. Retourne { \"mis_a_jour\": N }."
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une notification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "id": "notif-006",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "{{notification_id}}"]
+            },
+            "description": "Supprime définitivement la notification. Retourne 204 No Content."
+          },
+          "response": []
+        }
+      ],
+      "id": "notif-folder-actions"
+    },
+    {
+      "name": "WebSocket – Info",
+      "item": [
+        {
+          "name": "⚠ WebSocket STOMP (hors Postman)",
+          "id": "notif-ws-info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/ws/info",
+              "host": ["{{notif_base}}"],
+              "path": ["ws", "info"]
+            },
+            "description": "Ce GET vérifie que l'endpoint SockJS répond (retourne un JSON de négociation SockJS).\n\nPour recevoir des notifications en temps réel, utiliser Hoppscotch (hoppscotch.io → Realtime → STOMP) :\n- URL    : ws://localhost:8089/ws/websocket\n- Subscribe : /topic/notifications/{spectateurId}\n\nFormat du message reçu :\n{\n  \"id\": 42,\n  \"type\": \"INCIDENT\",\n  \"contenu\": \"Nouvel incident (TECHNIQUE) à Tribune A: Incident test\",\n  \"dateEnvoi\": \"2026-02-27T10:00:00\",\n  \"idEvent\": 1001,\n  \"idSpectateur\": 1,\n  \"sourceEventId\": \"evt-abc-123\",\n  \"lu\": false\n}"
+          },
+          "response": []
+        }
+      ],
+      "id": "notif-folder-ws"
+    }
+  ]
+}
