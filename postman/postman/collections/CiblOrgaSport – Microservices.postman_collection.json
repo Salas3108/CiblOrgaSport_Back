@@ -510,7 +510,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade principal - Piste 1\"\n}"
+              "raw": "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade principal - Piste 1\",\n  \"competitionId\": {{competition_id}}\n}"
             },
             "url": {
               "raw": "{{incident_base}}/api/incidents",
@@ -795,6 +795,131 @@
         }
       ],
       "id": "175c318f-2729-4c4a-b53f-c3bc6b56a0a8"
+    },
+    {
+      "name": "notifications-service",
+      "description": "Notifications REST (port 8089). Push temps réel via WebSocket STOMP → ws://localhost:8089/ws → /topic/notifications/{spectateurId}",
+      "id": "notif-group-global",
+      "item": [
+        {
+          "name": "Toutes les notifs du spectateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "if (data.length > 0) pm.environment.set('notification_id', data[0].id);"
+                ]
+              }
+            }
+          ],
+          "id": "ng-001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Notifications non lues",
+          "id": "ng-002",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/non-lues",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "non-lues"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Compteur non lues (badge)",
+          "id": "ng-003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/compteur",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "compteur"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marquer une notif comme lue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lu=true\", () => pm.expect(pm.response.json().lu).to.equal(true));"
+                ]
+              }
+            }
+          ],
+          "id": "ng-004",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}/lue",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "{{notification_id}}", "lue"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tout marquer comme lu",
+          "id": "ng-005",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/tout-lire",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "tout-lire"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une notification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test(\"Status 204\", () => pm.response.to.have.status(204));"]
+              }
+            }
+          ],
+          "id": "ng-006",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}",
+              "host": ["{{notif_base}}"],
+              "path": ["api", "notifications", "{{notification_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
     },
     {
       "name": "event-service",
@@ -2269,7 +2394,7 @@
     {
       "id": "60a8d9f0-0286-4e7d-b239-050b264357e9",
       "key": "incident_base",
-      "value": "http://localhost:8083"
+      "value": "http://localhost:8084"
     },
     {
       "id": "9953c71c-6fbc-4cb9-a1ee-86723c99619d",
@@ -2329,6 +2454,21 @@
     {
       "id": "5a4b3c2d-1e0f-4d9c-8b7a-6e5d4c3b2a1f",
       "key": "resultat_id",
+      "value": ""
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-notif000001",
+      "key": "notif_base",
+      "value": "http://localhost:8089"
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-notif000002",
+      "key": "spectateur_id",
+      "value": "1"
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-notif000003",
+      "key": "notification_id",
       "value": ""
     }
   ]

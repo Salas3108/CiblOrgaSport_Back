@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test WebSocket – Notifications</title>
+  <style>
+    body { font-family: monospace; max-width: 800px; margin: 40px auto; background: #1e1e2e; color: #cdd6f4; }
+    h2 { color: #89b4fa; }
+    input, button, select { padding: 8px 12px; border-radius: 6px; border: 1px solid #45475a; background: #313244; color: #cdd6f4; }
+    button { cursor: pointer; background: #89b4fa; color: #1e1e2e; font-weight: bold; border: none; }
+    button:hover { background: #74c7ec; }
+    button.danger { background: #f38ba8; }
+    #log { background: #181825; border-radius: 8px; padding: 16px; height: 350px; overflow-y: auto; font-size: 13px; margin-top: 12px; }
+    .ok   { color: #a6e3a1; }
+    .err  { color: #f38ba8; }
+    .msg  { color: #f9e2af; }
+    .info { color: #89dceb; }
+    .row  { display: flex; gap: 10px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+    label { color: #bac2de; min-width: 140px; }
+    #status { font-size: 14px; padding: 6px 12px; border-radius: 20px; background: #45475a; }
+    #status.connected { background: #a6e3a1; color: #1e1e2e; }
+    #status.disconnected { background: #f38ba8; color: #1e1e2e; }
+  </style>
+</head>
+<body>
+  <h2>🔔 Test WebSocket STOMP – Notifications Service</h2>
+
+  <div class="row">
+    <label>URL WebSocket :</label>
+    <input id="url" value="http://localhost:8089/ws" style="width:280px">
+    <span id="status" class="disconnected">● Déconnecté</span>
+  </div>
+  <div class="row">
+    <label>ID Spectateur :</label>
+    <input id="spectateurId" value="1" style="width:80px">
+    <small style="color:#6c7086">⟶ s'abonne à /topic/notifications/{id}</small>
+  </div>
+  <div class="row">
+    <button onclick="connect()">Connecter</button>
+    <button class="danger" onclick="disconnect()">Déconnecter</button>
+    <button onclick="clearLog()" style="background:#585b70">Effacer logs</button>
+  </div>
+
+  <div id="log"><span class="info">En attente de connexion...</span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script>
+    let client = null;
+
+    function log(msg, cls = 'info') {
+      const div = document.getElementById('log');
+      const ts = new Date().toISOString().substring(11, 23);
+      div.innerHTML += `<div class="${cls}">[${ts}] ${msg}</div>`;
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function setStatus(connected) {
+      const s = document.getElementById('status');
+      s.textContent = connected ? '● Connecté' : '● Déconnecté';
+      s.className = connected ? 'connected' : 'disconnected';
+    }
+
+    function connect() {
+      if (client && client.connected) { log('Déjà connecté.', 'ok'); return; }
+
+      const url = document.getElementById('url').value;
+      const spectateurId = document.getElementById('spectateurId').value;
+      const topic = `/topic/notifications/${spectateurId}`;
+
+      log(`Connexion à ${url} ...`);
+      const socket = new SockJS(url);
+      client = Stomp.over(socket);
+      client.debug = null; // désactive le spam de logs STOMP
+
+      client.connect({}, () => {
+        setStatus(true);
+        log(`✅ Connecté ! Abonnement à ${topic}`, 'ok');
+
+        client.subscribe(topic, (frame) => {
+          try {
+            const notif = JSON.parse(frame.body);
+            log(`📩 Notification reçue :`, 'msg');
+            log(`   id=${notif.id} | type=${notif.type} | lu=${notif.lu}`, 'msg');
+            log(`   contenu: ${notif.contenu}`, 'msg');
+            log(`   idEvent=${notif.idEvent} | idSpectateur=${notif.idSpectateur}`, 'msg');
+          } catch(e) {
+            log(`Message brut: ${frame.body}`, 'msg');
+          }
+        });
+
+      }, (error) => {
+        setStatus(false);
+        log(`❌ Erreur STOMP: ${error}`, 'err');
+      });
+
+      socket.onclose = () => {
+        setStatus(false);
+        log('🔌 Connexion fermée.', 'err');
+      };
+    }
+
+    function disconnect() {
+      if (client) {
+        client.disconnect(() => {
+          setStatus(false);
+          log('Déconnecté.', 'info');
+        });
+      }
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+  </script>
+</body>
+</html>

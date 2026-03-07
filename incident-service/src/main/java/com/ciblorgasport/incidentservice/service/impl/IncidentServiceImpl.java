@@ -4,6 +4,8 @@ import com.ciblorgasport.incidentservice.model.Incident;
 import com.ciblorgasport.incidentservice.model.IncidentStatus;
 import com.ciblorgasport.incidentservice.model.IncidentType;
 import com.ciblorgasport.incidentservice.model.ImpactLevel;
+import com.ciblorgasport.incidentservice.kafka.publisher.IncidentEventFactory;
+import com.ciblorgasport.incidentservice.kafka.publisher.IncidentEventPublisher;
 import com.ciblorgasport.incidentservice.repository.IncidentRepository;
 import com.ciblorgasport.incidentservice.service.IncidentService;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,11 @@ import java.util.stream.Collectors;
 public class IncidentServiceImpl implements IncidentService {
 
     private final IncidentRepository incidentRepository;
+    private final IncidentEventPublisher incidentEventPublisher;
 
-    public IncidentServiceImpl(IncidentRepository incidentRepository) {
+    public IncidentServiceImpl(IncidentRepository incidentRepository, IncidentEventPublisher incidentEventPublisher) {
         this.incidentRepository = incidentRepository;
+        this.incidentEventPublisher = incidentEventPublisher;
     }
 
     @Override
@@ -40,7 +44,12 @@ public class IncidentServiceImpl implements IncidentService {
         if (incident.getStatus() == null) {
             incident.setStatus(IncidentStatus.ACTIF);
         }
-        return incidentRepository.save(incident);
+        Incident saved = incidentRepository.save(incident);
+        incidentEventPublisher.publishIncidentCreated(
+                IncidentEventFactory.incidentCreated(saved),
+                IncidentEventFactory.partitionKey(saved)
+        );
+        return saved;
     }
 
     @Override
