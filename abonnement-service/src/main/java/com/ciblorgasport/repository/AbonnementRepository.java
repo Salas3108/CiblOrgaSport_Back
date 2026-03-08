@@ -7,14 +7,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AbonnementRepository extends JpaRepository<Abonnement, UUID> {
+    // Note: primary key (id) remains UUID; only competitionId changed to Long
     
     List<Abonnement> findByUserId(Long userId);
     
-    Optional<Abonnement> findByUserIdAndCompetitionId(Long userId, UUID competitionId);
+    Optional<Abonnement> findByUserIdAndCompetitionId(Long userId, Long competitionId);
     
-    boolean existsByUserIdAndCompetitionId(Long userId, UUID competitionId);
+    boolean existsByUserIdAndCompetitionId(Long userId, Long competitionId);
     
-    List<Abonnement> findByCompetitionId(UUID competitionId);
-    
-    long countByCompetitionId(UUID competitionId);
+    List<Abonnement> findByCompetitionId(Long competitionId);
+
+    List<Abonnement> findByCompetitionIdAndNotificationsActivesTrue(Long competitionId);
+
+    long countByCompetitionId(Long competitionId);
 }

@@ -46,3 +46,6 @@ logging:
     com.ciblorgasport.notificationsservice: DEBUG
     org.springframework.web.socket: DEBUG
     org.springframework.messaging.simp: WARN
+
+abonnement-service:
+  url: ${ABONNEMENT_SERVICE_URL:http://localhost:8085}

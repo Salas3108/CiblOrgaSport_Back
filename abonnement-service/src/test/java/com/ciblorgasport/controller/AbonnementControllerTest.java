@@ -30,13 +30,13 @@ class AbonnementControllerTest {
     private RestTemplate restTemplate;
 
     private Long userId;
-    private UUID competitionId;
+    private Long competitionId;
     private Abonnement abonnement;
 
     @BeforeEach
     void setUp() {
         userId = 1L;
-        competitionId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+        competitionId = 42L;
         abonnement = new Abonnement(userId, competitionId);
         abonnement.setId(UUID.randomUUID());
     }
@@ -49,7 +49,7 @@ class AbonnementControllerTest {
         mockMvc.perform(get("/api/abonnements/user/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userId").value(userId))
-                .andExpect(jsonPath("$[0].competitionId").value(competitionId.toString()));
+                .andExpect(jsonPath("$[0].competitionId").value(competitionId));
     }
 
     @Test
@@ -72,7 +72,7 @@ class AbonnementControllerTest {
                 .param("competitionId", competitionId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Abonnement réussi"))
-                .andExpect(jsonPath("$.competitionId").value(competitionId.toString()));
+                .andExpect(jsonPath("$.competitionId").value(competitionId));
     }
 
     @Test
@@ -102,10 +102,10 @@ class AbonnementControllerTest {
     }
 
     @Test
-    void testSabonnerCompetition_InvalidUUID() throws Exception {
+    void testSabonnerCompetition_InvalidLong() throws Exception {
         mockMvc.perform(post("/api/abonnements/subscribe")
                 .param("userId", userId.toString())
-                .param("competitionId", "invalid-uuid"))
+                .param("competitionId", "invalid-long"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -119,7 +119,7 @@ class AbonnementControllerTest {
                 .param("competitionId", competitionId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Désabonnement réussi"))
-                .andExpect(jsonPath("$.competitionId").value(competitionId.toString()));
+                .andExpect(jsonPath("$.competitionId").value(competitionId));
     }
 
     @Test

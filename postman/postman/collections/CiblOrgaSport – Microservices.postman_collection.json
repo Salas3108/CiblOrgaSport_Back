@@ -1463,7 +1463,7 @@
               }
             ],
             "url": {
-              "raw": "{{abonnement_base}}/api/abonnements/unsubscribe?userId=1&competitionId=00000000-0000-0000-0000-000000000001",
+              "raw": "{{abonnement_base}}/api/abonnements/unsubscribe?userId=1&competitionId={{competition_id}}",
               "host": [
                 "{{abonnement_base}}"
               ],
@@ -1479,10 +1479,42 @@
                 },
                 {
                   "key": "competitionId",
-                  "value": "00000000-0000-0000-0000-000000000001"
+                  "value": "{{competition_id}}"
                 }
               ]
             }
+          },
+          "response": []
+        }
+        {
+          "name": "[Interne] Abonnés notifiables d'une compétition",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Réponse est un tableau de Long\", () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "    data.forEach(id => pm.expect(id).to.be.a('number'));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "abonnement-internal-subscribers-test"
+              }
+            }
+          ],
+          "id": "abonnement-internal-subscribers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{abonnement_base}}/api/abonnements/internal/competition/{{competition_id}}/subscribers",
+              "host": ["{{abonnement_base}}"],
+              "path": ["api", "abonnements", "internal", "competition", "{{competition_id}}", "subscribers"]
+            },
+            "description": "Endpoint interne appelé par notifications-service. Retourne la liste des userId abonnés à la compétition avec notifications actives."
           },
           "response": []
         }
