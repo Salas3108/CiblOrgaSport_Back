@@ -5,7 +5,6 @@ import com.ciblorgasport.eventservice.model.Competition;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
-import com.ciblorgasport.eventservice.model.Lieu;
 
 import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 import com.ciblorgasport.eventservice.model.enums.GenreEpreuve;
@@ -29,9 +28,8 @@ public class Epreuve {
     @JsonIgnoreProperties({"event"}) // Inclut competition sans l'event pour éviter trop de niveaux
     private Competition competition;
 
-    @ManyToOne
-    @JoinColumn(name = "lieu_id")
-    private Lieu lieu;
+    @Column(name = "lieu_id")
+    private Long lieuId;
 
     @Enumerated(EnumType.STRING)
     private TypeEpreuve typeEpreuve;
@@ -63,8 +61,8 @@ public class Epreuve {
     public void setDescription(String description) { this.description = description; }
     public Competition getCompetition() { return competition; }
     public void setCompetition(Competition competition) { this.competition = competition; }
-    public Lieu getLieu() { return lieu; }
-    public void setLieu(Lieu lieu) { this.lieu = lieu; }
+    public Long getLieuId() { return lieuId; }
+    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
     public TypeEpreuve getTypeEpreuve() { return typeEpreuve; }
     public void setTypeEpreuve(TypeEpreuve typeEpreuve) { this.typeEpreuve = typeEpreuve; }
     public GenreEpreuve getGenreEpreuve() { return genreEpreuve; }

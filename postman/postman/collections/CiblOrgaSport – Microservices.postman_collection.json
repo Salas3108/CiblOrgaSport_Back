@@ -800,84 +800,6 @@
       "name": "event-service",
       "item": [
         {
-          "name": "Lieux – List",
-          "id": "f48f9432-aac1-43d7-aaf7-611529bfba0d",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "url": {
-              "raw": "{{event_base}}/lieux",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "lieux"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Lieux – Create",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "const jsonData = pm.response.json();",
-                  "pm.test(\"Lieu contient capaciteSpectateurs\", function () {",
-                  "    pm.expect(jsonData).to.have.property('capaciteSpectateurs');",
-                  "    pm.expect(jsonData.capaciteSpectateurs).to.eql(80000);",
-                  "});",
-                  "",
-                  "if (jsonData && jsonData.id) {",
-                  "    pm.environment.set('lieu_id', jsonData.id);",
-                  "}"
-                ],
-                "type": "text/javascript",
-                "id": "00315f66-e414-42e2-9522-fcd4a8cbd9b1"
-              }
-            }
-          ],
-          "id": "3d52cf4c-7c3d-41d6-8206-1a6a405dde9b",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"ville\": \"Paris\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"capaciteSpectateurs\": 80000\n}"
-            },
-            "url": {
-              "raw": "{{event_base}}/lieux",
-              "host": [
-                "{{event_base}}"
-              ],
-              "path": [
-                "lieux"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Events – List",
           "event": [
             {
@@ -2258,6 +2180,112 @@
         }
       ],
       "id": "c227c479-9c9a-42fd-ba64-6151d5455008"
+    },
+    {
+      "name": "lieu-service",
+      "item": [
+        {
+          "name": "Lieux – List",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Get by Id",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) { pm.environment.set('lieu_id', jsonData.id); }"
+                ],
+                "type": "text/javascript",
+                "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803"
+              }
+            }
+          ],
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567804",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 80000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Update",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567805",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique MAJ\",\n  \"adresse\": \"2 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 90000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Delete",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567806",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567800"
     }
   ],
   "variable": [
@@ -2330,6 +2358,16 @@
       "id": "5a4b3c2d-1e0f-4d9c-8b7a-6e5d4c3b2a1f",
       "key": "resultat_id",
       "value": ""
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "key": "lieu_base",
+      "value": "http://localhost:8089"
+    },
+    {
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "key": "lieu_id",
+      "value": "1"
     }
   ]
 }

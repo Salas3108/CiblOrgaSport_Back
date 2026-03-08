@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.model.Competition;
-import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
 
+import com.ciblorgasport.eventservice.client.LieuServiceClient;
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
@@ -37,13 +35,13 @@ public class EpreuveController {
     private CompetitionRepository competitionRepository;
 
     @Autowired
-    private LieuRepository lieuRepository;
-
-    @Autowired
     private EpreuveMapper epreuveMapper;
 
     @Autowired
     private EpreuveValidator epreuveValidator;
+
+    @Autowired
+    private LieuServiceClient lieuServiceClient;
 
     @GetMapping
     public List<EpreuveDTO> getAllEpreuves() {
@@ -62,10 +60,8 @@ public class EpreuveController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDto.getCompetitionId()));
             entity.setCompetition(comp);
         }
-        if (epreuveDto.getLieuId() != null) {
-            Lieu lieu = lieuRepository.findById(epreuveDto.getLieuId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDto.getLieuId()));
-            entity.setLieu(lieu);
+        if (epreuveDto.getLieuId() != null && !lieuServiceClient.existsById(epreuveDto.getLieuId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDto.getLieuId());
         }
         Epreuve saved = epreuveRepository.save(entity);
         return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
@@ -90,10 +86,8 @@ public class EpreuveController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
             existing.setCompetition(comp);
         }
-        if (epreuveDetails.getLieuId() != null) {
-            Lieu lieu = lieuRepository.findById(epreuveDetails.getLieuId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDetails.getLieuId()));
-            existing.setLieu(lieu);
+        if (epreuveDetails.getLieuId() != null && !lieuServiceClient.existsById(epreuveDetails.getLieuId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDetails.getLieuId());
         }
         Epreuve updated = epreuveRepository.save(existing);
         return ResponseEntity.ok(epreuveMapper.toDto(updated));

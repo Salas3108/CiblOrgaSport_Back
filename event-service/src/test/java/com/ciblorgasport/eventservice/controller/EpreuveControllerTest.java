@@ -5,7 +5,7 @@ import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
+import com.ciblorgasport.eventservice.client.LieuServiceClient;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class EpreuveControllerTest {
     private CompetitionRepository competitionRepository;
 
     @Mock
-    private LieuRepository lieuRepository;
+    private LieuServiceClient lieuServiceClient;
 
     @Mock
     private EpreuveValidator epreuveValidator;

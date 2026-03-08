@@ -39,3 +39,6 @@ application*.yaml
 *.zip
 *.tar.gz
 *.rar
+
+# claude
+claude/

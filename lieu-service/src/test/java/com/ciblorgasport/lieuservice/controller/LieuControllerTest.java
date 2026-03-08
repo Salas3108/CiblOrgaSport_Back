@@ -1,7 +1,7 @@
-package com.ciblorgasport.eventservice.controller;
+package com.ciblorgasport.lieuservice.controller;
 
-import com.ciblorgasport.eventservice.model.Lieu;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
+import com.ciblorgasport.lieuservice.model.Lieu;
+import com.ciblorgasport.lieuservice.service.LieuService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.*;
 class LieuControllerTest {
 
     @Mock
-    private LieuRepository lieuRepository;
+    private LieuService lieuService;
 
     @InjectMocks
     private LieuController lieuController;
@@ -32,15 +31,15 @@ class LieuControllerTest {
         lieu1.setId(1L);
         Lieu lieu2 = new Lieu();
         lieu2.setId(2L);
-        
-        when(lieuRepository.findAll()).thenReturn(Arrays.asList(lieu1, lieu2));
+
+        when(lieuService.getAllLieux()).thenReturn(Arrays.asList(lieu1, lieu2));
 
         // Act
         List<Lieu> result = lieuController.getAllLieux();
 
         // Assert
         assertEquals(2, result.size());
-        verify(lieuRepository, times(1)).findAll();
+        verify(lieuService, times(1)).getAllLieux();
     }
 
     @Test
@@ -49,8 +48,8 @@ class LieuControllerTest {
         Lieu lieu = new Lieu();
         lieu.setId(1L);
         lieu.setNom("Stade de France");
-        
-        when(lieuRepository.findById(1L)).thenReturn(Optional.of(lieu));
+
+        when(lieuService.getLieuById(1L)).thenReturn(lieu);
 
         // Act
         Lieu result = lieuController.getLieuById(1L);
@@ -58,7 +57,20 @@ class LieuControllerTest {
         // Assert
         assertNotNull(result);
         assertEquals("Stade de France", result.getNom());
-        verify(lieuRepository, times(1)).findById(1L);
+        verify(lieuService, times(1)).getLieuById(1L);
+    }
+
+    @Test
+    void getLieuById_WhenNotExists_ShouldReturnNull() {
+        // Arrange
+        when(lieuService.getLieuById(99L)).thenReturn(null);
+
+        // Act
+        Lieu result = lieuController.getLieuById(99L);
+
+        // Assert
+        assertNull(result);
+        verify(lieuService, times(1)).getLieuById(99L);
     }
 
     @Test
@@ -67,12 +79,12 @@ class LieuControllerTest {
         Lieu lieu = new Lieu();
         lieu.setNom("Parc des Princes");
         lieu.setVille("Paris");
-        
+
         Lieu savedLieu = new Lieu();
         savedLieu.setId(1L);
         savedLieu.setNom("Parc des Princes");
-        
-        when(lieuRepository.save(lieu)).thenReturn(savedLieu);
+
+        when(lieuService.createLieu(lieu)).thenReturn(savedLieu);
 
         // Act
         Lieu result = lieuController.createLieu(lieu);
@@ -80,15 +92,12 @@ class LieuControllerTest {
         // Assert
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        verify(lieuRepository, times(1)).save(lieu);
+        verify(lieuService, times(1)).createLieu(lieu);
     }
 
     @Test
     void updateLieu_ShouldUpdateAllFields() {
         // Arrange
-        Lieu existing = new Lieu();
-        existing.setId(1L);
-        
         Lieu updateDetails = new Lieu();
         updateDetails.setNom("New Name");
         updateDetails.setAdresse("New Address");
@@ -96,17 +105,33 @@ class LieuControllerTest {
         updateDetails.setCodePostal("75000");
         updateDetails.setPays("France");
         updateDetails.setCapaciteSpectateurs(12000);
-        
-        when(lieuRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(lieuRepository.save(any(Lieu.class))).thenReturn(existing);
+
+        Lieu updated = new Lieu();
+        updated.setId(1L);
+        updated.setCapaciteSpectateurs(12000);
+
+        when(lieuService.updateLieu(1L, updateDetails)).thenReturn(updated);
 
         // Act
         Lieu result = lieuController.updateLieu(1L, updateDetails);
 
         // Assert
         assertNotNull(result);
-        assertEquals(12000, existing.getCapaciteSpectateurs());
-        verify(lieuRepository, times(1)).save(any(Lieu.class));
+        assertEquals(12000, result.getCapaciteSpectateurs());
+        verify(lieuService, times(1)).updateLieu(1L, updateDetails);
+    }
+
+    @Test
+    void updateLieu_WhenNotExists_ShouldReturnNull() {
+        // Arrange
+        when(lieuService.updateLieu(eq(99L), any(Lieu.class))).thenReturn(null);
+
+        // Act
+        Lieu result = lieuController.updateLieu(99L, new Lieu());
+
+        // Assert
+        assertNull(result);
+        verify(lieuService, times(1)).updateLieu(eq(99L), any(Lieu.class));
     }
 
     @Test
@@ -115,6 +140,6 @@ class LieuControllerTest {
         lieuController.deleteLieu(1L);
 
         // Assert
-        verify(lieuRepository, times(1)).deleteById(1L);
+        verify(lieuService, times(1)).deleteLieu(1L);
     }
 }
