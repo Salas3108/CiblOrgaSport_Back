@@ -21,6 +21,7 @@ import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 
 import com.ciblorgasport.eventservice.client.LieuServiceClient;
+import com.ciblorgasport.eventservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
@@ -43,6 +44,9 @@ public class EpreuveController {
     @Autowired
     private LieuServiceClient lieuServiceClient;
 
+    @Autowired
+    private ParticipantsServiceClient participantsServiceClient;
+
     @GetMapping
     public List<EpreuveDTO> getAllEpreuves() {
         return epreuveRepository.findAll().stream()
@@ -61,6 +65,7 @@ public class EpreuveController {
             entity.setCompetition(comp);
         }
         validateLieuExists(epreuveDto.getLieuId());
+        validateAthletesExist(epreuveDto.getAthleteIds());
         Epreuve saved = epreuveRepository.save(entity);
         return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
     }
@@ -85,6 +90,7 @@ public class EpreuveController {
             existing.setCompetition(comp);
         }
         validateLieuExists(epreuveDetails.getLieuId());
+        validateAthletesExist(epreuveDetails.getAthleteIds());
         Epreuve updated = epreuveRepository.save(existing);
         return ResponseEntity.ok(epreuveMapper.toDto(updated));
     }
@@ -100,6 +106,31 @@ public class EpreuveController {
             }
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate lieu with lieu-service", ex);
+        }
+    }
+
+    private void validateAthletesExist(Iterable<Long> athleteIds) {
+        if (athleteIds == null) {
+            return;
+        }
+
+        List<Long> ids = new java.util.ArrayList<>();
+        for (Long athleteId : athleteIds) {
+            if (athleteId != null) {
+                ids.add(athleteId);
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        try {
+            if (!participantsServiceClient.areValidAthletes(ids)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more athleteIds are invalid or not validated");
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate athleteIds with participants-service", ex);
         }
     }
 
@@ -120,6 +151,7 @@ public class EpreuveController {
         if (athleteId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing required field 'athleteId'");
         }
+        validateAthletesExist(Collections.singletonList(athleteId));
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
@@ -135,6 +167,7 @@ public class EpreuveController {
         if (athleteIds == null || athleteIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'athleteIds' must be provided and non-empty");
         }
+        validateAthletesExist(athleteIds);
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());

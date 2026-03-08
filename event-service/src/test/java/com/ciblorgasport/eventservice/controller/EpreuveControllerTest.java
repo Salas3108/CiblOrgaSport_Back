@@ -6,6 +6,7 @@ import com.ciblorgasport.eventservice.dto.EpreuveMapper;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import com.ciblorgasport.eventservice.client.LieuServiceClient;
+import com.ciblorgasport.eventservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
 
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,9 @@ class EpreuveControllerTest {
 
     @Mock
     private LieuServiceClient lieuServiceClient;
+
+    @Mock
+    private ParticipantsServiceClient participantsServiceClient;
 
     @Mock
     private EpreuveValidator epreuveValidator;
@@ -178,6 +182,7 @@ class EpreuveControllerTest {
         existing.setId(1L);
 
         when(epreuveRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(participantsServiceClient.areValidAthletes(anyCollection())).thenReturn(true);
 
         Epreuve saved = new Epreuve();
         saved.setId(1L);
@@ -210,6 +215,7 @@ class EpreuveControllerTest {
 
     @Test
     void addAthlete_ShouldReturnNotFoundWhenEpreuveNotFound() {
+        when(participantsServiceClient.areValidAthletes(anyCollection())).thenReturn(true);
         when(epreuveRepository.findById(1L)).thenReturn(Optional.empty());
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
             () -> epreuveController.addAthlete(1L, Collections.singletonMap("athleteId", 5L)));
