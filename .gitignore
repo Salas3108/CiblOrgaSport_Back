@@ -42,3 +42,6 @@ Thumbs.db
 
 # claude
 claude/
+
+# Postman import artifacts
+postman/postman/
