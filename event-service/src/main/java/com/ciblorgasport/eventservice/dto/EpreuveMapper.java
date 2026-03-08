@@ -23,7 +23,7 @@ public class EpreuveMapper {
         dto.setNiveauEpreuve(e.getNiveauEpreuve());
         dto.setEquipeId(e.getEquipeId());
         if (e.getCompetition() != null) dto.setCompetitionId(e.getCompetition().getId());
-        if (e.getLieu() != null) dto.setLieuId(e.getLieu().getId());
+        dto.setLieuId(e.getLieuId());
         dto.setAthleteIds(e.getAthleteIds());
         return dto;
     }
@@ -41,6 +41,7 @@ public class EpreuveMapper {
         e.setGenreEpreuve(dto.getGenreEpreuve());
         e.setNiveauEpreuve(dto.getNiveauEpreuve());
         e.setEquipeId(dto.getEquipeId());
+        e.setLieuId(dto.getLieuId());
         e.setAthleteIds(dto.getAthleteIds());
         return e;
     }
@@ -58,5 +59,6 @@ public class EpreuveMapper {
         if (dto.getEquipeId() != null) {
             entity.setEquipeId(dto.getEquipeId());
         }
+        entity.setLieuId(dto.getLieuId());
     }
 }

@@ -822,8 +822,15 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}"
+              ]
             }
           },
           "response": []
@@ -836,8 +843,16 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/non-lues",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "non-lues"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "non-lues"
+              ]
             }
           },
           "response": []
@@ -850,8 +865,16 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/compteur",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "compteur"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "compteur"
+              ]
             }
           },
           "response": []
@@ -876,8 +899,15 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/{{notification_id}}/lue",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "{{notification_id}}", "lue"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}",
+                "lue"
+              ]
             }
           },
           "response": []
@@ -890,8 +920,16 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/tout-lire",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "spectateur", "{{spectateur_id}}", "tout-lire"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "tout-lire"
+              ]
             }
           },
           "response": []
@@ -903,7 +941,9 @@
               "listen": "test",
               "script": {
                 "type": "text/javascript",
-                "exec": ["pm.test(\"Status 204\", () => pm.response.to.have.status(204));"]
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
               }
             }
           ],
@@ -913,8 +953,14 @@
             "header": [],
             "url": {
               "raw": "{{notif_base}}/api/notifications/{{notification_id}}",
-              "host": ["{{notif_base}}"],
-              "path": ["api", "notifications", "{{notification_id}}"]
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}"
+              ]
             }
           },
           "response": []
@@ -922,11 +968,11 @@
       ]
     },
     {
-      "name": "event-service",
+      "name": "lieu-service",
       "item": [
         {
           "name": "Lieux – List",
-          "id": "f48f9432-aac1-43d7-aaf7-611529bfba0d",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
           "request": {
             "method": "GET",
             "header": [
@@ -936,12 +982,36 @@
               }
             ],
             "url": {
-              "raw": "{{event_base}}/lieux",
+              "raw": "{{lieu_base}}/lieux",
               "host": [
-                "{{event_base}}"
+                "{{lieu_base}}"
               ],
               "path": [
                 "lieux"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Get by Id",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
               ]
             }
           },
@@ -954,26 +1024,18 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
                   "});",
-                  "",
                   "const jsonData = pm.response.json();",
-                  "pm.test(\"Lieu contient capaciteSpectateurs\", function () {",
-                  "    pm.expect(jsonData).to.have.property('capaciteSpectateurs');",
-                  "    pm.expect(jsonData.capaciteSpectateurs).to.eql(80000);",
-                  "});",
-                  "",
-                  "if (jsonData && jsonData.id) {",
-                  "    pm.environment.set('lieu_id', jsonData.id);",
-                  "}"
+                  "if (jsonData && jsonData.id) { pm.environment.set('lieu_id', jsonData.id); }"
                 ],
                 "type": "text/javascript",
-                "id": "00315f66-e414-42e2-9522-fcd4a8cbd9b1"
+                "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803"
               }
             }
           ],
-          "id": "3d52cf4c-7c3d-41d6-8206-1a6a405dde9b",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567804",
           "request": {
             "method": "POST",
             "header": [
@@ -988,12 +1050,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"ville\": \"Paris\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"capaciteSpectateurs\": 80000\n}"
+              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 80000\n}"
             },
             "url": {
-              "raw": "{{event_base}}/lieux",
+              "raw": "{{lieu_base}}/lieux",
               "host": [
-                "{{event_base}}"
+                "{{lieu_base}}"
               ],
               "path": [
                 "lieux"
@@ -1002,6 +1064,68 @@
           },
           "response": []
         },
+        {
+          "name": "Lieux – Update",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567805",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique MAJ\",\n  \"adresse\": \"2 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 90000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Delete",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567806",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567800"
+    },
+    {
+      "name": "event-service",
+      "item": [
         {
           "name": "Events – List",
           "event": [
@@ -2470,6 +2594,16 @@
       "id": "f1a2b3c4-d5e6-7890-abcd-notif000003",
       "key": "notification_id",
       "value": ""
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "key": "lieu_base",
+      "value": "http://localhost:8089"
+    },
+    {
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "key": "lieu_id",
+      "value": "1"
     }
   ]
 }

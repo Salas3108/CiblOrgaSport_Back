@@ -39,3 +39,6 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+
+# claude
+claude/
