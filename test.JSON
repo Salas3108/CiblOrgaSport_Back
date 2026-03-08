@@ -1,0 +1,102 @@
+[
+    {
+        "title": "Accueil - Entrée principale",
+        "description": "Accueillir les athlètes et les visiteurs à l'entrée principale",
+        "taskDate": "2026-07-15",
+        "startTime": "08:00:00",
+        "endTime": "12:00:00",
+        "location": "Piscine Olympique - Entrée A",
+        "taskType": "ACCUEIL",
+        "requiredLanguages": ["Français", "Anglais"]
+    },
+    {
+        "title": "Accueil - Entrée secondaire",
+        "description": "Accueillir les visiteurs à l'entrée sud",
+        "taskDate": "2026-07-15",
+        "startTime": "12:00:00",
+        "endTime": "18:00:00",
+        "location": "Piscine Olympique - Entrée B",
+        "taskType": "ACCUEIL",
+        "requiredLanguages": ["Français"]
+    },
+    {
+        "title": "Distribution d'eau",
+        "description": "Distribution d'eau et de ravitaillement",
+        "taskDate": "2026-07-15",
+        "startTime": "09:00:00",
+        "endTime": "19:00:00",
+        "location": "Zone de repos",
+        "taskType": "DISTRIBUTION_EAU",
+        "requiredLanguages": ["Français", "Anglais"]
+    },
+    {
+        "title": "Sécurité - Tribunes",
+        "description": "Surveillance des tribunes",
+        "taskDate": "2026-07-15",
+        "startTime": "13:00:00",
+        "endTime": "22:00:00",
+        "location": "Tribunes principales",
+        "taskType": "SECURITE",
+        "requiredLanguages": ["Français", "Anglais"]
+    },
+    {
+        "title": "Nettoyage - Vestiaires",
+        "description": "Nettoyage des vestiaires",
+        "taskDate": "2026-07-15",
+        "startTime": "19:00:00",
+        "endTime": "22:00:00",
+        "location": "Vestiaires",
+        "taskType": "NETTOYAGE",
+        "requiredLanguages": ["Français"]
+    },
+    {
+        "title": "Information - Stand principal",
+        "description": "Renseigner les visiteurs",
+        "taskDate": "2026-07-15",
+        "startTime": "09:00:00",
+        "endTime": "13:00:00",
+        "location": "Hall principal",
+        "taskType": "INFORMATION",
+        "requiredLanguages": ["Français", "Anglais", "Espagnol"]
+    },
+    {
+        "title": "Premiers secours",
+        "description": "Poste de premiers secours",
+        "taskDate": "2026-07-15",
+        "startTime": "08:00:00",
+        "endTime": "20:00:00",
+        "location": "Infirmerie",
+        "taskType": "PREMIERS_SECOURS",
+        "requiredLanguages": ["Français", "Anglais"]
+    },
+    {
+        "title": "Orientation - Parking",
+        "description": "Guider les véhicules",
+        "taskDate": "2026-07-15",
+        "startTime": "07:00:00",
+        "endTime": "15:00:00",
+        "location": "Parking P1",
+        "taskType": "ORIENTATION",
+        "requiredLanguages": ["Français"]
+    },
+    {
+        "title": "Support logistique",
+        "description": "Transport de matériel",
+        "taskDate": "2026-07-15",
+        "startTime": "08:00:00",
+        "endTime": "18:00:00",
+        "location": "Zone logistique",
+        "taskType": "SUPPORT_LOGISTIQUE",
+        "requiredLanguages": ["Français"]
+    },
+    {
+        "title": "Accompagnement athlètes",
+        "description": "Accompagner les athlètes",
+        "taskDate": "2026-07-15",
+        "startTime": "09:00:00",
+        "endTime": "17:00:00",
+        "location": "Village athlètes",
+        "taskType": "ACCOMPAGNEMENT_ATHLETES",
+        "requiredLanguages": ["Français", "Anglais"]
+    }
+]

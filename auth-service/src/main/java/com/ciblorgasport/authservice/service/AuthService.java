@@ -67,8 +67,8 @@ public class AuthService {
         } else {
             user.setRole(Role.USER);
         }
-        // Tous validés par défaut sauf ATHLETE
-        if (user.getRole() == Role.ATHLETE) {
+        // ATHLETE et VOLONTAIRE nécessitent validation par admin
+        if (user.getRole() == Role.ATHLETE || user.getRole() == Role.VOLONTAIRE) {
             user.setValidated(false);
         } else {
             user.setValidated(true);
