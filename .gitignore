@@ -39,3 +39,9 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+
+# claude
+claude/
+
+# Postman import artifacts
+postman/postman/

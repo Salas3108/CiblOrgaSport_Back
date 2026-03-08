@@ -1,4 +1,4 @@
-package com.ciblorgasport.eventservice.model;
+package com.ciblorgasport.lieuservice.model;
 
 import jakarta.persistence.*;
 
