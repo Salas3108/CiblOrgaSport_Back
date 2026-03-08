@@ -22,7 +22,7 @@ class AbonnementTest {
     @Test
     void testAllArgsConstructor() {
         Long userId = 123L;
-        UUID competitionId = UUID.randomUUID();
+        Long competitionId = 42L;
         
         Abonnement abonnement = new Abonnement(userId, competitionId);
 
@@ -38,7 +38,7 @@ class AbonnementTest {
         Abonnement abonnement = new Abonnement();
         UUID id = UUID.randomUUID();
         Long userId = 456L;
-        UUID competitionId = UUID.randomUUID();
+        Long competitionId = 99L;
         LocalDateTime dateAbonnement = LocalDateTime.now().minusDays(2);
         
         abonnement.setId(id);
@@ -69,7 +69,7 @@ class AbonnementTest {
     void testConstructorSetsDateAutomatically() {
         LocalDateTime beforeCreation = LocalDateTime.now();
         
-        Abonnement abonnement = new Abonnement(100L, UUID.randomUUID());
+        Abonnement abonnement = new Abonnement(100L, 7L);
         
         assertThat(abonnement.getDateAbonnement()).isNotNull();
         assertThat(abonnement.getDateAbonnement()).isAfterOrEqualTo(beforeCreation);

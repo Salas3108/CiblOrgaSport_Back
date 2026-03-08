@@ -2,7 +2,6 @@ package com.ciblorgasport.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class AbonnementController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<?> sabonnerCompetition(@RequestParam Long userId, @RequestParam UUID competitionId) {
+    public ResponseEntity<?> sabonnerCompetition(@RequestParam Long userId, @RequestParam Long competitionId) {
         if (abonnementRepo.existsByUserIdAndCompetitionId(userId, competitionId)) {
             return ResponseEntity.badRequest().body(Map.of("message", "Déjà abonné à cette compétition"));
         }
@@ -55,11 +54,25 @@ public class AbonnementController {
     }
 
     @DeleteMapping("/unsubscribe")
-    public ResponseEntity<?> desabonnerCompetition(@RequestParam Long userId, @RequestParam UUID competitionId) {
+    public ResponseEntity<?> desabonnerCompetition(@RequestParam Long userId, @RequestParam Long competitionId) {
         Abonnement abonnement = abonnementRepo.findByUserIdAndCompetitionId(userId, competitionId)
             .orElseThrow(() -> new RuntimeException("Non abonné à cette compétition"));
         AbonnementDTO dto = abonnementMapper.toDto(abonnement);
         abonnementRepo.delete(abonnement);
         return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Endpoint interne utilisé par notifications-service.
+     * Retourne les userId des abonnés à une compétition ayant les notifications actives.
+     */
+    @GetMapping("/internal/competition/{competitionId}/subscribers")
+    public ResponseEntity<List<Long>> getSubscriberIdsWithNotifications(@PathVariable Long competitionId) {
+        List<Long> userIds = abonnementRepo
+                .findByCompetitionIdAndNotificationsActivesTrue(competitionId)
+                .stream()
+                .map(Abonnement::getUserId)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userIds);
     }
 }

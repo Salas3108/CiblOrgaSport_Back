@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.ciblorgasport.notificationsservice.client.AbonnementServiceClient;
 import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
 import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
 import com.ciblorgasport.notificationsservice.model.Notification;
-import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
 import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
 
 @Service
@@ -25,14 +25,14 @@ public class NotificationGeneratorService {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationGeneratorService.class);
 
-    private final AbonnementRepository abonnementRepository;
+    private final AbonnementServiceClient abonnementServiceClient;
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public NotificationGeneratorService(AbonnementRepository abonnementRepository,
+    public NotificationGeneratorService(AbonnementServiceClient abonnementServiceClient,
                                         NotificationRepository notificationRepository,
                                         SimpMessagingTemplate messagingTemplate) {
-        this.abonnementRepository = abonnementRepository;
+        this.abonnementServiceClient = abonnementServiceClient;
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
     }
@@ -54,11 +54,9 @@ public class NotificationGeneratorService {
             return;
         }
 
-        List<Long> spectatorIds = abonnementRepository
-                .findByIdIdCompetitionAndPreferenceNotifTrue(competitionId)
-                .stream()
-                .map(a -> a.getId().getIdSpectateur())
-                .toList();
+        // Fetch subscribers from abonnement-service via HTTP.
+        List<Long> spectatorIds = abonnementServiceClient
+                .getSubscribersWithNotifications(competitionId);
 
         Set<Long> recipientIds = new HashSet<>(spectatorIds);
         recipientIds.addAll(determineVolunteerRecipients(event));

@@ -18,14 +18,14 @@ import jakarta.persistence.UniqueConstraint;
        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "competition_id"}))
 public class Abonnement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Column(name = "competition_id", nullable = false)
-    private UUID competitionId;
+    private Long competitionId;
 
     @Column(name = "date_abonnement", nullable = false)
     private LocalDateTime dateAbonnement;
@@ -42,7 +42,7 @@ public class Abonnement {
         this.dateAbonnement = LocalDateTime.now();
     }
 
-    public Abonnement(Long userId, UUID competitionId) {
+    public Abonnement(Long userId, Long competitionId) {
         this();
         this.userId = userId;
         this.competitionId = competitionId;
@@ -55,8 +55,8 @@ public class Abonnement {
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 
-    public UUID getCompetitionId() { return competitionId; }
-    public void setCompetitionId(UUID competitionId) { this.competitionId = competitionId; }
+    public Long getCompetitionId() { return competitionId; }
+    public void setCompetitionId(Long competitionId) { this.competitionId = competitionId; }
 
     public LocalDateTime getDateAbonnement() { return dateAbonnement; }
     public void setDateAbonnement(LocalDateTime dateAbonnement) { this.dateAbonnement = dateAbonnement; }
