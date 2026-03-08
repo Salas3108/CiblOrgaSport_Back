@@ -2507,6 +2507,112 @@
         }
       ],
       "id": "c227c479-9c9a-42fd-ba64-6151d5455008"
+    },
+    {
+      "name": "lieu-service",
+      "item": [
+        {
+          "name": "Lieux – List",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Get by Id",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) { pm.environment.set('lieu_id', jsonData.id); }"
+                ],
+                "type": "text/javascript",
+                "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803"
+              }
+            }
+          ],
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567804",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"adresse\": \"1 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 80000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Update",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567805",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique MAJ\",\n  \"adresse\": \"2 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 90000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux – Delete",
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567806",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "{{jwt}}" }],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": ["{{lieu_base}}"],
+              "path": ["lieux", "{{lieu_id}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567800"
     }
   ],
   "variable": [
