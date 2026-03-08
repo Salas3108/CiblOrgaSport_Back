@@ -60,9 +60,7 @@ public class EpreuveController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDto.getCompetitionId()));
             entity.setCompetition(comp);
         }
-        if (epreuveDto.getLieuId() != null && !lieuServiceClient.existsById(epreuveDto.getLieuId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDto.getLieuId());
-        }
+        validateLieuExists(epreuveDto.getLieuId());
         Epreuve saved = epreuveRepository.save(entity);
         return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
     }
@@ -86,11 +84,23 @@ public class EpreuveController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
             existing.setCompetition(comp);
         }
-        if (epreuveDetails.getLieuId() != null && !lieuServiceClient.existsById(epreuveDetails.getLieuId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + epreuveDetails.getLieuId());
-        }
+        validateLieuExists(epreuveDetails.getLieuId());
         Epreuve updated = epreuveRepository.save(existing);
         return ResponseEntity.ok(epreuveMapper.toDto(updated));
+    }
+
+    private void validateLieuExists(Long lieuId) {
+        if (lieuId == null) {
+            return;
+        }
+
+        try {
+            if (!lieuServiceClient.existsById(lieuId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + lieuId);
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate lieu with lieu-service", ex);
+        }
     }
 
     @DeleteMapping("/{id}")

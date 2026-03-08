@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/lieux")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
 public class LieuController {
     private final LieuService lieuService;
 
@@ -28,16 +27,19 @@ public class LieuController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public Lieu createLieu(@RequestBody Lieu lieu) {
         return lieuService.createLieu(lieu);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public Lieu updateLieu(@PathVariable Long id, @RequestBody Lieu lieuDetails) {
         return lieuService.updateLieu(id, lieuDetails);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public void deleteLieu(@PathVariable Long id) {
         lieuService.deleteLieu(id);
     }

@@ -1398,14 +1398,7 @@
                                                         "listen":  "prerequest",
                                                         "script":  {
                                                                        "exec":  [
-                                                                                    "const source = pm.variables.get(\u0027athlete_ids\u0027) || pm.environment.get(\u0027athlete_ids\u0027) || pm.collectionVariables.get(\u0027athlete_ids\u0027) || \u00272,3,6,7\u0027;",
-                                                                                    "const parsed = String(source)",
-                                                                                    "    .split(\u0027,\u0027)",
-                                                                                    "    .map(v =\u003e v.trim())",
-                                                                                    "    .filter(v =\u003e v.length \u003e 0)",
-                                                                                    "    .map(v =\u003e Number(v))",
-                                                                                    "    .filter(v =\u003e Number.isFinite(v));",
-                                                                                    "pm.variables.set(\u0027athlete_ids_payload\u0027, JSON.stringify(parsed));"
+                                                                                    ""
                                                                                 ],
                                                                        "type":  "text/javascript"
                                                                    }
@@ -1451,7 +1444,7 @@
                                                                  ],
                                                       "body":  {
                                                                    "mode":  "raw",
-                                                                   "raw":  "{\n  \"nom\": \"Finale 100m\",\n  \"description\": \"Epreuve individuelle de sprint\",\n  \"dateHeure\": \"2026-06-20T14:30:00\",\n  \"dureeMinutes\": 45,\n  \"statut\": \"PLANIFIE\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MASCULIN\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": {{athlete_ids_payload}}\n}"
+                                                                   "raw":  "{\n  \"nom\": \"Finale 100m\",\n  \"description\": \"Epreuve individuelle de sprint\",\n  \"dateHeure\": \"2026-06-20T14:30:00\",\n  \"dureeMinutes\": 45,\n  \"statut\": \"PLANIFIE\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MASCULIN\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": []\n}"
                                                                },
                                                       "url":  {
                                                                   "raw":  "{{event_base}}/epreuves",
@@ -1613,14 +1606,7 @@
                                                         "listen":  "prerequest",
                                                         "script":  {
                                                                        "exec":  [
-                                                                                    "const source = pm.variables.get(\u0027athlete_ids\u0027) || pm.environment.get(\u0027athlete_ids\u0027) || pm.collectionVariables.get(\u0027athlete_ids\u0027) || \u00272,3,6,7\u0027;",
-                                                                                    "const parsed = String(source)",
-                                                                                    "    .split(\u0027,\u0027)",
-                                                                                    "    .map(v =\u003e v.trim())",
-                                                                                    "    .filter(v =\u003e v.length \u003e 0)",
-                                                                                    "    .map(v =\u003e Number(v))",
-                                                                                    "    .filter(v =\u003e Number.isFinite(v));",
-                                                                                    "pm.variables.set(\u0027athlete_ids_payload\u0027, JSON.stringify(parsed));"
+                                                                                    ""
                                                                                 ],
                                                                        "type":  "text/javascript"
                                                                    }
@@ -1663,7 +1649,7 @@
                                                                  ],
                                                       "body":  {
                                                                    "mode":  "raw",
-                                                                   "raw":  "{\n  \"nom\": \"Finale 100m Sprint - MAJ\",\n  \"description\": \"Epreuve en cours\",\n  \"dateHeure\": \"2026-06-20T18:30:00\",\n  \"dureeMinutes\": 70,\n  \"statut\": \"EN_COURS\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MIXTE\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": {{athlete_ids_payload}}\n}"
+                                                                   "raw":  "{\n  \"nom\": \"Finale 100m Sprint - MAJ\",\n  \"description\": \"Epreuve en cours\",\n  \"dateHeure\": \"2026-06-20T18:30:00\",\n  \"dureeMinutes\": 70,\n  \"statut\": \"EN_COURS\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MIXTE\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": []\n}"
                                                                },
                                                       "url":  {
                                                                   "raw":  "{{event_base}}/epreuves/{{epreuve_id}}",
@@ -2780,11 +2766,6 @@
                          "value":  "1"
                      },
                      {
-                         "id":  "d3aab4f2-7d21-4a58-a5f6-3e8a2b0b7a12",
-                         "key":  "athlete_ids",
-                         "value":  "2,3,6,7"
-                     },
-                     {
                          "id":  "6c5b4a3f-2e1d-4c9b-8a7e-1f2d3c4b5a6e",
                          "key":  "equipe_id",
                          "value":  "1"
@@ -2797,7 +2778,7 @@
                      {
                          "id":  "f1a2b3c4-d5e6-7890-abcd-notif000001",
                          "key":  "notif_base",
-                         "value":  "http://localhost:8089"
+                                "value":  "http://localhost:8089"
                      },
                      {
                          "id":  "f1a2b3c4-d5e6-7890-abcd-notif000002",
@@ -2812,7 +2793,7 @@
                      {
                          "id":  "b2c3d4e5-f6a7-8901-bcde-f12345678901",
                          "key":  "lieu_base",
-                         "value":  "http://localhost:8089"
+                         "value":  "http://localhost:8090"
                      },
                      {
                          "id":  "c3d4e5f6-a7b8-9012-cdef-123456789012",

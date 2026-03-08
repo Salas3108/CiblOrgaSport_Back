@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 public class LieuServiceClient {
-    @Value("${lieu-service.url:http://localhost:8089}")
+    @Value("${lieu-service.url:http://localhost:8090}")
     private String lieuServiceUrl;
 
     public boolean existsById(Long id) {
@@ -21,8 +21,10 @@ public class LieuServiceClient {
             return response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
         } catch (HttpClientErrorException.NotFound e) {
             return false;
+        } catch (HttpClientErrorException e) {
+            throw new IllegalStateException("Failed to validate lieu " + id + " via lieu-service: HTTP " + e.getStatusCode().value(), e);
         } catch (Exception e) {
-            return false;
+            throw new IllegalStateException("Failed to validate lieu " + id + " via lieu-service", e);
         }
     }
 }
