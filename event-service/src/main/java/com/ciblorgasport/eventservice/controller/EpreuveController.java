@@ -17,10 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.Valid;
 import com.ciblorgasport.eventservice.model.Epreuve;
-import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.model.Competition;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 
 import com.ciblorgasport.eventservice.client.LieuServiceClient;
@@ -50,65 +48,116 @@ public class EpreuveController {
 
     @Autowired
     private ParticipantsServiceClient participantsServiceClient;
-    @Autowired
-    private LieuRepository lieuRepository;
 
     @GetMapping
-    @PreAuthorize("permitAll()")
-    public List<Epreuve> getAllEpreuves() {
-        return epreuveRepository.findAll();
+    public List<EpreuveDTO> getAllEpreuves() {
+        return epreuveRepository.findAll().stream()
+            .map(epreuveMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
-    public ResponseEntity<Epreuve> createEpreuve(@RequestBody Epreuve epreuve) {
-        Long lieuId = epreuve.getLieuId();
-        if (lieuId == null && epreuve.getLieu() != null) {
-            lieuId = epreuve.getLieu().getId();
+    public ResponseEntity<EpreuveDTO> createEpreuve(@Valid @RequestBody EpreuveDTO epreuveDto) {
+        epreuveValidator.validateForCreate(epreuveDto);
+        Epreuve entity = epreuveMapper.toEntity(epreuveDto);
+        if (epreuveDto.getCompetitionId() != null) {
+            Competition comp = competitionRepository.findById(epreuveDto.getCompetitionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDto.getCompetitionId()));
+            entity.setCompetition(comp);
         }
-        if (lieuId != null) {
-            Lieu lieu = lieuRepository.findById(lieuId).orElseThrow(() -> new RuntimeException("Lieu not found"));
-            epreuve.setLieu(lieu);
-        }
-        Epreuve saved = epreuveRepository.save(epreuve);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        validateLieuExists(epreuveDto.getLieuId());
+        validateAthletesExist(epreuveDto.getAthleteIds());
+        validateEquipesExist(epreuveDto.getEquipeIds());
+        Epreuve saved = epreuveRepository.save(entity);
+        return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<Epreuve> getEpreuveById(@PathVariable Long id) {
-        return epreuveRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<EpreuveDTO> getEpreuveById(@PathVariable Long id) {
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        return ResponseEntity.ok(epreuveMapper.toDto(e));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
-    public ResponseEntity<Epreuve> updateEpreuve(@PathVariable Long id, @RequestBody Epreuve epreuveDetails) {
-        return epreuveRepository.findById(id)
-                .map(existing -> {
-                    existing.setNom(epreuveDetails.getNom());
-                    existing.setDescription(epreuveDetails.getDescription());
-                    existing.setDate(epreuveDetails.getDate());
-                    existing.setHeureDebut(epreuveDetails.getHeureDebut());
-                    existing.setHeureFin(epreuveDetails.getHeureFin());
-                    Long lieuId = epreuveDetails.getLieuId();
-                    if (lieuId == null && epreuveDetails.getLieu() != null) {
-                        lieuId = epreuveDetails.getLieu().getId();
-                    }
-                    if (lieuId != null) {
-                        Lieu lieu = lieuRepository.findById(lieuId).orElseThrow(() -> new RuntimeException("Lieu not found"));
-                        existing.setLieu(lieu);
-                    }
-                    Epreuve updated = epreuveRepository.save(existing);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<EpreuveDTO> updateEpreuve(@PathVariable Long id, @Valid @RequestBody EpreuveDTO epreuveDetails) {
+        epreuveValidator.validate(epreuveDetails);
+        Epreuve existing = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        epreuveMapper.updateEntityFromDto(existing, epreuveDetails);
+        if (epreuveDetails.getCompetitionId() != null) {
+            Competition comp = competitionRepository.findById(epreuveDetails.getCompetitionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Competition not found with id " + epreuveDetails.getCompetitionId()));
+            existing.setCompetition(comp);
+        }
+        validateLieuExists(epreuveDetails.getLieuId());
+        validateAthletesExist(epreuveDetails.getAthleteIds());
+        validateEquipesExist(epreuveDetails.getEquipeIds());
+        Epreuve updated = epreuveRepository.save(existing);
+        return ResponseEntity.ok(epreuveMapper.toDto(updated));
+    }
+
+    private void validateLieuExists(Long lieuId) {
+        if (lieuId == null) {
+            return;
+        }
+
+        try {
+            if (!lieuServiceClient.existsById(lieuId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lieu not found with id " + lieuId);
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate lieu with lieu-service", ex);
+        }
+    }
+
+    private void validateAthletesExist(Iterable<Long> athleteIds) {
+        if (athleteIds == null) {
+            return;
+        }
+
+        List<Long> ids = new java.util.ArrayList<>();
+        for (Long athleteId : athleteIds) {
+            if (athleteId != null) {
+                ids.add(athleteId);
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        try {
+            if (!participantsServiceClient.areValidAthletes(ids)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more athleteIds are invalid or not validated");
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate athleteIds with participants-service", ex);
+        }
+    }
+
+    private void validateEquipesExist(Collection<Long> equipeIds) {
+        if (equipeIds == null || equipeIds.isEmpty()) {
+            return;
+        }
+
+        try {
+            if (!participantsServiceClient.areValidEquipes(equipeIds)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more equipeIds are invalid");
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate equipeIds with participants-service", ex);
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Void> deleteEpreuve(@PathVariable Long id) {
+        if (!epreuveRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id);
+        }
         epreuveRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

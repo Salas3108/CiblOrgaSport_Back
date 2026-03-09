@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ciblorgasport.eventservice.model.Competition;
 import com.ciblorgasport.eventservice.model.Epreuve;
 import com.ciblorgasport.eventservice.model.Event;
-import com.ciblorgasport.eventservice.model.Lieu;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
 import com.ciblorgasport.eventservice.repository.EpreuveRepository;
 import com.ciblorgasport.eventservice.repository.EventRepository;
-import com.ciblorgasport.eventservice.repository.LieuRepository;
+import com.ciblorgasport.eventservice.client.LieuServiceClient;
 
 @RestController
 @RequestMapping("/admin/events")
@@ -29,14 +28,14 @@ public class AdminEventController {
     private final EventRepository eventRepo;
     private final CompetitionRepository competitionRepo;
     private final EpreuveRepository epreuveRepo;
-    private final LieuRepository lieuRepo;
+    private final LieuServiceClient lieuServiceClient;
 
     @Autowired
-    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo, LieuRepository lieuRepo) {
+    public AdminEventController(EventRepository eventRepo, CompetitionRepository competitionRepo, EpreuveRepository epreuveRepo, LieuServiceClient lieuServiceClient) {
         this.eventRepo = eventRepo;
         this.competitionRepo = competitionRepo;
         this.epreuveRepo = epreuveRepo;
-        this.lieuRepo = lieuRepo;
+        this.lieuServiceClient = lieuServiceClient;
     }
 
     // EVENTS
@@ -69,12 +68,10 @@ public class AdminEventController {
         Competition competition = competitionRepo.findById(competitionId).orElseThrow(() -> new RuntimeException("Competition not found"));
         epreuve.setCompetition(competition);
         Long lieuId = epreuve.getLieuId();
-        if (lieuId == null && epreuve.getLieu() != null) {
-            lieuId = epreuve.getLieu().getId();
-        }
         if (lieuId != null) {
-            Lieu lieu = lieuRepo.findById(lieuId).orElseThrow(() -> new RuntimeException("Lieu not found"));
-            epreuve.setLieu(lieu);
+            if (!lieuServiceClient.existsById(lieuId)) {
+                throw new RuntimeException("Lieu not found with id " + lieuId);
+            }
         }
         return epreuveRepo.save(epreuve);
     }

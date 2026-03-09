@@ -54,11 +54,6 @@ public class Epreuve {
     @Column(name = "athlete_id")
     private Set<Long> athleteIds = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "lieu_id")
-    private Lieu lieu;
-    @Transient
-    private Long lieuId;
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -86,27 +81,4 @@ public class Epreuve {
     public void setDateHeure(LocalDateTime dateHeure) { this.dateHeure = dateHeure; }
     public Integer getDureeMinutes() { return dureeMinutes; }
     public void setDureeMinutes(Integer dureeMinutes) { this.dureeMinutes = dureeMinutes; }
-    public Lieu getLieu() { return lieu; }
-    public void setLieu(Lieu lieu) { this.lieu = lieu; }
-    public Long getLieuId() { return lieuId; }
-    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
-	public LocalDate getDate() {
-		return date;
-	}
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-	public LocalTime getHeureDebut() {
-		return heureDebut;
-	}
-	public void setHeureDebut(LocalTime heureDebut) {
-		this.heureDebut = heureDebut;
-	}
-	public LocalTime getHeureFin() {
-		return heureFin;
-	}
-	public void setHeureFin(LocalTime heureFin) {
-		this.heureFin = heureFin;
-	}
-    
 }
