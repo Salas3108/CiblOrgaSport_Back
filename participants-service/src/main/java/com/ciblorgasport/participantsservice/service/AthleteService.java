@@ -2,19 +2,26 @@ package com.ciblorgasport.participantsservice.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ciblorgasport.participantsservice.dto.AthleteMapper;
+import com.ciblorgasport.participantsservice.dto.EquipeDto;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteDocsRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
 import com.ciblorgasport.participantsservice.dto.request.ValidationRequest;
 import com.ciblorgasport.participantsservice.model.Athlete;
 import com.ciblorgasport.participantsservice.model.AthleteDocs;
+import com.ciblorgasport.participantsservice.model.Equipe;
 import com.ciblorgasport.participantsservice.model.Message;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
 import com.ciblorgasport.participantsservice.repository.JpaMessageRepository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AthleteService {
@@ -42,9 +49,50 @@ public class AthleteService {
         return athleteRepository.findByValideTrue();
     }
 
+    public boolean existsById(Long id) {
+        return athleteRepository.existsById(id);
+    }
+
     public Athlete findByIdOrThrow(Long id) {
         return athleteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Athlète introuvable: " + id));
+    }
+
+    public Athlete updateUsernameIfMissing(Long id, String username) {
+        Athlete athlete = findByIdOrThrow(id);
+        if (athlete.getUsername() == null || athlete.getUsername().isBlank()) {
+            if (username != null && !username.isBlank()) {
+                athlete.setUsername(username);
+                return athleteRepository.save(athlete);
+            }
+        }
+        return athlete;
+    }
+
+    @Transactional(readOnly = true)
+    public EquipeDto getEquipeForAthlete(Long athleteId) {
+        Athlete athlete = findByIdOrThrow(athleteId);
+        Equipe equipe = athlete.getEquipe();
+        if (equipe == null) {
+            return null;
+        }
+
+        EquipeDto dto = new EquipeDto();
+        dto.setId(equipe.getId());
+        dto.setNom(equipe.getNom());
+        dto.setPays(equipe.getPays());
+
+        if (equipe.getAthletes() != null) {
+            Map<Long, String> idUsernameMap = equipe.getAthletes().stream()
+                    .filter(a -> !a.getId().equals(athleteId)) // exclut l'athlète courant si nécessaire
+                    .collect(Collectors.toMap(
+                            Athlete::getId,
+                            a -> a.getUsername() != null ? a.getUsername() : ""
+                    ));
+            dto.setAthleteIdUsernameMap(idUsernameMap);
+        }
+
+        return dto;
     }
 
     /**
@@ -153,7 +201,14 @@ public class AthleteService {
         if (userId == null) {
             throw new IllegalArgumentException("userId est obligatoire");
         }
-        return athleteRepository.findById(userId).orElseGet(() -> {
+        return athleteRepository.findById(userId).map(existing -> {
+            if ((existing.getUsername() == null || existing.getUsername().isBlank())
+                    && username != null && !username.isBlank()) {
+                existing.setUsername(username);
+                return athleteRepository.save(existing);
+            }
+            return existing;
+        }).orElseGet(() -> {
             Athlete athlete = new Athlete();
             athlete.setId(userId);
             if (username != null && !username.isBlank()) {

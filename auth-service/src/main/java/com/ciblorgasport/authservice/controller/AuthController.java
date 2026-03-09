@@ -18,14 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ciblorgasport.authservice.dto.DocumentUploadRequest;
+import com.ciblorgasport.authservice.dto.InternalAthleteSummary;
 import com.ciblorgasport.authservice.dto.JwtResponse;
 import com.ciblorgasport.authservice.dto.LoginRequest;
 import com.ciblorgasport.authservice.dto.RegisterRequest;
 import com.ciblorgasport.authservice.dto.ValidateAthleteRequest;
 import com.ciblorgasport.authservice.entity.User;
+import com.ciblorgasport.authservice.entity.Role;
 import com.ciblorgasport.authservice.repository.UserRepository;
 import com.ciblorgasport.authservice.security.JwtUtils;
 import com.ciblorgasport.authservice.service.AuthService;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -63,6 +67,15 @@ public class AuthController {
                 // Filtrer par statut de validation
                 return ResponseEntity.ok(userRepository.findByRoleAndValidated(com.ciblorgasport.authservice.entity.Role.ATHLETE, validated));
             }
+        }
+
+        // INTERNAL : list athletes (id + username) for participants sync
+        @GetMapping("/internal/athletes")
+        public ResponseEntity<List<InternalAthleteSummary>> listAthletesInternal() {
+            List<InternalAthleteSummary> athletes = userRepository.findByRole(Role.ATHLETE).stream()
+                    .map(user -> new InternalAthleteSummary(user.getId(), user.getUsername()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(athletes);
         }
 
     private final AuthService authService;

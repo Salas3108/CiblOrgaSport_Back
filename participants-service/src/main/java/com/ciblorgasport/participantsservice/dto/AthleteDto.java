@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 public class AthleteDto {
     private Long id;
+    private String username;
     private String nom;
     private String prenom;
 
@@ -21,6 +22,7 @@ public class AthleteDto {
     private String observation;
 
     private Long equipeId;
+    private String equipeNom;
 
     // Champ utilisé quand un commissaire refuse/justifie (optionnel côté front)
     private String motifRefus;
@@ -34,6 +36,14 @@ public class AthleteDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getNom() {
@@ -98,6 +108,14 @@ public class AthleteDto {
 
     public void setEquipeId(Long equipeId) {
         this.equipeId = equipeId;
+    }
+
+    public String getEquipeNom() {
+        return equipeNom;
+    }
+
+    public void setEquipeNom(String equipeNom) {
+        this.equipeNom = equipeNom;
     }
 
     public String getMotifRefus() {
