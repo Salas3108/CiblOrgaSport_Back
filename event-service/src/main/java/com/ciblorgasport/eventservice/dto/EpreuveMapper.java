@@ -21,7 +21,7 @@ public class EpreuveMapper {
         dto.setTypeEpreuve(e.getTypeEpreuve());
         dto.setGenreEpreuve(e.getGenreEpreuve());
         dto.setNiveauEpreuve(e.getNiveauEpreuve());
-        dto.setEquipeId(e.getEquipeId());
+        dto.setEquipeIds(e.getEquipeIds());
         if (e.getCompetition() != null) dto.setCompetitionId(e.getCompetition().getId());
         dto.setLieuId(e.getLieuId());
         dto.setAthleteIds(e.getAthleteIds());
@@ -40,7 +40,7 @@ public class EpreuveMapper {
         e.setTypeEpreuve(dto.getTypeEpreuve());
         e.setGenreEpreuve(dto.getGenreEpreuve());
         e.setNiveauEpreuve(dto.getNiveauEpreuve());
-        e.setEquipeId(dto.getEquipeId());
+        e.setEquipeIds(dto.getEquipeIds());
         e.setLieuId(dto.getLieuId());
         e.setAthleteIds(dto.getAthleteIds());
         return e;
@@ -56,9 +56,7 @@ public class EpreuveMapper {
         entity.setTypeEpreuve(dto.getTypeEpreuve());
         entity.setGenreEpreuve(dto.getGenreEpreuve());
         entity.setNiveauEpreuve(dto.getNiveauEpreuve());
-        if (dto.getEquipeId() != null) {
-            entity.setEquipeId(dto.getEquipeId());
-        }
+        entity.setEquipeIds(dto.getEquipeIds());
         entity.setLieuId(dto.getLieuId());
     }
 }

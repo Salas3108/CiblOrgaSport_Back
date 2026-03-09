@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import com.ciblorgasport.eventservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
+import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 
 @RestController
 @RequestMapping({"/epreuves", "/api/epreuves"})
@@ -57,7 +59,7 @@ public class EpreuveController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<EpreuveDTO> createEpreuve(@Valid @RequestBody EpreuveDTO epreuveDto) {
-        epreuveValidator.validate(epreuveDto);
+        epreuveValidator.validateForCreate(epreuveDto);
         Epreuve entity = epreuveMapper.toEntity(epreuveDto);
         if (epreuveDto.getCompetitionId() != null) {
             Competition comp = competitionRepository.findById(epreuveDto.getCompetitionId())
@@ -66,6 +68,7 @@ public class EpreuveController {
         }
         validateLieuExists(epreuveDto.getLieuId());
         validateAthletesExist(epreuveDto.getAthleteIds());
+        validateEquipesExist(epreuveDto.getEquipeIds());
         Epreuve saved = epreuveRepository.save(entity);
         return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
     }
@@ -91,6 +94,7 @@ public class EpreuveController {
         }
         validateLieuExists(epreuveDetails.getLieuId());
         validateAthletesExist(epreuveDetails.getAthleteIds());
+        validateEquipesExist(epreuveDetails.getEquipeIds());
         Epreuve updated = epreuveRepository.save(existing);
         return ResponseEntity.ok(epreuveMapper.toDto(updated));
     }
@@ -134,6 +138,20 @@ public class EpreuveController {
         }
     }
 
+    private void validateEquipesExist(Collection<Long> equipeIds) {
+        if (equipeIds == null || equipeIds.isEmpty()) {
+            return;
+        }
+
+        try {
+            if (!participantsServiceClient.areValidEquipes(equipeIds)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more equipeIds are invalid");
+            }
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to validate equipeIds with participants-service", ex);
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Void> deleteEpreuve(@PathVariable Long id) {
@@ -154,8 +172,57 @@ public class EpreuveController {
         validateAthletesExist(Collections.singletonList(athleteId));
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
+        }
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().add(athleteId);
+        Epreuve saved = epreuveRepository.save(e);
+        return ResponseEntity.ok(epreuveMapper.toDto(saved));
+    }
+
+    @PostMapping({"/{id}/equipe", "/{id}/equipes"})
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
+    public ResponseEntity<EpreuveDTO> addEquipes(@PathVariable Long id, @RequestBody Map<String, List<?>> payload) {
+        List<?> rawEquipeIds = payload == null ? null : payload.get("equipeIds");
+        if (rawEquipeIds == null || rawEquipeIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'equipeIds' must be provided and non-empty");
+        }
+        List<Long> equipeIds = new java.util.ArrayList<>();
+        for (Object rawId : rawEquipeIds) {
+            Long equipeId;
+            if (rawId instanceof Number number) {
+                equipeId = number.longValue();
+            } else if (rawId instanceof String str && !str.isBlank()) {
+                try {
+                    equipeId = Long.parseLong(str);
+                } catch (NumberFormatException ex) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'equipeIds' must contain positive ids");
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'equipeIds' must contain positive ids");
+            }
+
+            if (equipeId <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'equipeIds' must contain positive ids");
+            }
+            equipeIds.add(equipeId);
+        }
+
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+
+        if (e.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
+        }
+
+        if (e.getAthleteIds() != null && !e.getAthleteIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide either equipeIds or athleteIds, not both");
+        }
+
+        validateEquipesExist(equipeIds);
+        if (e.getEquipeIds() == null) e.setEquipeIds(new HashSet<>());
+        e.getEquipeIds().addAll(equipeIds);
         Epreuve saved = epreuveRepository.save(e);
         return ResponseEntity.ok(epreuveMapper.toDto(saved));
     }
@@ -170,6 +237,9 @@ public class EpreuveController {
         validateAthletesExist(athleteIds);
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
+        }
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().addAll(athleteIds);
         Epreuve saved = epreuveRepository.save(e);
@@ -181,6 +251,13 @@ public class EpreuveController {
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         return ResponseEntity.ok(e.getAthleteIds() == null ? Collections.emptySet() : e.getAthleteIds());
+    }
+
+    @GetMapping("/{id}/equipes")
+    public ResponseEntity<Set<Long>> getEquipes(@PathVariable Long id) {
+        Epreuve e = epreuveRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
+        return ResponseEntity.ok(e.getEquipeIds() == null ? Collections.emptySet() : e.getEquipeIds());
     }
 
     @GetMapping("/{id}/athletes/{athleteId}")

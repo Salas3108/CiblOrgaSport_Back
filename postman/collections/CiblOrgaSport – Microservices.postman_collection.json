@@ -1667,6 +1667,346 @@
                                                    ]
                                   },
                                   {
+                                      "name":  "Epreuves - Add Athlete (ADMIN)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Athlete added to epreuve\", function () {",
+                                                                                    "    pm.expect(jsonData).to.have.property('id');",
+                                                                                    "    pm.expect(jsonData).to.have.property('athleteIds');",
+                                                                                    "    pm.expect(jsonData.athleteIds).to.include(Number(pm.environment.get('athlete_id')));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "1c7bf9ac-2a91-4135-bf09-c95df3f7f6a2",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"athleteId\": {{athlete_id}}\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}/athletes",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}",
+                                                                               "athletes"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Add Equipe (ADMIN)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Equipe added to epreuve\", function () {",
+                                                                                    "    pm.expect(jsonData).to.have.property('id');",
+                                                                                    "    pm.expect(jsonData).to.have.property('equipeIds');",
+                                                                                    "    pm.expect(jsonData.equipeIds).to.include(Number(pm.environment.get('equipe_id')));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "8f933615-c166-4d15-ab8d-c4a5a35a008f",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"equipeIds\": [{{equipe_id}}]\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}/equipes",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}",
+                                                                               "equipes"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Add Athletes Bulk (ADMIN)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Athletes added in bulk to epreuve\", function () {",
+                                                                                    "    pm.expect(jsonData).to.have.property('id');",
+                                                                                    "    pm.expect(jsonData).to.have.property('athleteIds');",
+                                                                                    "    pm.expect(jsonData.athleteIds).to.include(Number(pm.environment.get('athlete_id')));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "9f7801fe-8c84-4068-a873-0eebf4f08ab7",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"athleteIds\": [{{athlete_id}}]\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}/athletes/bulk",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}",
+                                                                               "athletes",
+                                                                               "bulk"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Get Equipes",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array of equipe ids\", function () {",
+                                                                                    "    pm.expect(jsonData).to.be.an('array');",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "047fd9b8-e7df-44e6-a98c-a3a37ce364ad",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}/equipes",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}",
+                                                                               "equipes"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Get Athletes",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array of athlete ids\", function () {",
+                                                                                    "    pm.expect(jsonData).to.be.an('array');",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "cebe5f68-fe7f-4348-9f27-b57be7711efe",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}/athletes",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}",
+                                                                               "athletes"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Get by Id",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Response contains requested epreuve id\", function () {",
+                                                                                    "    pm.expect(jsonData).to.have.property('id');",
+                                                                                    "    pm.expect(jsonData.id).to.eql(Number(pm.environment.get('epreuve_id')));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "c08d95ea-289f-4967-930c-934f8062db0a",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Epreuves - Delete (ADMIN/COMMISSAIRE)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 204\", function () {",
+                                                                                    "    pm.response.to.have.status(204);",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "0b0ff8fe-b6fd-4064-bfa1-cafff9f2746a",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
                                       "name":  "Events - Delete (ADMIN)",
                                       "event":  [
                                                     {
