@@ -43,7 +43,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(authenticationManager, userRepository, passwordEncoder, jwtUtils);
+        authService = new AuthService(authenticationManager, userRepository, passwordEncoder, jwtUtils, "http://localhost:8087");
     }
 
     @Test
