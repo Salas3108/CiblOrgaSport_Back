@@ -1923,6 +1923,51 @@
                                                    ]
                                   },
                                   {
+                                      "name":  "Epreuves - Get by Id",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const jsonData = pm.response.json();",
+                                                                                    "pm.test(\"Response contains requested epreuve id\", function () {",
+                                                                                    "    pm.expect(jsonData).to.have.property('id');",
+                                                                                    "    pm.expect(jsonData.id).to.eql(Number(pm.environment.get('epreuve_id')));",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "id":  "c08d95ea-289f-4967-930c-934f8062db0a",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{event_base}}/epreuves/{{epreuve_id}}",
+                                                                  "host":  [
+                                                                               "{{event_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "epreuves",
+                                                                               "{{epreuve_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
                                       "name":  "Epreuves - Delete (ADMIN/COMMISSAIRE)",
                                       "event":  [
                                                     {
