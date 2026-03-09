@@ -15,6 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.ciblorgasport.eventservice.service.UserDetailsServiceImpl;
+import com.ciblorgasport.eventservice.security.RestAuthenticationEntryPoint;
+import com.ciblorgasport.eventservice.security.RestAccessDeniedHandler;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableMethodSecurity
@@ -42,23 +45,33 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+    @Bean
+    public RestAuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+    @Bean
+    public RestAccessDeniedHandler restAccessDeniedHandler() {
+        return new RestAccessDeniedHandler();
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            	    // public
-            	    .requestMatchers(HttpMethod.GET, "/api/epreuves/**").permitAll()
-            	    .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
-
-            	    // protégé
-            	    .requestMatchers(HttpMethod.POST, "/api/epreuves/**").hasRole("COMMISSAIRE")
-            	    .requestMatchers(HttpMethod.POST, "/api/events/**").hasRole("ADMIN")
-
-            	    .anyRequest().authenticated()
-            	);
+                // allow public READ endpoints only
+                .requestMatchers(HttpMethod.GET, "/epreuves/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/events/**").permitAll()
+                // if a context path or gateway prefixes with /api
+                .requestMatchers(HttpMethod.GET, "/api/epreuves/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(restAuthenticationEntryPoint())
+                .accessDeniedHandler(restAccessDeniedHandler())
+            );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

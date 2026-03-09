@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn test)",
+      "Bash(mvn clean compile test-compile)",
+      "Read(//usr/**)",
+      "Read(//mingw64/**)",
+      "Bash(\"/c/Program Files/Python311/python\":*)",
+      "Bash(cygpath -w /tmp/postman_ours.json)"
+    ]
+  }
+}

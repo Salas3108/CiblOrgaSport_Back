@@ -1,0 +1,607 @@
+{
+  "info": {
+    "_postman_id": "a0998a78-4cd8-4f11-afb0-0c0622098d40",
+    "name": "Participants Service - CiblOrgaSport",
+    "description": "Collection pour tester les endpoints Athlète / Commissaire du microservice participants-service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Commissaire - Equipes",
+      "item": [
+        {
+          "name": "Commissaire - List Equipes",
+          "id": "94f7e63b-9fdb-4d65-b569-4589e704fd30",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Get Equipe",
+          "id": "12cc26df-8b58-4885-a4e3-5ff2e7c55b97",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes/{{equipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes",
+                "{{equipeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Create Equipe",
+          "id": "ef5b5bb4-ee7d-448d-b99a-8d4adba77639",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Trukush\",\n  \"pays\": \"Turquie\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Update Equipe",
+          "id": "49bf00c3-8289-42d7-a00d-0644325b8f1b",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Equipe France A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes/{{equipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes",
+                "{{equipeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Delete Equipe",
+          "id": "3ccbaf03-350c-4924-8ee8-3511d13d17ef",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes/{{equipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes",
+                "{{equipeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Assign Athletes to Equipe",
+          "id": "afe7160e-ea35-44e4-a0f6-0b93f309001e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteIds\": [{{athleteId}}]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/equipes/{{equipeId}}/athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "equipes",
+                "{{equipeId}}",
+                "athletes"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "2f0d1bf8-f378-4013-8e2b-1f6fafe7e943"
+    },
+    {
+      "name": "Commissaire - Athletes",
+      "item": [
+        {
+          "name": "Commissaire - List Athletes",
+          "id": "4cb7241c-58ef-4163-a539-65daf7dd5c87",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - List Athletes Valides",
+          "id": "f433da9c-abf5-4a26-9f0e-e723af7eb311",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/valides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "valides"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    pm.expect(Array.isArray(data)).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test(\"All athletes are validated\", function () {",
+                  "    data.forEach((athlete) => {",
+                  "        pm.expect(athlete.valide).to.eql(true);",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Commissaire - Get Athlete Info",
+          "id": "b42595e8-6584-4ba3-94d1-559a1fbe43ea",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/info",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "{{athleteId}}",
+                "info"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Get Athlete Docs",
+          "id": "d9473950-3a41-42b9-9cea-acf0b73c4aeb",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "{{athleteId}}",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Post Validation (refuse)",
+          "id": "16f89159-3256-4166-97f5-ea5017a169b9",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valide\": false,\n  \"message\": \"Passport expiré\",\n  \"motifRefus\": \"Passport expiré\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "{{athleteId}}",
+                "validation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Post Validation (accept)",
+          "id": "56443b3b-abe1-4e6a-927a-458308e85e9b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valide\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/validation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "{{athleteId}}",
+                "validation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Commissaire - Post Message",
+          "id": "9f14074e-e05f-416c-8a9e-caffbbae1b57",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenu\": \"Passeport expiré, merci de renouveler\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commissaire/athletes/{{athleteId}}/message",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "athletes",
+                "{{athleteId}}",
+                "message"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "5514a804-4150-4cea-b853-54efed3f6d6e"
+    },
+    {
+      "name": "Admin - Create Athlete Profile",
+      "id": "c58eb78b-cfe1-4bad-b888-4faffde570d8",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{athleteUsername}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Athlete - Post Info (upsert)",
+      "id": "1c7a28d7-c787-4b3a-adbe-8c2a4d514443",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Dupont\",\n  \"prenom\": \"Marie\",\n  \"dateNaissance\": \"2000-03-22\",\n  \"pays\": \"Belgique\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/info",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "info"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Athlete - Post Doc",
+      "id": "a4975522-a730-47a9-b902-9dbecea09f61",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docs\": {\n    \"certificatMedical\": \"certificat_medical_dupont.pdf\",\n    \"passport\": \"passport_dupont.pdf\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "doc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Athlete - Post Remarque",
+      "id": "6145d3e2-0e98-4b21-8b7e-cd78802f2b60",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"observation\": \"Certificat médical valide\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/remarque",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "remarque"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "092b7290-2178-4c60-9ee4-ff3fc537c1d1",
+      "key": "baseUrl",
+      "value": "http://localhost:8087",
+      "type": "string"
+    },
+    {
+      "id": "e6f2a564-ba85-4d81-b67f-d0956a384a62",
+      "key": "athleteId",
+      "value": "2",
+      "type": "string",
+      "description": "ID utilisateur/athlete utilisé pour les requêtes"
+    },
+    {
+      "id": "8252bb56-0e74-478f-b05b-31052798e956",
+      "key": "athleteUsername",
+      "value": "athlete123",
+      "type": "string",
+      "description": "Username de l'athlete a creer"
+    },
+    {
+      "id": "715f75ea-b623-4546-aded-26f3e966d36f",
+      "key": "equipeId",
+      "value": "1",
+      "type": "string",
+      "description": "ID equipe utilisé pour les requêtes"
+    },
+    {
+      "id": "1bfc5ce1-3851-4e5d-83e7-d9593937e7f0",
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Mettez ici un JWT valide (ex: depuis auth-service)"
+    }
+  ]
+}

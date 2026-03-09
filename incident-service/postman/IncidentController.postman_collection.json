@@ -113,6 +113,7 @@
               "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
               "var json = {}; try { json = pm.response.json(); } catch(e) {}",
               "pm.test('Error is Unauthorized', function () { pm.expect(json.error || '').to.eql('Unauthorized'); });",
+              "pm.test('Has message', function () { pm.expect(json.message || '').to.not.be.empty; });",
               "pm.test('X-Debug header exists', function () { pm.expect(pm.response.headers.has('X-Debug-AuthHeader-Present')).to.be.true; });"
             ]
           }

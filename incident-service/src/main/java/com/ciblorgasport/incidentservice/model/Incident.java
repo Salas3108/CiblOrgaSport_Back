@@ -31,6 +31,8 @@ public class Incident {
     @Column(nullable = false)
     private String location;                 // Lieu de l'incident
 
+    private Long competitionId;              // Optionnel: rattachement à une compétition
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private IncidentStatus status;           // ACTIF, RESOLU
@@ -83,6 +85,14 @@ public class Incident {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Long getCompetitionId() {
+        return competitionId;
+    }
+
+    public void setCompetitionId(Long competitionId) {
+        this.competitionId = competitionId;
     }
 
     public IncidentStatus getStatus() {

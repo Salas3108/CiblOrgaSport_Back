@@ -8,4 +8,5 @@ import com.ciblorgasport.participantsservice.model.Athlete;
 @Repository
 public interface JpaAthleteRepository extends JpaRepository<Athlete, Long> {
 	java.util.Optional<Athlete> findByUsername(String username);
+	java.util.List<Athlete> findByValideTrue();
 }
