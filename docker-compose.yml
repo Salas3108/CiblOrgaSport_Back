@@ -73,6 +73,43 @@ services:
     networks:
       - appnet
 
+  analytics-service:
+    build: ./analytics-service
+    container_name: analytics-service
+    ports:
+      - "8090:8090"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: glop
+      DB_USER: admin
+      DB_PASSWORD: password
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3001:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: glop
+      MB_DB_PORT: 5432
+      MB_DB_USER: admin
+      MB_DB_PASS: password
+      MB_DB_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - appnet
+
 volumes:
   postgres_data:
     #external: true
