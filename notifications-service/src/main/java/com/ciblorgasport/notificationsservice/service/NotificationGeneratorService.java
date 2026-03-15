@@ -14,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.ciblorgasport.notificationsservice.client.AbonnementServiceClient;
 import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
+import com.ciblorgasport.notificationsservice.kafka.event.EpreuveRappelEventV1;
 import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
 import com.ciblorgasport.notificationsservice.model.Notification;
-import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
 import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
 
 @Service
@@ -25,14 +26,14 @@ public class NotificationGeneratorService {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationGeneratorService.class);
 
-    private final AbonnementRepository abonnementRepository;
+    private final AbonnementServiceClient abonnementServiceClient;
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public NotificationGeneratorService(AbonnementRepository abonnementRepository,
+    public NotificationGeneratorService(AbonnementServiceClient abonnementServiceClient,
                                         NotificationRepository notificationRepository,
                                         SimpMessagingTemplate messagingTemplate) {
-        this.abonnementRepository = abonnementRepository;
+        this.abonnementServiceClient = abonnementServiceClient;
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
     }
@@ -54,11 +55,9 @@ public class NotificationGeneratorService {
             return;
         }
 
-        List<Long> spectatorIds = abonnementRepository
-                .findByIdIdCompetitionAndPreferenceNotifTrue(competitionId)
-                .stream()
-                .map(a -> a.getId().getIdSpectateur())
-                .toList();
+        // Fetch subscribers from abonnement-service via HTTP.
+        List<Long> spectatorIds = abonnementServiceClient
+                .getSubscribersWithNotifications(competitionId);
 
         Set<Long> recipientIds = new HashSet<>(spectatorIds);
         recipientIds.addAll(determineVolunteerRecipients(event));
@@ -139,6 +138,86 @@ public class NotificationGeneratorService {
         }
         if (event.getDescription() != null) {
             base += ": " + event.getDescription();
+        }
+        return base;
+    }
+
+    // ---- Epreuve Rappel ----
+
+    @Transactional
+    public void handleEpreuveRappel(EpreuveRappelEventV1 event) {
+        if (event == null) {
+            return;
+        }
+
+        Long competitionId = event.getCompetitionId();
+        if (competitionId == null) {
+            return;
+        }
+
+        String sourceEventId = event.getEventId() != null && !event.getEventId().isBlank()
+                ? event.getEventId()
+                : "epreuve-rappel-" + event.getEpreuveId();
+
+        List<Long> spectatorIds = abonnementServiceClient.getSubscribersWithNotifications(competitionId);
+
+        if (spectatorIds.isEmpty()) {
+            return;
+        }
+
+        List<Long> alreadyNotified = notificationRepository
+                .findRecipientIdsBySourceEventIdAndIdSpectateurIn(sourceEventId, spectatorIds);
+
+        Set<Long> alreadyNotifiedSet = new HashSet<>(alreadyNotified);
+        List<Long> toNotify = spectatorIds.stream()
+                .filter(id -> !alreadyNotifiedSet.contains(id))
+                .toList();
+
+        if (toNotify.isEmpty()) {
+            log.debug("Idempotence: epreuve rappel event {} already processed for all recipients", sourceEventId);
+            return;
+        }
+
+        String content = buildEpreuveRappelContent(event);
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Notification> notifications = toNotify.stream().map(recipientId -> {
+            Notification notification = new Notification();
+            notification.setType("EPREUVE_RAPPEL");
+            notification.setContenu(content);
+            notification.setDateEnvoi(now);
+            notification.setIdEvent(competitionId);
+            notification.setIdSpectateur(recipientId);
+            notification.setSourceEventId(sourceEventId);
+            return notification;
+        }).collect(Collectors.toList());
+
+        List<Notification> saved = notificationRepository.saveAll(notifications);
+        log.debug("Persisted {} rappel notification(s) for sourceEventId={}", saved.size(), sourceEventId);
+
+        List<NotificationDTO> dtos = saved.stream().map(NotificationDTO::from).toList();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                dtos.forEach(dto -> {
+                    log.debug("WS push → /topic/notifications/{} notifId={}", dto.getIdSpectateur(), dto.getId());
+                    messagingTemplate.convertAndSend(
+                            "/topic/notifications/" + dto.getIdSpectateur(),
+                            dto
+                    );
+                });
+            }
+        });
+    }
+
+    private String buildEpreuveRappelContent(EpreuveRappelEventV1 event) {
+        String base = "Rappel : l'épreuve";
+        if (event.getNom() != null) {
+            base += " \"" + event.getNom() + "\"";
+        }
+        if (event.getDateHeure() != null) {
+            base += " aura lieu le " + event.getDateHeure().toLocalDate()
+                    + " à " + event.getDateHeure().toLocalTime();
         }
         return base;
     }

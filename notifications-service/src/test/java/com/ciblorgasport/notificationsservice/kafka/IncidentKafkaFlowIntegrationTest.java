@@ -1,11 +1,9 @@
 package com.ciblorgasport.notificationsservice.kafka;
 
+import com.ciblorgasport.notificationsservice.client.AbonnementServiceClient;
 import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
 import com.ciblorgasport.notificationsservice.kafka.topic.KafkaTopics;
-import com.ciblorgasport.notificationsservice.model.Abonnement;
-import com.ciblorgasport.notificationsservice.model.AbonnementId;
 import com.ciblorgasport.notificationsservice.model.Notification;
-import com.ciblorgasport.notificationsservice.repository.AbonnementRepository;
 import com.ciblorgasport.notificationsservice.repository.NotificationRepository;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -30,7 +29,6 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,7 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = {
         "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
@@ -51,7 +52,8 @@ import static org.mockito.Mockito.doAnswer;
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
         "spring.kafka.consumer.auto-offset-reset=earliest",
-        "spring.kafka.listener.concurrency=1"
+        "spring.kafka.listener.concurrency=1",
+        "abonnement-service.url=http://localhost:8085"
 })
 @EmbeddedKafka(partitions = 1, topics = {
         KafkaTopics.INCIDENT_TOPIC,
@@ -66,8 +68,8 @@ class IncidentKafkaFlowIntegrationTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
-    @Autowired
-    private AbonnementRepository abonnementRepository;
+    @MockBean
+    private AbonnementServiceClient abonnementServiceClient;
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -78,18 +80,17 @@ class IncidentKafkaFlowIntegrationTest {
     @BeforeEach
     void setUp() {
         notificationRepository.deleteAll();
-        abonnementRepository.deleteAll();
     }
 
     @AfterEach
     void tearDown() {
         notificationRepository.deleteAll();
-        abonnementRepository.deleteAll();
     }
 
     @Test
     void happyPath_CreatesNotificationRows() {
-        addAbonnement(11L, 1001L, true);
+        when(abonnementServiceClient.getSubscribersWithNotifications(anyLong()))
+                .thenReturn(List.of(11L));
 
         IncidentCreatedEventV1 event = buildEvent("evt-happy-1", 7001L, 1001L);
         kafkaTemplate.send(KafkaTopics.INCIDENT_TOPIC, "inc-7001", event);
@@ -104,7 +105,8 @@ class IncidentKafkaFlowIntegrationTest {
 
     @Test
     void duplicateMessage_DoesNotInsertTwice() {
-        addAbonnement(12L, 1002L, true);
+        when(abonnementServiceClient.getSubscribersWithNotifications(anyLong()))
+                .thenReturn(List.of(12L));
 
         IncidentCreatedEventV1 event = buildEvent("evt-dup-1", 7002L, 1002L);
         kafkaTemplate.send(KafkaTopics.INCIDENT_TOPIC, "inc-7002", event);
@@ -116,7 +118,8 @@ class IncidentKafkaFlowIntegrationTest {
 
     @Test
     void retry_OnTemporaryDbError_EventuallySucceeds() {
-        addAbonnement(13L, 1003L, true);
+        when(abonnementServiceClient.getSubscribersWithNotifications(anyLong()))
+                .thenReturn(List.of(13L));
 
         AtomicInteger attempts = new AtomicInteger(0);
         doAnswer(invocation -> {
@@ -193,14 +196,6 @@ class IncidentKafkaFlowIntegrationTest {
         event.setReportedBy("system");
         event.setCompetitionId(competitionId);
         return event;
-    }
-
-    private void addAbonnement(Long spectateurId, Long competitionId, boolean preferenceNotif) {
-        Abonnement abonnement = new Abonnement();
-        abonnement.setId(new AbonnementId(spectateurId, competitionId));
-        abonnement.setPreferenceNotif(preferenceNotif);
-        abonnement.setDateAbonnement(LocalDateTime.now());
-        abonnementRepository.save(abonnement);
     }
 
     private void awaitTrue(BooleanSupplier condition, String failureMessage) {
