@@ -15,6 +15,7 @@ public class AthleteMapper {
         if (athlete == null) return null;
         AthleteDto dto = new AthleteDto();
         dto.setId(athlete.getId());
+        dto.setUsername(athlete.getUsername());
         dto.setNom(athlete.getNom());
         dto.setPrenom(athlete.getPrenom());
         dto.setDateNaissance(athlete.getDateNaissance());
@@ -22,7 +23,13 @@ public class AthleteMapper {
         dto.setValide(athlete.isValide());
         dto.setObservation(athlete.getObservation());
         dto.setMotifRefus(athlete.getMotifRefus());
-        dto.setEquipeId(athlete.getEquipe() != null ? athlete.getEquipe().getId() : null);
+        if (athlete.getEquipe() != null) {
+            dto.setEquipeId(athlete.getEquipe().getId());
+            dto.setEquipeNom(athlete.getEquipe().getNom());
+        } else {
+            dto.setEquipeId(null);
+            dto.setEquipeNom(null);
+        }
 
         if (athlete.getDocs() != null) {
             dto.setDocs(new AthleteDocsDto(athlete.getDocs().getCertificatMedical(), athlete.getDocs().getPassport()));

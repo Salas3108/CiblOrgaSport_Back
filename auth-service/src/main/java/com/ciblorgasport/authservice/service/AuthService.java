@@ -7,24 +7,36 @@ import com.ciblorgasport.authservice.entity.User;
 import com.ciblorgasport.authservice.entity.Role;
 import com.ciblorgasport.authservice.repository.UserRepository;
 import com.ciblorgasport.authservice.security.JwtUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Service
 public class AuthService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+    private final RestTemplate restTemplate;
+    private final String participantsBaseUrl;
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils,
+                       @Value("${participants-service.base-url:http://localhost:8087}") String participantsBaseUrl) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.participantsBaseUrl = participantsBaseUrl;
+        this.restTemplate = new RestTemplate();
     }
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -64,6 +76,20 @@ public class AuthService {
         user.setCreatedAt(java.time.LocalDateTime.now());
         user.setUpdatedAt(java.time.LocalDateTime.now());
         userRepository.save(user);
+        if (user.getRole() == Role.ATHLETE) {
+            syncAthleteProfile(user.getId(), user.getUsername());
+        }
         return "User registered successfully!";
+    }
+
+    private void syncAthleteProfile(Long userId, String username) {
+        try {
+            if (userId == null || username == null || username.isBlank()) return;
+            String url = participantsBaseUrl + "/internal/athletes";
+            Map<String, Object> payload = Map.of("id", userId, "username", username);
+            restTemplate.postForEntity(url, payload, Object.class);
+        } catch (Exception ex) {
+            logger.warn("Failed to sync athlete profile to participants-service", ex);
+        }
     }
 }

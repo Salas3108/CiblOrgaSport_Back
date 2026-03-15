@@ -1,0 +1,179 @@
+{
+  "info": {
+    "_postman_id": "298543ed-f6be-4719-97b7-3f28c545b9ae",
+    "name": "Reservation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Exercice 1",
+      "item": [
+        {
+          "name": "healthcheck",
+          "id": "45904bca-69f3-4fe1-85fa-8f97fedc1aef",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{server}}:{{port}}/api/reservation/",
+              "protocol": "http",
+              "host": [
+                "{{server}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "reservation",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un sinistre - 1",
+          "id": "e65374f7-74e5-4159-be41-88ee1f35a646",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"sinistre\":{\r\n        \"codeSinistre\":\"101\",\r\n        \"libelleSinistre\":\"Libelle\",\r\n        \"detailSinistre\":\"detail\"\r\n\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{server}}:{{port}}/api/reservation/voiture/987654321/sinistre",
+              "protocol": "http",
+              "host": [
+                "{{server}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "reservation",
+                "voiture",
+                "987654321",
+                "sinistre"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Créer un sinistre - 2",
+          "id": "a1638a3e-7796-4f58-90ad-51faf97d1848",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"sinistre\":{\r\n        \"codeSinistre\":\"101\",\r\n        \"libelleSinistre\":\"Libelle\",\r\n        \"detailSinistre\":\"detail\"\r\n\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{server}}:{{port}}/api/reservation/voiture/123456789/sinistre",
+              "protocol": "http",
+              "host": [
+                "{{server}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "reservation",
+                "voiture",
+                "123456789",
+                "sinistre"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "b7a8901e-232b-4578-a21b-cdb3207ec404"
+    },
+    {
+      "name": "Exercice 4",
+      "item": [
+        {
+          "name": "Créer un sinistre",
+          "id": "43e9e745-7574-4286-a047-f2b858884daf",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"sinistre\":{\r\n        \"codeSinistre\":\"101\",\r\n        \"libelleSinistre\":\"Libelle\",\r\n        \"detailSinistre\":\"detail\"\r\n\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{server}}:{{port}}/api/reservation/voiture/123456789/sinistre",
+              "protocol": "http",
+              "host": [
+                "{{server}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "reservation",
+                "voiture",
+                "123456789",
+                "sinistre"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "cbb57108-2d4f-4f49-bdc0-4194c77a9d5e"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "password",
+        "value": "SYS",
+        "type": "string"
+      },
+      {
+        "key": "username",
+        "value": "_system",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ],
+        "id": "c8578fc9-02dc-421b-9b57-6cf6016e2fc8"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ],
+        "id": "cd4fa3e3-5364-47d7-a55d-27d10582ebfc"
+      }
+    }
+  ]
+}

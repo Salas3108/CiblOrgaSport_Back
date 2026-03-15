@@ -39,8 +39,8 @@ public class EpreuveDTO {
     // remplacez :
     // private Set<Long> participantIds;
     // par :
-    @JsonDeserialize(using = FlexibleLongDeserializer.class)
-    private Long equipeId;
+    @JsonDeserialize(contentUsing = FlexibleLongDeserializer.class)
+    private Set<Long> equipeIds;
 
     // optional: when creating/updating in non-admin path you can specify competition id
     @JsonDeserialize(using = FlexibleLongDeserializer.class)
@@ -80,8 +80,8 @@ public class EpreuveDTO {
     public NiveauEpreuve getNiveauEpreuve() { return niveauEpreuve; }
     public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
 
-    public Long getEquipeId() { return equipeId; }
-    public void setEquipeId(Long equipeId) { this.equipeId = equipeId; }
+    public Set<Long> getEquipeIds() { return equipeIds; }
+    public void setEquipeIds(Set<Long> equipeIds) { this.equipeIds = equipeIds; }
 
     public Long getCompetitionId() { return competitionId; }
     public void setCompetitionId(Long competitionId) { this.competitionId = competitionId; }

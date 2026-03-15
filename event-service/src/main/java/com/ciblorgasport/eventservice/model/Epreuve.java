@@ -43,8 +43,10 @@ public class Epreuve {
     @Enumerated(EnumType.STRING)
     private StatutEpreuve statut = StatutEpreuve.PLANIFIE;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "epreuve_equipes", joinColumns = @JoinColumn(name = "epreuve_id"))
     @Column(name = "equipe_id")
-    private Long equipeId;
+    private Set<Long> equipeIds = new HashSet<>();
 
     // participants (IDs) -> permet d'ajouter des athlètes par leur id sans dépendre d'un entity Athlete
     @ElementCollection(fetch = FetchType.LAZY)
@@ -71,8 +73,8 @@ public class Epreuve {
     public void setNiveauEpreuve(NiveauEpreuve niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
     public StatutEpreuve getStatut() { return statut; }
     public void setStatut(StatutEpreuve statut) { this.statut = statut; }
-    public Long getEquipeId() { return equipeId; }
-    public void setEquipeId(Long equipeId) { this.equipeId = equipeId; }
+    public Set<Long> getEquipeIds() { return equipeIds; }
+    public void setEquipeIds(Set<Long> equipeIds) { this.equipeIds = equipeIds; }
     public Set<Long> getAthleteIds() { return athleteIds; }
     public void setAthleteIds(Set<Long> athleteIds) { this.athleteIds = athleteIds; }
     public LocalDateTime getDateHeure() { return dateHeure; }

@@ -10,6 +10,39 @@ import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 public class EpreuveValidator {
 
     public void validate(EpreuveDTO dto) {
+        validateCommon(dto);
+
+        // strict rules (kept for update/full payload validation)
+        if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE) {
+            if (dto.getAthleteIds() == null || dto.getAthleteIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must have at least one athlete id");
+            }
+            if (dto.getEquipeIds() != null && !dto.getEquipeIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
+            }
+        } else { // COLLECTIVE or others
+            if (dto.getEquipeIds() == null || dto.getEquipeIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must have at least one equipe id");
+            }
+            if (dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
+            }
+        }
+    }
+
+    public void validateForCreate(EpreuveDTO dto) {
+        validateCommon(dto);
+
+        // relaxed rules for creation: participants/team can be added later via dedicated endpoints
+        if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE && dto.getEquipeIds() != null && !dto.getEquipeIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
+        }
+        if (dto.getTypeEpreuve() == TypeEpreuve.COLLECTIVE && dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
+        }
+    }
+
+    private void validateCommon(EpreuveDTO dto) {
         if (dto == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Epreuve payload is required");
         if (dto.getTypeEpreuve() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "typeEpreuve is required");
         if (dto.getGenreEpreuve() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "genreEpreuve is required");
@@ -24,9 +57,13 @@ public class EpreuveValidator {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "lieuId must be a positive id");
         }
 
-        // equipeId must be positive if provided
-        if (dto.getEquipeId() != null && dto.getEquipeId() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "equipeId must be a positive id");
+        // equipeIds must be positive if provided
+        if (dto.getEquipeIds() != null) {
+            for (Long eid : dto.getEquipeIds()) {
+                if (eid == null || eid <= 0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "equipeIds must contain positive ids");
+                }
+            }
         }
 
         // athleteIds must be positive if provided
@@ -38,23 +75,10 @@ public class EpreuveValidator {
             }
         }
 
-        // do not allow both equipeId and athleteIds at the same time
-        if (dto.getEquipeId() != null && dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide either equipeId or athleteIds, not both");
-        }
-
-        // rules per type
-        if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE) {
-            if (dto.getAthleteIds() == null || dto.getAthleteIds().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must have at least one athlete id");
-            }
-            if (dto.getEquipeId() != null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeId");
-            }
-        } else { // COLLECTIVE or others
-            if (dto.getEquipeId() == null && (dto.getAthleteIds() == null || dto.getAthleteIds().isEmpty())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must have a equipeId or at least one athlete id");
-            }
+        // do not allow both equipeIds and athleteIds at the same time
+        if (dto.getEquipeIds() != null && !dto.getEquipeIds().isEmpty()
+                && dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide either equipeIds or athleteIds, not both");
         }
     }
 }
