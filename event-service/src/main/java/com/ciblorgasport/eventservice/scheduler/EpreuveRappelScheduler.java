@@ -24,7 +24,7 @@ public class EpreuveRappelScheduler {
     private final EpreuveRepository epreuveRepository;
     private final EpreuveEventPublisher epreuveEventPublisher;
 
-    @Value("${epreuve.rappel.windowMinHours:23}")
+    @Value("${epreuve.rappel.windowMinHours:1}")
     private int windowMinHours;
 
     @Value("${epreuve.rappel.windowMaxHours:25}")
