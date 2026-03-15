@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,16 +18,21 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
+import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
+import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
 import com.ciblorgasport.resultatsservice.dto.request.ResultatRequest;
 import com.ciblorgasport.resultatsservice.model.Medaille;
 import com.ciblorgasport.resultatsservice.model.Resultat;
 import com.ciblorgasport.resultatsservice.model.ResultatStatut;
 import com.ciblorgasport.resultatsservice.model.TypePerformance;
 import com.ciblorgasport.resultatsservice.repository.ResultatRepository;
+import com.ciblorgasport.resultatsservice.service.calcul.ClassementService;
 
 class ResultatServiceTest {
 
     private ResultatRepository resultatRepository;
+    private ClassementService classementService;
     private ResultatService resultatService;
     private Map<Long, Resultat> fakeStore;
 
@@ -35,13 +40,12 @@ class ResultatServiceTest {
     void setUp() {
         fakeStore = new HashMap<>();
         resultatRepository = mock(ResultatRepository.class);
-        resultatService = new ResultatService(resultatRepository);
+        classementService = mock(ClassementService.class);
+        resultatService = new ResultatService(resultatRepository, classementService);
 
         when(resultatRepository.save(any(Resultat.class))).thenAnswer(inv -> {
             Resultat r = inv.getArgument(0);
-            if (r.getId() == null) {
-                r.setId((long) (fakeStore.size() + 1));
-            }
+            if (r.getId() == null) r.setId((long) (fakeStore.size() + 1));
             fakeStore.put(r.getId(), r);
             return r;
         });
@@ -50,11 +54,15 @@ class ResultatServiceTest {
             Long id = inv.getArgument(0);
             return Optional.ofNullable(fakeStore.get(id));
         });
+
+        when(resultatRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
     }
+
+    // ── createOrUpdate ────────────────────────────────────────────────────────
 
     @Test
     void createOrUpdate_creates_new_resultat_with_defaults() {
-        when(resultatRepository.findByEpreuveIdAndAthleteId(eq(10L), eq(5L))).thenReturn(Optional.empty());
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 5L)).thenReturn(Optional.empty());
 
         ResultatRequest request = new ResultatRequest();
         request.setEpreuveId(10L);
@@ -87,7 +95,7 @@ class ResultatServiceTest {
         existing.setUnite("secondes");
         fakeStore.put(1L, existing);
 
-        when(resultatRepository.findByEpreuveIdAndAthleteId(eq(10L), eq(5L)))
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 5L))
                 .thenReturn(Optional.of(existing));
 
         ResultatRequest request = new ResultatRequest();
@@ -123,6 +131,8 @@ class ResultatServiceTest {
                 resultatService.createOrUpdate(request));
         assertEquals("athleteId et equipeId sont mutuellement exclusifs", ex.getMessage());
     }
+
+    // ── validateResultat / publishResultat ───────────────────────────────────
 
     @Test
     void validateResultat_sets_status_valide() {
@@ -160,6 +170,8 @@ class ResultatServiceTest {
         assertEquals(true, published.isPublished());
     }
 
+    // ── getClassementEpreuve ─────────────────────────────────────────────────
+
     @Test
     void getClassementEpreuve_sorts_by_classement() {
         Resultat r1 = new Resultat();
@@ -172,23 +184,116 @@ class ResultatServiceTest {
         r3.setId(3L);
         r3.setClassement(null);
 
-        when(resultatRepository.findByEpreuveId(eq(10L)))
+        when(resultatRepository.findByEpreuveId(10L))
                 .thenReturn(new ArrayList<>(List.of(r1, r2, r3)));
 
         List<Resultat> sorted = resultatService.getClassementEpreuve(10L, false);
 
-        assertEquals(2, sorted.get(0).getId());
-        assertEquals(1, sorted.get(1).getId());
-        assertEquals(3, sorted.get(2).getId());
+        assertEquals(2L, sorted.get(0).getId());
+        assertEquals(1L, sorted.get(1).getId());
+        assertEquals(3L, sorted.get(2).getId());
     }
 
     @Test
     void getResultatsAthlete_published_only_uses_filtered_repository() {
-        when(resultatRepository.findByAthleteIdAndPublishedTrue(eq(9L)))
+        when(resultatRepository.findByAthleteIdAndPublishedTrue(9L))
                 .thenReturn(new ArrayList<>());
 
         resultatService.getResultatsAthlete(9L, true);
 
         verify(resultatRepository).findByAthleteIdAndPublishedTrue(9L);
+    }
+
+    // ── saisirBulk ───────────────────────────────────────────────────────────
+
+    @Test
+    void saisirBulk_persists_each_entry_and_triggers_classement() {
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 1L)).thenReturn(Optional.empty());
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 2L)).thenReturn(Optional.empty());
+        when(resultatRepository.findByEpreuveId(10L)).thenReturn(new ArrayList<>());
+
+        EpreuveContextDto ctx = new EpreuveContextDto();
+        ctx.setId(10L);
+        ctx.setDiscipline("NATATION");
+        ctx.setNiveauEpreuve("FINALE");
+
+        PerformanceEntryDto e1 = new PerformanceEntryDto();
+        e1.setAthleteId(1L);
+        e1.setValeurPrincipale("49.95");
+
+        PerformanceEntryDto e2 = new PerformanceEntryDto();
+        e2.setAthleteId(2L);
+        e2.setValeurPrincipale("50.12");
+
+        BulkResultatRequest request = new BulkResultatRequest();
+        request.setPerformances(List.of(e1, e2));
+
+        resultatService.saisirBulk(10L, request, ctx);
+
+        verify(resultatRepository).findByEpreuveIdAndAthleteId(10L, 1L);
+        verify(resultatRepository).findByEpreuveIdAndAthleteId(10L, 2L);
+        verify(classementService).calculerClassementAvecContexte(10L, ctx);
+        verify(resultatRepository).findByEpreuveId(10L);
+    }
+
+    @Test
+    void saisirBulk_assigns_score_type_for_water_polo() {
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 1L)).thenReturn(Optional.empty());
+        when(resultatRepository.findByEpreuveId(10L)).thenReturn(new ArrayList<>());
+
+        EpreuveContextDto ctx = new EpreuveContextDto();
+        ctx.setId(10L);
+        ctx.setDiscipline("WATER_POLO");
+        ctx.setNiveauEpreuve("FINALE");
+
+        PerformanceEntryDto e1 = new PerformanceEntryDto();
+        e1.setAthleteId(1L);
+        e1.setValeurPrincipale("12-8");
+
+        BulkResultatRequest request = new BulkResultatRequest();
+        request.setPerformances(List.of(e1));
+
+        resultatService.saisirBulk(10L, request, ctx);
+
+        verify(resultatRepository).save(any(Resultat.class));
+    }
+
+    // ── validerTout ──────────────────────────────────────────────────────────
+
+    @Test
+    void validerTout_changes_all_en_attente_to_valide() {
+        Resultat r1 = new Resultat();
+        r1.setId(1L);
+        r1.setStatut(ResultatStatut.EN_ATTENTE);
+        r1.setEpreuveId(10L);
+
+        Resultat r2 = new Resultat();
+        r2.setId(2L);
+        r2.setStatut(ResultatStatut.VALIDE);
+        r2.setEpreuveId(10L);
+
+        when(resultatRepository.findByEpreuveId(10L))
+                .thenReturn(new ArrayList<>(List.of(r1, r2)));
+
+        resultatService.validerTout(10L);
+
+        verify(resultatRepository).saveAll(List.of(r1));
+        assertEquals(ResultatStatut.VALIDE, r1.getStatut());
+    }
+
+    @Test
+    void validerTout_returns_empty_when_nothing_en_attente() {
+        Resultat r1 = new Resultat();
+        r1.setId(1L);
+        r1.setStatut(ResultatStatut.VALIDE);
+        r1.setEpreuveId(10L);
+
+        when(resultatRepository.findByEpreuveId(10L))
+                .thenReturn(new ArrayList<>(List.of(r1)));
+
+        List<Resultat> result = resultatService.validerTout(10L);
+
+        verify(resultatRepository).saveAll(List.of());
+        assertEquals(0, result.size());
     }
 }

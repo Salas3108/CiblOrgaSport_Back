@@ -1,0 +1,796 @@
+{
+    "info": {
+        "_postman_id": "b1c2d3e4-f5a6-7890-bcde-resultats2025",
+        "name": "Resultats Service — CiblOrgaSport",
+        "description": "Tests complets du resultats-service.\nWorkflow : Login → Contexte → Saisie bulk → Valider → Publier → Vérification publique.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "gateway_base",
+            "value": "http://localhost:8080",
+            "description": "Gateway (recommandé)"
+        },
+        {
+            "key": "resultats_base",
+            "value": "http://localhost:8088",
+            "description": "Accès direct au service (sans gateway)"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "description": "Rempli automatiquement par le test Login"
+        },
+        {
+            "key": "epreuve_id",
+            "value": "1",
+            "description": "ID de l'épreuve à tester"
+        },
+        {
+            "key": "athlete_id",
+            "value": "1"
+        },
+        {
+            "key": "equipe_id",
+            "value": "1"
+        },
+        {
+            "key": "resultat_id",
+            "value": "",
+            "description": "Rempli automatiquement après saisie unitaire"
+        }
+    ],
+    "item": [
+        {
+            "name": "0 — Authentification",
+            "id": "folder-auth-001",
+            "item": [
+                {
+                    "name": "Login en tant que COMMISSAIRE",
+                    "id": "req-auth-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Token JWT présent\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('token');",
+                                    "    pm.collectionVariables.set('jwt_token', json.token);",
+                                    "    console.log('Token sauvegardé :', json.token.substring(0, 30) + '...');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"commissaire1\",\n  \"password\": \"commissaire1\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_base}}/auth/signin",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["auth", "signin"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login en tant que ADMIN",
+                    "id": "req-auth-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Token JWT présent\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('token');",
+                                    "    pm.collectionVariables.set('jwt_token', json.token);",
+                                    "    console.log('Token sauvegardé :', json.token.substring(0, 30) + '...');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_base}}/auth/signin",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["auth", "signin"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "1 — Contexte épreuve",
+            "id": "folder-contexte-001",
+            "item": [
+                {
+                    "name": "GET Contexte épreuve (discipline + participants)",
+                    "id": "req-contexte-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Contient epreuveId et discipline\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('epreuveId');",
+                                    "    pm.expect(json).to.have.property('discipline');",
+                                    "    pm.expect(json).to.have.property('niveauEpreuve');",
+                                    "    console.log('Discipline :', json.discipline);",
+                                    "    console.log('Niveau :', json.niveauEpreuve);",
+                                    "    console.log('Nb athlètes :', (json.athletes || []).length);",
+                                    "    console.log('Nb équipes :', (json.equipes || []).length);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/contexte",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "contexte"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Contexte — épreuve inexistante (404)",
+                    "id": "req-contexte-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/99999/contexte",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "99999", "contexte"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "2 — Saisie bulk (classement automatique)",
+            "id": "folder-bulk-001",
+            "item": [
+                {
+                    "name": "POST Saisie bulk — NATATION (temps croissant)",
+                    "id": "req-bulk-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Retourne une liste\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    pm.expect(json.length).to.be.greaterThan(0);",
+                                    "});",
+                                    "pm.test(\"Classements calculés automatiquement\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    json.forEach(r => pm.expect(r.classement).to.not.be.null);",
+                                    "});",
+                                    "pm.test(\"Tous en statut EN_ATTENTE\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    json.forEach(r => pm.expect(r.statut).to.eql('EN_ATTENTE'));",
+                                    "});",
+                                    "pm.test(\"Le plus rapide est classé 1er\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const premier = json.find(r => r.classement === 1);",
+                                    "    pm.expect(premier).to.not.be.undefined;",
+                                    "    console.log('1er :', premier.athleteId, '— temps :', premier.valeurPrincipale);",
+                                    "});",
+                                    "if (pm.response.json().length > 0) {",
+                                    "    pm.collectionVariables.set('resultat_id', pm.response.json()[0].id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"performances\": [\n    { \"athleteId\": 1, \"valeurPrincipale\": \"49.95\" },\n    { \"athleteId\": 2, \"valeurPrincipale\": \"48.77\" },\n    { \"athleteId\": 3, \"valeurPrincipale\": \"50.12\" }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/saisie",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "saisie"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Saisie bulk — WATER POLO (équipes, score décroissant)",
+                    "id": "req-bulk-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"TypePerformance = SCORE\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.length > 0) pm.expect(json[0].typePerformance).to.eql('SCORE');",
+                                    "});",
+                                    "pm.test(\"L'équipe avec le plus de buts est 1ère\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const premier = json.find(r => r.classement === 1);",
+                                    "    pm.expect(premier).to.not.be.undefined;",
+                                    "    console.log('1ère équipe :', premier.equipeId, '— score :', premier.valeurPrincipale);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"performances\": [\n    { \"equipeId\": 1, \"valeurPrincipale\": \"9-6\" },\n    { \"equipeId\": 2, \"valeurPrincipale\": \"12-8\" }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/saisie",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "saisie"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Saisie bulk — PLONGEON (points décroissants)",
+                    "id": "req-bulk-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"TypePerformance = POINTS\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.length > 0) pm.expect(json[0].typePerformance).to.eql('POINTS');",
+                                    "});",
+                                    "pm.test(\"Le meilleur score est classé 1er\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const premier = json.find(r => r.classement === 1);",
+                                    "    console.log('1er :', premier.athleteId, '— points :', premier.valeurPrincipale);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"performances\": [\n    { \"athleteId\": 1, \"valeurPrincipale\": \"89.50\" },\n    { \"athleteId\": 2, \"valeurPrincipale\": \"95.25\" },\n    { \"athleteId\": 3, \"valeurPrincipale\": \"91.00\" }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/saisie",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "saisie"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "3 — Saisie unitaire",
+            "id": "folder-unitaire-001",
+            "item": [
+                {
+                    "name": "POST Saisie unitaire — athlète",
+                    "id": "req-unit-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Statut = EN_ATTENTE\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.statut).to.eql('EN_ATTENTE');",
+                                    "    pm.expect(json.published).to.be.false;",
+                                    "    pm.collectionVariables.set('resultat_id', json.id);",
+                                    "    console.log('resultat_id sauvegardé :', json.id);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"epreuveId\": {{epreuve_id}},\n  \"athleteId\": {{athlete_id}},\n  \"valeurPrincipale\": \"51.30\",\n  \"unite\": \"secondes\",\n  \"typePerformance\": \"TEMPS\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Saisie unitaire — sans participant (400)",
+                    "id": "req-unit-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 400 — participant obligatoire\", () => {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"epreuveId\": {{epreuve_id}},\n  \"valeurPrincipale\": \"51.30\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "4 — Validation",
+            "id": "folder-validation-001",
+            "item": [
+                {
+                    "name": "POST Valider 1 résultat",
+                    "id": "req-valid-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Statut = VALIDE\", () => {",
+                                    "    pm.expect(pm.response.json().statut).to.eql('VALIDE');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/{{resultat_id}}/validation",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "{{resultat_id}}", "validation"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Valider TOUT (épreuve entière)",
+                    "id": "req-valid-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Tous les résultats sont VALIDE\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    json.forEach(r => pm.expect(r.statut).to.eql('VALIDE'));",
+                                    "    console.log(json.length + ' résultat(s) validés');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/valider-tout",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "valider-tout"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "5 — Publication",
+            "id": "folder-publication-001",
+            "item": [
+                {
+                    "name": "POST Publier TOUT — résultats non validés (erreur attendue)",
+                    "id": "req-pub-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Doit échouer si EN_ATTENTE présents\", () => {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                                    "    console.log('Erreur reçue :', pm.response.text());",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/publier-tout",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "publier-tout"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Publier 1 résultat",
+                    "id": "req-pub-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"published = true\", () => {",
+                                    "    pm.expect(pm.response.json().published).to.be.true;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/{{resultat_id}}/publier",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "{{resultat_id}}", "publier"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Publier TOUT (après validation)",
+                    "id": "req-pub-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"success = true et nbResultatsPublies > 0\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    pm.expect(json.nbResultatsPublies).to.be.greaterThan(0);",
+                                    "    console.log(json.nbResultatsPublies + ' résultat(s) publiés');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/publier-tout",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "publier-tout"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "6 — Consultation commissaire",
+            "id": "folder-consult-comm-001",
+            "item": [
+                {
+                    "name": "GET Classement épreuve (tous statuts, enrichi)",
+                    "id": "req-cons-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Liste triée par classement\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    for (let i = 1; i < json.length; i++) {",
+                                    "        const prev = json[i-1].classement ?? 0;",
+                                    "        const curr = json[i].classement ?? 999;",
+                                    "        pm.expect(prev).to.be.at.most(curr);",
+                                    "    }",
+                                    "});",
+                                    "pm.test(\"Champs enrichis présents\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    if (json.length > 0) {",
+                                    "        console.log('Exemple résultat enrichi :', JSON.stringify(json[0], null, 2));",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Résultats d'un athlète (tous statuts)",
+                    "id": "req-cons-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Résultats de l'athlète\", () => {",
+                                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/athletes/{{athlete_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "athletes", "{{athlete_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Résultats d'une équipe (tous statuts)",
+                    "id": "req-cons-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Résultats de l'équipe\", () => {",
+                                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/equipes/{{equipe_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "equipes", "{{equipe_id}}"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "7 — Consultation publique (sans JWT)",
+            "id": "folder-public-001",
+            "item": [
+                {
+                    "name": "GET Classement épreuve public (published only)",
+                    "id": "req-pub-view-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Tous les résultats sont publiés\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    json.forEach(r => pm.expect(r.published).to.be.true);",
+                                    "});",
+                                    "pm.test(\"Médaille OR au rang 1 (si FINALE)\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const top = json.find(r => r.classement === 1);",
+                                    "    if (top && top.niveauEpreuve === 'FINALE') {",
+                                    "        pm.expect(top.medaille).to.eql('OR');",
+                                    "        console.log('Médaille OR confirmée pour :', top.athleteId || top.equipeId);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/public/epreuves/{{epreuve_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "public", "epreuves", "{{epreuve_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Résultats athlète public",
+                    "id": "req-pub-view-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Uniquement les résultats publiés\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    json.forEach(r => pm.expect(r.published).to.be.true);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/public/athletes/{{athlete_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "public", "athletes", "{{athlete_id}}"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Résultats équipe public",
+                    "id": "req-pub-view-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Uniquement les résultats publiés\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    json.forEach(r => pm.expect(r.published).to.be.true);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/public/equipes/{{equipe_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "public", "equipes", "{{equipe_id}}"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
