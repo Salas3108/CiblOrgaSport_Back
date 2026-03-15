@@ -791,6 +791,231 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "8 — Participants (athlètes validés)",
+            "id": "folder-participants-001",
+            "item": [
+                {
+                    "name": "GET Athlètes validés (participants-service)",
+                    "id": "req-participants-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Réponse est un tableau\", () => {",
+                                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                                    "});",
+                                    "pm.test(\"Tous les athlètes sont validés\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    json.forEach(a => pm.expect(a.valide).to.be.true);",
+                                    "    console.log(json.length + ' athlète(s) validé(s) trouvé(s)');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{gateway_base}}/commissaire/athletes/valides",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["commissaire", "athletes", "valides"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "9 — Setup athlètes (sync → valider → assigner)",
+            "id": "folder-setup-athletes-001",
+            "item": [
+                {
+                    "name": "POST Sync athlètes depuis auth-service",
+                    "id": "req-setup-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Sync retourne total et created\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.have.property('total');",
+                                    "    pm.expect(json).to.have.property('created');",
+                                    "    console.log('Sync : total=' + json.total + ', created=' + json.created);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{gateway_base}}/commissaire/athletes/sync",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["commissaire", "athletes", "sync"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Liste tous les athlètes (pour récupérer un ID)",
+                    "id": "req-setup-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Sauvegarde le premier athlete_id\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    if (json.length > 0) {",
+                                    "        pm.collectionVariables.set('athlete_id', json[0].id);",
+                                    "        console.log('athlete_id sauvegardé :', json[0].id, '-', json[0].username);",
+                                    "    } else {",
+                                    "        console.warn('Aucun athlète trouvé. Lancer le sync d abord.');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{gateway_base}}/commissaire/athletes",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["commissaire", "athletes"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Valider un athlète (athlete_id)",
+                    "id": "req-setup-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Athlète validé\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.valide).to.be.true;",
+                                    "    console.log('Athlète validé :', json.id, json.username);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"valide\": true,\n  \"message\": \"Dossier complet\",\n  \"motifRefus\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_base}}/commissaire/athletes/{{athlete_id}}/validation",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["commissaire", "athletes", "{{athlete_id}}", "validation"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET Athlètes validés (vérification)",
+                    "id": "req-setup-004",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Au moins 1 athlète validé\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.length).to.be.greaterThan(0);",
+                                    "    json.forEach(a => pm.expect(a.valide).to.be.true);",
+                                    "    console.log(json.length + ' athlète(s) validé(s) :', json.map(a => a.id).join(', '));",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{gateway_base}}/commissaire/athletes/valides",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["commissaire", "athletes", "valides"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Assigner athlète à épreuve (bulk)",
+                    "id": "req-setup-005",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Athlète présent dans l épreuve\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const athleteId = parseInt(pm.collectionVariables.get('athlete_id'));",
+                                    "    pm.expect(json.athleteIds).to.include(athleteId);",
+                                    "    console.log('athleteIds dans l épreuve :', json.athleteIds);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"athleteIds\": [{{athlete_id}}]\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_base}}/epreuves/{{epreuve_id}}/athletes/bulk",
+                            "host": ["{{gateway_base}}"],
+                            "path": ["epreuves", "{{epreuve_id}}", "athletes", "bulk"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
         }
     ]
 }
