@@ -1,29 +1,38 @@
 package com.ciblorgasport.incidentservice.service;
 
-import com.ciblorgasport.incidentservice.model.*;
-import com.ciblorgasport.incidentservice.repository.IncidentRepository;
-import com.ciblorgasport.incidentservice.service.impl.IncidentServiceImpl;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.ciblorgasport.incidentservice.model.ImpactLevel;
+import com.ciblorgasport.incidentservice.model.Incident;
+import com.ciblorgasport.incidentservice.model.IncidentStatus;
+import com.ciblorgasport.incidentservice.model.IncidentType;
+import com.ciblorgasport.incidentservice.repository.IncidentRepository;
+import com.ciblorgasport.incidentservice.service.impl.IncidentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class IncidentServiceImplTest {
 
     @Mock
     private IncidentRepository incidentRepository;
+
+    @Mock
+    private com.ciblorgasport.incidentservice.kafka.publisher.IncidentEventPublisher incidentEventPublisher;
 
     @InjectMocks
     private IncidentServiceImpl incidentService;

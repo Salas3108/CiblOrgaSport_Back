@@ -2,11 +2,17 @@ package com.ciblorgasport.eventservice.controller;
 
 import com.ciblorgasport.eventservice.model.Event;
 import com.ciblorgasport.eventservice.repository.EventRepository;
+import com.ciblorgasport.eventservice.dto.EventDTO;
+import com.ciblorgasport.eventservice.dto.EventMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -22,6 +28,9 @@ class EventControllerTest {
 
     @Mock
     private EventRepository eventRepository;
+
+    @Mock
+    private EventMapper eventMapper;
 
     @InjectMocks
     private EventController eventController;
@@ -84,23 +93,41 @@ class EventControllerTest {
     @Test
     void createEvent_ShouldSaveAndReturnEvent() {
         // Arrange
-        Event eventToSave = new Event();
-        eventToSave.setName("New Event");
-        eventToSave.setDate(LocalDate.now());
-        
+        EventDTO dto = new EventDTO();
+        dto.setName("New Event");
+        dto.setDateDebut(LocalDate.now());
+        dto.setDateFin(LocalDate.now().plusDays(2));
+        dto.setDescription("Description");
+        dto.setPaysHote("France");
+
+        Event entity = new Event();
+        entity.setName(dto.getName());
+        entity.setDateDebut(dto.getDateDebut());
+        entity.setDateFin(dto.getDateFin());
+        entity.setDescription(dto.getDescription());
+        entity.setPaysHote(dto.getPaysHote());
+
         Event savedEvent = new Event();
         savedEvent.setId(1L);
         savedEvent.setName("New Event");
-        
-        when(eventRepository.save(eventToSave)).thenReturn(savedEvent);
+
+        EventDTO savedDto = new EventDTO();
+        savedDto.setId(1L);
+        savedDto.setName("New Event");
+
+        when(eventMapper.toEntity(dto)).thenReturn(entity);
+        when(eventRepository.save(entity)).thenReturn(savedEvent);
+        when(eventMapper.toDto(savedEvent)).thenReturn(savedDto);
 
         // Act
-        Event result = eventController.createEvent(eventToSave);
+        ResponseEntity<EventDTO> response = eventController.createEvent(dto);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(eventRepository, times(1)).save(eventToSave);
+        assertNotNull(response);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+        verify(eventRepository, times(1)).save(entity);
     }
 
     @Test
@@ -112,7 +139,10 @@ class EventControllerTest {
         
         Event updateDetails = new Event();
         updateDetails.setName("Updated Name");
-        updateDetails.setDate(LocalDate.now());
+        updateDetails.setDateDebut(LocalDate.now());
+        updateDetails.setDateFin(LocalDate.now().plusDays(1));
+        updateDetails.setDescription("Updated description");
+        updateDetails.setPaysHote("Maroc");
         
         when(eventRepository.findById(1L)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(any(Event.class))).thenReturn(existingEvent);
@@ -150,5 +180,18 @@ class EventControllerTest {
 
         // Assert
         verify(eventRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void createEvent_WhenDataIntegrityViolation_ShouldReturnConflict() {
+        EventDTO dto = new EventDTO();
+        dto.setName("Test Event");
+
+        when(eventMapper.toEntity(dto)).thenReturn(new Event());
+        when(eventRepository.save(any(Event.class))).thenThrow(new DataIntegrityViolationException("Unique constraint"));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(dto));
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+        assertTrue(ex.getReason().toLowerCase().contains("data integrity"));
     }
 }

@@ -33,7 +33,6 @@ import com.ciblorgasport.participantsservice.service.AthleteService;
  */
 @RestController
 @RequestMapping({"/commissaire", "/api/commissaire"})
-@PreAuthorize("hasRole('COMMISSAIRE')")
 public class CommissaireController {
 
     private final AthleteService athleteService;
@@ -52,6 +51,7 @@ public class CommissaireController {
 
     // COMMISSAIRE : get all athletes
     @GetMapping("/athletes")
+    @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<List<AthleteDto>> getAllAthletes() {
         List<Athlete> athletes = athleteService.findAll();
         for (Athlete athlete : athletes) {
@@ -116,8 +116,19 @@ public class CommissaireController {
         }
     }
 
+    // COMMISSAIRE : get validated athletes
+    @GetMapping("/athletes/valides")
+    @PreAuthorize("hasRole('COMMISSAIRE') or hasRole('ADMIN')")
+    public ResponseEntity<List<AthleteDto>> getValidatedAthletes() {
+        List<AthleteDto> athletes = athleteService.findValidated().stream()
+                .map(athleteMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(athletes);
+    }
+
     // COMMISSAIRE : get info
     @GetMapping("/athletes/{id}/info")
+    @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<AthleteDto> getInfo(@PathVariable Long id) {
         Athlete athlete = athleteService.findByIdOrThrow(id);
         return ResponseEntity.ok(athleteMapper.toDto(athlete));
@@ -125,6 +136,7 @@ public class CommissaireController {
 
     // COMMISSAIRE : get doc
     @GetMapping("/athletes/{id}/doc")
+    @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<?> getDoc(@PathVariable Long id) {
         Athlete athlete = athleteService.findByIdOrThrow(id);
         // On renvoie la structure docs directement (comme dans le mock)
@@ -133,12 +145,14 @@ public class CommissaireController {
 
     // COMMISSAIRE : post validation -> true/false (+ motifRefus)
     @PostMapping("/athletes/{id}/validation")
+    @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<AthleteDto> postValidation(@PathVariable Long id, @RequestBody ValidationRequest request) {
         return ResponseEntity.ok(athleteMapper.toDto(athleteService.validate(id, request)));
     }
 
     // COMMISSAIRE : post message (ex: "passport expiré")
     @PostMapping("/athletes/{id}/message")
+    @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<MessageDto> postMessage(@PathVariable Long id, @RequestBody CreateMessageRequest request) {
         Message message = athleteService.createMessage(id, request.getContenu());
         return ResponseEntity.ok(messageMapper.toDto(message));

@@ -45,6 +45,10 @@ public class AthleteService {
         return athleteRepository.findAll();
     }
 
+    public List<Athlete> findValidated() {
+        return athleteRepository.findByValideTrue();
+    }
+
     public boolean existsById(Long id) {
         return athleteRepository.existsById(id);
     }

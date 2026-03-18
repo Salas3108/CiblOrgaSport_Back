@@ -90,17 +90,6 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Autres microservices (si nécessaires) -->
-        <dependency>
-            <groupId>com.ciblorgasport</groupId>
-            <artifactId>abonnement-service</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ciblorgasport</groupId>
-            <artifactId>billetterie</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
     
     <build>

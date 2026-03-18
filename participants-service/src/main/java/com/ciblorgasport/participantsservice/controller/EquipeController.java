@@ -27,7 +27,7 @@ import com.ciblorgasport.participantsservice.service.EquipeService;
  */
 @RestController
 @RequestMapping({"/commissaire/equipes", "/api/commissaire/equipes"})
-@PreAuthorize("hasRole('COMMISSAIRE')")
+@PreAuthorize("hasRole('COMMISSAIRE') or hasRole('ADMIN')")
 public class EquipeController {
 
     private final EquipeService equipeService;

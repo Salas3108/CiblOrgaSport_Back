@@ -1,9 +1,6 @@
 package com.ciblorgasport.eventservice.model;
 
 import java.time.LocalDate;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import com.ciblorgasport.eventservice.model.Lieu;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,33 +13,23 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @ManyToOne
-    @JoinColumn(name = "lieu_principal_id")
-    private Lieu lieuPrincipal;
 
     private LocalDate dateDebut;
     private LocalDate dateFin;
-    private LocalDate date; // added field used by tests
+    private String description;
+    private String paysHote;
 
     // Getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Lieu getLieuPrincipal() { return lieuPrincipal; }
-    public void setLieuPrincipal(Lieu lieuPrincipal) { this.lieuPrincipal = lieuPrincipal; }
-	public LocalDate getDateDebut() {
-		return dateDebut;
-	}
-	public void setDateDebut(LocalDate dateDebut) {
-		this.dateDebut = dateDebut;
-	}
-	public LocalDate getDateFin() {
-		return dateFin;
-	}
-	public void setDateFin(LocalDate dateFin) {
-		this.dateFin = dateFin;
-	}
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public LocalDate getDateDebut() { return dateDebut; }
+    public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
+    public LocalDate getDateFin() { return dateFin; }
+    public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getPaysHote() { return paysHote; }
+    public void setPaysHote(String paysHote) { this.paysHote = paysHote; }
 }

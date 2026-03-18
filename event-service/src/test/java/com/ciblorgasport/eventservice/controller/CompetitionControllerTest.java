@@ -1,14 +1,16 @@
 package com.ciblorgasport.eventservice.controller;
 
 import com.ciblorgasport.eventservice.model.Competition;
+import com.ciblorgasport.eventservice.model.Event;
+import com.ciblorgasport.eventservice.model.enums.Discipline;
 import com.ciblorgasport.eventservice.repository.CompetitionRepository;
+import com.ciblorgasport.eventservice.repository.EventRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,9 @@ class CompetitionControllerTest {
 
     @Mock
     private CompetitionRepository competitionRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @InjectMocks
     private CompetitionController competitionController;
@@ -48,11 +53,11 @@ class CompetitionControllerTest {
     void createCompetition_ShouldSaveCompetition() {
         // Arrange
         Competition competition = new Competition();
-        competition.setName("100m Sprint");
+        competition.setDiscipline(Discipline.NATATION);
         
         Competition savedCompetition = new Competition();
         savedCompetition.setId(1L);
-        savedCompetition.setName("100m Sprint");
+        savedCompetition.setDiscipline(Discipline.NATATION);
         
         when(competitionRepository.save(competition)).thenReturn(savedCompetition);
 
@@ -70,7 +75,7 @@ class CompetitionControllerTest {
         // Arrange
         Competition competition = new Competition();
         competition.setId(1L);
-        competition.setName("Marathon");
+        competition.setDiscipline(Discipline.EAU_LIBRE);
         
         when(competitionRepository.findById(1L)).thenReturn(Optional.of(competition));
 
@@ -79,7 +84,7 @@ class CompetitionControllerTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("Marathon", result.getName());
+        assertEquals(Discipline.EAU_LIBRE, result.getDiscipline());
         verify(competitionRepository, times(1)).findById(1L);
     }
 
@@ -88,14 +93,16 @@ class CompetitionControllerTest {
         // Arrange
         Competition existing = new Competition();
         existing.setId(1L);
-        existing.setName("Old Name");
+        existing.setDiscipline(Discipline.NATATION);
         
         Competition updateDetails = new Competition();
-        updateDetails.setName("New Name");
-        updateDetails.setDate(LocalDate.now());
-        updateDetails.setType("Athletics");
+        Event event = new Event();
+        event.setId(10L);
+        updateDetails.setEvent(event);
+        updateDetails.setDiscipline(Discipline.WATER_POLO);
         
         when(competitionRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(eventRepository.findById(10L)).thenReturn(Optional.of(event));
         when(competitionRepository.save(any(Competition.class))).thenReturn(existing);
 
         // Act
@@ -103,6 +110,9 @@ class CompetitionControllerTest {
 
         // Assert
         assertNotNull(result);
+        assertEquals(Discipline.WATER_POLO, existing.getDiscipline());
+        assertNotNull(existing.getEvent());
+        assertEquals(10L, existing.getEvent().getId());
         verify(competitionRepository, times(1)).save(any(Competition.class));
     }
 

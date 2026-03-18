@@ -21,11 +21,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable()) // CORS géré par le gateway
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
             	    .requestMatchers("/internal/**").permitAll()
             	    .requestMatchers("/commissaire/epreuves/**", "/api/commissaire/epreuves/**").permitAll()
-            	    .requestMatchers("/epreuves/**").permitAll()   // 👈 AJOUTE CETTE LIGNE
+            	    .requestMatchers("/epreuves/**").permitAll()
             	    .anyRequest().authenticated()
             	)
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
