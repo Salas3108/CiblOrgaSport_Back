@@ -2744,6 +2744,836 @@
                      "id":  "97403cfe-7d70-41e4-a912-509cba5934ea"
                  },
                  {
+                     "name":  "volunteer-service",
+                     "item":  [
+                                  {
+                                      "name":  "Volunteer - Complete Profile",
+                                      "id":  "c48c6522-1c2f-4b42-9c01-0b35e87e2bb4",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+33612345678\",\n  \"languages\": [\"Français\", \"Anglais\"],\n  \"preferredTaskTypes\": [\"ACCUEIL\", \"ORIENTATION\"],\n  \"availabilities\": [\n    {\n      \"dayOfWeek\": \"MONDAY\",\n      \"startTime\": \"09:00\",\n      \"endTime\": \"12:00\"\n    }\n  ]\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/volunteers/profile/complete",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "volunteers",
+                                                                               "profile",
+                                                                               "complete"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () {",
+                                                                                    "  pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response contains profile fields\", function () {",
+                                                                                    "  pm.expect(data.firstName).to.exist;",
+                                                                                    "  pm.expect(data.lastName).to.exist;",
+                                                                                    "  pm.expect(data.email).to.exist;",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Volunteer id is returned\", function () {",
+                                                                                    "  pm.expect(data.id).to.exist;",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.environment.set('volunteer_id', data.id);",
+                                                                                    "",
+                                                                                    "pm.test(\"Profile is marked as complete\", function () {",
+                                                                                    "  pm.expect(data.profileComplete).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Volunteer - Get Profile",
+                                      "id":  "d48c6522-1c2f-4b42-9c01-0b35e87e2bb5",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/volunteers/profile",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "volunteers",
+                                                                               "profile"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response contains profile fields\", function () {",
+                                                                                    "  pm.expect(data.firstName).to.exist;",
+                                                                                    "  pm.expect(data.lastName).to.exist;",
+                                                                                    "  pm.expect(data.email).to.exist;",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Languages is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data.languages)).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Import Tasks",
+                                      "id":  "3b9a5a1d-1b6b-4a57-8a86-3f1f6b6c8c12",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "[\n  {\n    \"title\": \"Accueil Participants\",\n    \"description\": \"Accueil des participants à l'arrivée\",\n    \"taskDate\": \"2026-03-15\",\n    \"startTime\": \"09:00:00\",\n    \"endTime\": \"12:00:00\",\n    \"location\": \"Entrée Site A\",\n    \"taskType\": \"ACCUEIL\",\n    \"requiredLanguages\": [\"Français\"]\n  },\n  {\n    \"title\": \"Support Logistique\",\n    \"description\": \"Aide à la logistique du parcours\",\n    \"taskDate\": \"2026-03-15\",\n    \"startTime\": \"13:00:00\",\n    \"endTime\": \"17:00:00\",\n    \"location\": \"Site B\",\n    \"taskType\": \"SUPPORT_LOGISTIQUE\",\n    \"requiredLanguages\": []\n  }\n]"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/import",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "import"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () {",
+                                                                                    "  pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"At least one imported task is returned\", function () {",
+                                                                                    "  pm.expect(data.length).to.be.above(0);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "if (data.length > 0) {",
+                                                                                    "  pm.environment.set('task_id', data[0].id);",
+                                                                                    "  pm.test(\"Each task has required fields\", function () {",
+                                                                                    "    const task = data[0];",
+                                                                                    "    pm.expect(task.title).to.exist;",
+                                                                                    "    pm.expect(task.taskDate).to.exist;",
+                                                                                    "    pm.expect(task.location).to.exist;",
+                                                                                    "  });",
+                                                                                    "}"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Volunteer - Today Schedule",
+                                      "id":  "e48c6522-1c2f-4b42-9c01-0b35e87e2bb6",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/volunteers/schedule/today",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "volunteers",
+                                                                               "schedule",
+                                                                               "today"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Each task has required fields\", function () {",
+                                                                                    "  data.forEach(task => {",
+                                                                                    "    pm.expect(task.title).to.exist;",
+                                                                                    "    pm.expect(task.taskDate).to.exist;",
+                                                                                    "    pm.expect(task.location).to.exist;",
+                                                                                    "  });",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Volunteer - Schedule with Date Filter",
+                                      "id":  "b48c6522-1c2f-4b42-9c01-0b35e87e2bb3",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/volunteers/schedule?date={{from_date}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "volunteers",
+                                                                               "schedule"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "date",
+                                                                                    "value":  "{{from_date}}"
+                                                                                }
+                                                                            ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const fromDate = pm.variables.get('from_date');",
+                                                                                    "pm.test(\"Every task is on or after from_date\", function () {",
+                                                                                    "  const ok = data.every(task => task.taskDate >= fromDate);",
+                                                                                    "  pm.expect(ok).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - All Tasks",
+                                      "id":  "f48c6522-1c2f-4b42-9c01-0b35e87e2bb7",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Each task has required fields\", function () {",
+                                                                                    "  data.forEach(task => {",
+                                                                                    "    pm.expect(task.title).to.exist;",
+                                                                                    "    pm.expect(task.taskDate).to.exist;",
+                                                                                    "    pm.expect(task.location).to.exist;",
+                                                                                    "  });",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - All Tasks by Date",
+                                      "id":  "748c6522-1c2f-4b42-9c01-0b35e87e2bb8",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks?date={{from_date}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "date",
+                                                                                    "value":  "{{from_date}}"
+                                                                                }
+                                                                            ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const fromDate = pm.variables.get('from_date');",
+                                                                                    "pm.test(\"All tasks match the date filter\", function () {",
+                                                                                    "  data.forEach(task => {",
+                                                                                    "    pm.expect(task.taskDate).to.eql(fromDate);",
+                                                                                    "  });",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Create Task",
+                                      "id":  "848c6522-1c2f-4b42-9c01-0b35e87e2bb9",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"title\": \"Accueil Parcours\",\n  \"description\": \"Accueil des participants\",\n  \"taskDate\": \"2026-03-16\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"11:00:00\",\n  \"location\": \"Parcours Principal\",\n  \"taskType\": \"ACCUEIL\",\n  \"requiredLanguages\": [\"Français\"]\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () {",
+                                                                                    "  pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Task has id field\", function () {",
+                                                                                    "  pm.expect(data.id).to.exist;",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Task data matches request\", function () {",
+                                                                                    "  pm.expect(data.title).to.eql('Accueil Parcours');",
+                                                                                    "  pm.expect(data.location).to.eql('Parcours Principal');",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.environment.set('task_id', data.id);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Update Task",
+                                      "id":  "948c6522-1c2f-4b42-9c01-0b35e87e2bba",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"title\": \"Accueil Parcours - Vague 1\",\n  \"description\": \"Accueil des participants - Matin\",\n  \"taskDate\": \"2026-03-16\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"location\": \"Parcours Principal\",\n  \"taskType\": \"ACCUEIL\",\n  \"requiredLanguages\": [\"Français\"]\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/{{task_id}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "{{task_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Task was updated\", function () {",
+                                                                                    "  pm.expect(data.title).to.include('Vague 1');",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Assign Volunteer to Task",
+                                      "id":  "a48c6522-1c2f-4b42-9c01-0b35e87e2bbb",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/{{task_id}}/assign/{{volunteer_id}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "{{task_id}}",
+                                                                               "assign",
+                                                                               "{{volunteer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Task is now assigned\", function () {",
+                                                                                    "  pm.expect(data.assigned).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Unassign Volunteer from Task",
+                                      "id":  "b48c6522-1c2f-4b42-9c01-0b35e87e2bbc",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/{{task_id}}/assign/{{volunteer_id}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "{{task_id}}",
+                                                                               "assign",
+                                                                               "{{volunteer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Task is now unassigned\", function () {",
+                                                                                    "  pm.expect(data.assigned).to.eql(false);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Find Volunteers with Match Info",
+                                      "id":  "d48c6522-1c2f-4b42-9c01-0b35e87e2bbe",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/{{task_id}}/volunteers-match-info",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "{{task_id}}",
+                                                                               "volunteers-match-info"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array of match info\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Delete Task",
+                                      "id":  "f48c6522-1c2f-4b42-9c01-0b35e87e2bc0",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/tasks/{{task_id}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "tasks",
+                                                                               "{{task_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 204 (No Content)\", function () {",
+                                                                                    "  pm.response.to.have.status(204);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Get All Volunteers",
+                                      "id":  "048c6522-1c2f-4b42-9c01-0b35e87e2bc1",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response is an array\", function () {",
+                                                                                    "  pm.expect(Array.isArray(data)).to.eql(true);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Admin - Get Single Volunteer",
+                                      "id":  "148c6522-1c2f-4b42-9c01-0b35e87e2bc2",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{volunteer_base}}/api/v1/admin/volunteers/{{volunteer_id}}",
+                                                                  "host":  [
+                                                                               "{{volunteer_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "admin",
+                                                                               "volunteers",
+                                                                               "{{volunteer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () {",
+                                                                                    "  pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "const data = pm.response.json();",
+                                                                                    "pm.test(\"Response contains volunteer fields\", function () {",
+                                                                                    "  pm.expect(data.id).to.exist;",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\"Volunteer ID matches request\", function () {",
+                                                                                    "  pm.expect(data.id.toString()).to.eql(pm.environment.get('volunteer_id'));",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ],
+                     "id":  "4e20b5bb-5e79-4d3b-84ba-7fd74d8ecf87"
+                 },
+                 {
                      "name":  "ciblorgasport (monolith API)",
                      "item":  [
                                   {
@@ -3139,6 +3969,26 @@
                          "id":  "c3d4e5f6-a7b8-9012-cdef-123456789012",
                          "key":  "lieu_id",
                          "value":  "1"
+                     },
+                     {
+                         "id":  "0f4e4d89-8581-4f8c-bd95-9f56eb5f31aa",
+                         "key":  "volunteer_base",
+                         "value":  "http://localhost:8090"
+                     },
+                     {
+                         "id":  "6cb1cdf4-a48d-4624-9b2e-1131f2118d20",
+                         "key":  "task_id",
+                         "value":  "550e8400-e29b-41d4-a716-446655440000"
+                     },
+                     {
+                         "id":  "2e59f657-f2f2-4a36-b84f-a9ecdf6d72fb",
+                         "key":  "volunteer_id",
+                         "value":  "550e8400-e29b-41d4-a716-446655440001"
+                     },
+                     {
+                         "id":  "3d70fd4c-8f6d-4f56-b84c-58038b6075a4",
+                         "key":  "from_date",
+                         "value":  "2026-03-01"
                      }
                  ]
 }
