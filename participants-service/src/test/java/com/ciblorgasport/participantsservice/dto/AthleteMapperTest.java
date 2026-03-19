@@ -2,6 +2,8 @@ package com.ciblorgasport.participantsservice.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -19,6 +21,8 @@ class AthleteMapperTest {
 
     @Test
     void toDto_copies_all_fields_and_docs() {
+        byte[] fakeCert = new byte[] {1,2,3};
+        byte[] fakePass = new byte[] {4,5,6};
         Athlete athlete = new Athlete(
                 1L,
                 "Titouche",
@@ -26,7 +30,7 @@ class AthleteMapperTest {
                 LocalDate.parse("2000-07-26"),
                 "Algerie",
                 true,
-                new AthleteDocs("certificat.pdf", "passport.pdf"),
+                new AthleteDocs(fakeCert, fakePass),
                 "OK"
         );
         athlete.setMotifRefus("passport expiré");
@@ -43,8 +47,9 @@ class AthleteMapperTest {
         assertEquals("passport expiré", dto.getMotifRefus());
 
         assertNotNull(dto.getDocs());
-        assertEquals("certificat.pdf", dto.getDocs().getCertificatMedical());
-        assertEquals("passport.pdf", dto.getDocs().getPassport());
+        // Les URLs doivent être générées (sans préfixe /api)
+        assertTrue(dto.getDocs().getCertificatMedicalUrl() != null && dto.getDocs().getCertificatMedicalUrl().contains("/athlete/1/doc/certificatMedical"));
+        assertTrue(dto.getDocs().getPassportUrl() != null && dto.getDocs().getPassportUrl().contains("/athlete/1/doc/passport"));
     }
 
     @Test
@@ -63,7 +68,7 @@ class AthleteMapperTest {
         AthleteDto dto = mapper.toDto(athlete);
 
         assertNotNull(dto.getDocs());
-        assertEquals(null, dto.getDocs().getCertificatMedical());
-        assertEquals(null, dto.getDocs().getPassport());
+        assertNull(dto.getDocs().getCertificatMedicalUrl());
+        assertNull(dto.getDocs().getPassportUrl());
     }
 }

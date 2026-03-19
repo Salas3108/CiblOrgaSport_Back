@@ -15,7 +15,6 @@ import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteDocsReques
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteInfoRequest;
 import com.ciblorgasport.participantsservice.dto.request.UpdateAthleteObservationRequest;
 import com.ciblorgasport.participantsservice.dto.request.ValidationRequest;
-import com.ciblorgasport.participantsservice.dto.AthleteDocsDto;
 import com.ciblorgasport.participantsservice.model.Athlete;
 import com.ciblorgasport.participantsservice.model.AthleteDocs;
 import com.ciblorgasport.participantsservice.model.Message;
@@ -95,17 +94,17 @@ class AthleteServiceTest {
     }
 
     @Test
-    void athlete_updateDocs_sets_certificat_and_passport() {
+    void athlete_updateDocsFiles_sets_certificat_and_passport() {
         // Athlète existant
         fakeStore.put(2L, new Athlete(2L, "Test", null, null, null, false, null, null));
 
-        UpdateAthleteDocsRequest docsRequest = new UpdateAthleteDocsRequest();
-        docsRequest.setDocs(new AthleteDocsDto("certificat.pdf", "passport.pdf"));
+        byte[] fakeCert = new byte[]{1,2,3};
+        byte[] fakePass = new byte[]{4,5,6};
 
-        Athlete athlete = athleteService.updateDocs(2L, docsRequest);
+        Athlete athlete = athleteService.updateDocsFiles(2L, fakeCert, fakePass);
 
-        assertEquals("certificat.pdf", athlete.getDocs().getCertificatMedical());
-        assertEquals("passport.pdf", athlete.getDocs().getPassport());
+        assertNotNull(athlete.getDocs().getCertificatMedical());
+        assertNotNull(athlete.getDocs().getPassport());
     }
 
     @Test
@@ -136,7 +135,7 @@ class AthleteServiceTest {
             LocalDate.parse("2000-03-22"),
             "Belgique",
             false,
-            new AthleteDocs("certificat.pdf", "passport.pdf"),
+            new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6}),
             null
         ));
 
@@ -165,7 +164,7 @@ class AthleteServiceTest {
             LocalDate.parse("2000-03-22"),
             "Belgique",
             false,
-            new AthleteDocs("certificat.pdf", "passport.pdf"),
+            new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6}),
             null
         ));
 
