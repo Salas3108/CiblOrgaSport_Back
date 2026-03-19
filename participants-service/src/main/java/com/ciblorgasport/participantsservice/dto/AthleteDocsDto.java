@@ -1,33 +1,33 @@
 package com.ciblorgasport.participantsservice.dto;
 
 /**
- * DTO Docs (même structure que le mock front : docs.certificatMedical + docs.passport).
+ * DTO Docs avec URLs de téléchargement des PDFs.
  */
 public class AthleteDocsDto {
-    private String certificatMedical;
-    private String passport;
+    private String certificatMedicalUrl;
+    private String passportUrl;
 
     public AthleteDocsDto() {
     }
 
-    public AthleteDocsDto(String certificatMedical, String passport) {
-        this.certificatMedical = certificatMedical;
-        this.passport = passport;
+    public AthleteDocsDto(String certificatMedicalUrl, String passportUrl) {
+        this.certificatMedicalUrl = certificatMedicalUrl;
+        this.passportUrl = passportUrl;
     }
 
-    public String getCertificatMedical() {
-        return certificatMedical;
+    public String getCertificatMedicalUrl() {
+        return certificatMedicalUrl;
     }
 
-    public void setCertificatMedical(String certificatMedical) {
-        this.certificatMedical = certificatMedical;
+    public void setCertificatMedicalUrl(String certificatMedicalUrl) {
+        this.certificatMedicalUrl = certificatMedicalUrl;
     }
 
-    public String getPassport() {
-        return passport;
+    public String getPassportUrl() {
+        return passportUrl;
     }
 
-    public void setPassport(String passport) {
-        this.passport = passport;
+    public void setPassportUrl(String passportUrl) {
+        this.passportUrl = passportUrl;
     }
 }
