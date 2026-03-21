@@ -2,6 +2,7 @@ package com.ciblorgasport.participantsservice.dto.request;
 
 import java.time.LocalDate;
 
+import com.ciblorgasport.participantsservice.model.Sexe;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -15,6 +16,7 @@ public class UpdateAthleteInfoRequest {
     private LocalDate dateNaissance;
 
     private String pays;
+    private Sexe sexe;
 
     public UpdateAthleteInfoRequest() {
     }
@@ -49,5 +51,13 @@ public class UpdateAthleteInfoRequest {
 
     public void setPays(String pays) {
         this.pays = pays;
+    }
+
+    public Sexe getSexe() {
+        return sexe;
+    }
+
+    public void setSexe(Sexe sexe) {
+        this.sexe = sexe;
     }
 }

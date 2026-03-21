@@ -25,6 +25,7 @@ import com.ciblorgasport.eventservice.client.LieuServiceClient;
 import com.ciblorgasport.eventservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
+import com.ciblorgasport.eventservice.service.GenderEligibilityService;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
 import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 
@@ -48,6 +49,9 @@ public class EpreuveController {
 
     @Autowired
     private ParticipantsServiceClient participantsServiceClient;
+
+    @Autowired
+    private GenderEligibilityService genderEligibilityService;
 
     @GetMapping
     public List<EpreuveDTO> getAllEpreuves() {
@@ -175,6 +179,7 @@ public class EpreuveController {
         if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
         }
+        genderEligibilityService.validateAthlete(athleteId, e.getGenreEpreuve());
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().add(athleteId);
         Epreuve saved = epreuveRepository.save(e);
@@ -221,6 +226,9 @@ public class EpreuveController {
         }
 
         validateEquipesExist(equipeIds);
+        for (Long eqId : equipeIds) {
+            genderEligibilityService.validateEquipe(eqId, e.getGenreEpreuve());
+        }
         if (e.getEquipeIds() == null) e.setEquipeIds(new HashSet<>());
         e.getEquipeIds().addAll(equipeIds);
         Epreuve saved = epreuveRepository.save(e);
@@ -244,6 +252,9 @@ public class EpreuveController {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
+        }
+        for (Long aId : normalizedIds) {
+            genderEligibilityService.validateAthlete(aId, e.getGenreEpreuve());
         }
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().addAll(normalizedIds);

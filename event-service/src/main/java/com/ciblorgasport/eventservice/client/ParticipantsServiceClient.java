@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.ciblorgasport.eventservice.dto.AthleteSexeDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Component
@@ -169,6 +170,33 @@ public class ParticipantsServiceClient {
             }
         }
         return normalized;
+    }
+
+    public AthleteSexeDto getAthleteInfo(Long athleteId) {
+        if (athleteId == null) {
+            return null;
+        }
+        RestTemplate restTemplate = new RestTemplate();
+        String url = participantsServiceUrl + "/internal/athletes/" + athleteId;
+        try {
+            return restTemplate.getForObject(url, AthleteSexeDto.class);
+        } catch (Exception e) {
+            throw new IllegalStateException("Impossible de récupérer le profil de l'athlète " + athleteId + " via participants-service", e);
+        }
+    }
+
+    public List<AthleteSexeDto> getEquipeAthletes(Long equipeId) {
+        if (equipeId == null) {
+            return List.of();
+        }
+        RestTemplate restTemplate = new RestTemplate();
+        String url = participantsServiceUrl + "/internal/equipes/" + equipeId + "/athletes";
+        try {
+            AthleteSexeDto[] result = restTemplate.getForObject(url, AthleteSexeDto[].class);
+            return result != null ? List.of(result) : List.of();
+        } catch (Exception e) {
+            throw new IllegalStateException("Impossible de récupérer la composition de l'équipe " + equipeId + " via participants-service", e);
+        }
     }
 
     private String resolveAuthorizationHeader() {

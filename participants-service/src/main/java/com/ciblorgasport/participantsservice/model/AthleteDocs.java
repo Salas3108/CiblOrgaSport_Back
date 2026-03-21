@@ -21,6 +21,9 @@ public class AthleteDocs {
      @Column(name = "passport", columnDefinition = "bytea")
      private byte[] passport;
 
+    @Column(name = "document_genre")
+    private String documentGenre;
+
     public AthleteDocs() {
     }
 
@@ -43,5 +46,13 @@ public class AthleteDocs {
 
     public void setPassport(byte[] passport) {
         this.passport = passport;
+    }
+
+    public String getDocumentGenre() {
+        return documentGenre;
+    }
+
+    public void setDocumentGenre(String documentGenre) {
+        this.documentGenre = documentGenre;
     }
 }
