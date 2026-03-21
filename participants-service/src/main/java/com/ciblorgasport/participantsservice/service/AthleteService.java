@@ -127,6 +127,31 @@ public class AthleteService {
         return athleteRepository.save(athlete);
     }
 
+    public Athlete updateDocsFiles(Long id, byte[] certificatMedicalPdf, byte[] passportPdf) {
+        Athlete athlete = findExistingAthleteOrThrow(id);
+
+        if ((certificatMedicalPdf == null || certificatMedicalPdf.length == 0)
+                && (passportPdf == null || passportPdf.length == 0)) {
+            throw new IllegalArgumentException("au moins un document PDF est obligatoire");
+        }
+
+        AthleteDocs docs = athlete.getDocs();
+        if (docs == null) {
+            docs = new AthleteDocs();
+        }
+
+        if (certificatMedicalPdf != null && certificatMedicalPdf.length > 0) {
+            docs.setCertificatMedical(certificatMedicalPdf);
+        }
+        if (passportPdf != null && passportPdf.length > 0) {
+            docs.setPassport(passportPdf);
+        }
+
+        athlete.setDocs(docs);
+        store.addLog("ATHLETE updateDocsFiles id=" + id);
+        return athleteRepository.save(athlete);
+    }
+
     public Athlete updateObservation(Long id, UpdateAthleteObservationRequest request) {
         Athlete athlete = findExistingAthleteOrThrow(id);
         athlete.setObservation(request.getObservation());
@@ -172,10 +197,10 @@ public class AthleteService {
         if (athlete.getDocs() == null) {
             throw new IllegalArgumentException("documents sont obligatoires pour valider");
         }
-        if (athlete.getDocs().getCertificatMedical() == null || athlete.getDocs().getCertificatMedical().isBlank()) {
+        if (athlete.getDocs().getCertificatMedical() == null || athlete.getDocs().getCertificatMedical().length == 0) {
             throw new IllegalArgumentException("certificatMedical est obligatoire pour valider");
         }
-        if (athlete.getDocs().getPassport() == null || athlete.getDocs().getPassport().isBlank()) {
+        if (athlete.getDocs().getPassport() == null || athlete.getDocs().getPassport().length == 0) {
             throw new IllegalArgumentException("passport est obligatoire pour valider");
         }
     }
@@ -219,5 +244,33 @@ public class AthleteService {
             athlete.setObservation(null);
             return athleteRepository.save(athlete);
         });
+    }
+
+    /**
+     * Récupère le PDF d'un athlète pour téléchargement.
+     * @param athleteId ID de l'athlète
+     * @param docType "certificatMedical" ou "passport"
+     * @return Contenu du PDF en tant que byte[]
+     */
+    public byte[] getPdfBytes(Long athleteId, String docType) {
+        Athlete athlete = findByIdOrThrow(athleteId);
+        if (athlete.getDocs() == null) {
+            throw new IllegalArgumentException("Pas de document trouvé");
+        }
+
+        byte[] pdfBytes;
+        if ("certificatMedical".equalsIgnoreCase(docType)) {
+            pdfBytes = athlete.getDocs().getCertificatMedical();
+        } else if ("passport".equalsIgnoreCase(docType)) {
+            pdfBytes = athlete.getDocs().getPassport();
+        } else {
+            throw new IllegalArgumentException("Type de document invalide: " + docType);
+        }
+
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            throw new IllegalArgumentException("Document " + docType + " non trouvé");
+        }
+
+        return pdfBytes;
     }
 }

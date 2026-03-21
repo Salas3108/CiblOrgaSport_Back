@@ -27,10 +27,12 @@ class CommissaireControllerListAthletesTest {
 
         CommissaireController controller = new CommissaireController(athleteService, athleteMapper, messageMapper);
 
+        byte[] fakeCert = new byte[] {1,2,3};
+        byte[] fakePass = new byte[] {4,5,6};
         Athlete a1 = new Athlete(1L, "Dupont", "Marie", LocalDate.parse("2000-03-22"), "Belgique", false,
-                new AthleteDocs("certificat.pdf", "passport.pdf"), "");
+            new AthleteDocs(fakeCert, fakePass), "");
         Athlete a2 = new Athlete(2L, "Titouche", "Salim", LocalDate.parse("2000-07-26"), "Algerie", true,
-                null, "OK");
+            null, "OK");
 
         when(athleteService.findAll()).thenReturn(List.of(a1, a2));
 
@@ -41,6 +43,9 @@ class CommissaireControllerListAthletesTest {
         assertEquals(2, response.getBody().size());
         assertEquals(1L, response.getBody().get(0).getId());
         assertEquals("Dupont", response.getBody().get(0).getNom());
+        // Vérifie que les URLs docs sont présentes
+        assertNotNull(response.getBody().get(0).getDocs().getCertificatMedicalUrl());
+        assertNotNull(response.getBody().get(0).getDocs().getPassportUrl());
         assertEquals(2L, response.getBody().get(1).getId());
     }
 

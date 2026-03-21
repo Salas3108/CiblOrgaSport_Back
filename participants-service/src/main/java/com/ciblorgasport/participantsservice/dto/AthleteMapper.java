@@ -12,6 +12,13 @@ import com.ciblorgasport.participantsservice.model.AthleteDocs;
 public class AthleteMapper {
 
     public AthleteDto toDto(Athlete athlete) {
+        if (athlete == null || athlete.getId() == null) {
+            return toDtoWithDownloadUrls(athlete, null);
+        }
+        return toDtoWithDownloadUrls(athlete, String.valueOf(athlete.getId()));
+    }
+
+    public AthleteDto toDtoWithDownloadUrls(Athlete athlete, String athleteId) {
         if (athlete == null) return null;
         AthleteDto dto = new AthleteDto();
         dto.setId(athlete.getId());
@@ -32,7 +39,20 @@ public class AthleteMapper {
         }
 
         if (athlete.getDocs() != null) {
-            dto.setDocs(new AthleteDocsDto(athlete.getDocs().getCertificatMedical(), athlete.getDocs().getPassport()));
+            AthleteDocs docs = athlete.getDocs();
+            String certUrl = null;
+            String passportUrl = null;
+            
+            if (athleteId != null) {
+                if (docs.getCertificatMedical() != null && docs.getCertificatMedical().length > 0) {
+                    certUrl = "/athlete/" + athleteId + "/doc/certificatMedical";
+                }
+                if (docs.getPassport() != null && docs.getPassport().length > 0) {
+                    passportUrl = "/athlete/" + athleteId + "/doc/passport";
+                }
+            }
+            
+            dto.setDocs(new AthleteDocsDto(certUrl, passportUrl));
         } else {
             dto.setDocs(new AthleteDocsDto(null, null));
         }
@@ -42,6 +62,6 @@ public class AthleteMapper {
 
     public AthleteDocs toEntity(AthleteDocsDto dto) {
         if (dto == null) return null;
-        return new AthleteDocs(dto.getCertificatMedical(), dto.getPassport());
+        return new AthleteDocs(null, null);
     }
 }

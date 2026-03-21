@@ -2,39 +2,46 @@ package com.ciblorgasport.participantsservice.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Lob;
 
 /**
- * Documents d'un athlète. Embeddable JPA pour stocker les noms de fichiers.
+ * Documents d'un athlète. Stockés en binaire (BYTEA PostgreSQL).
  */
 @Embeddable
 public class AthleteDocs {
-    @Column(name = "certificat_medical")
-    private String certificatMedical;
+     @Lob
+     @Basic(fetch = FetchType.LAZY)
+     @Column(name = "certificat_medical", columnDefinition = "bytea")
+     private byte[] certificatMedical;
 
-    @Column(name = "passport")
-    private String passport;
+     @Lob
+     @Basic(fetch = FetchType.LAZY)
+     @Column(name = "passport", columnDefinition = "bytea")
+     private byte[] passport;
 
     public AthleteDocs() {
     }
 
-    public AthleteDocs(String certificatMedical, String passport) {
+    public AthleteDocs(byte[] certificatMedical, byte[] passport) {
         this.certificatMedical = certificatMedical;
         this.passport = passport;
     }
 
-    public String getCertificatMedical() {
+    public byte[] getCertificatMedical() {
         return certificatMedical;
     }
 
-    public void setCertificatMedical(String certificatMedical) {
+    public void setCertificatMedical(byte[] certificatMedical) {
         this.certificatMedical = certificatMedical;
     }
 
-    public String getPassport() {
+    public byte[] getPassport() {
         return passport;
     }
 
-    public void setPassport(String passport) {
+    public void setPassport(byte[] passport) {
         this.passport = passport;
     }
 }
