@@ -4,19 +4,28 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
+import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
+import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
 import com.ciblorgasport.resultatsservice.dto.request.ResultatRequest;
+import com.ciblorgasport.resultatsservice.model.Discipline;
 import com.ciblorgasport.resultatsservice.model.Resultat;
 import com.ciblorgasport.resultatsservice.model.ResultatStatut;
+import com.ciblorgasport.resultatsservice.model.TypePerformance;
 import com.ciblorgasport.resultatsservice.repository.ResultatRepository;
+import com.ciblorgasport.resultatsservice.service.calcul.ClassementService;
 
 @Service
 public class ResultatService {
 
     private final ResultatRepository resultatRepository;
+    private final ClassementService classementService;
 
-    public ResultatService(ResultatRepository resultatRepository) {
+    public ResultatService(ResultatRepository resultatRepository, ClassementService classementService) {
         this.resultatRepository = resultatRepository;
+        this.classementService = classementService;
     }
 
     public Resultat createOrUpdate(ResultatRequest request) {
@@ -73,6 +82,54 @@ public class ResultatService {
                 : resultatRepository.findByAthleteId(athleteId);
         resultats.sort(byEpreuveThenClassement());
         return resultats;
+    }
+
+    /**
+     * Saisie en masse des performances d'une épreuve.
+     * Persiste chaque entrée, puis déclenche le calcul automatique du classement.
+     */
+    @Transactional
+    public List<Resultat> saisirBulk(Long epreuveId, BulkResultatRequest request, EpreuveContextDto ctx) {
+        TypePerformance typePerformance = resolveTypePerformance(ctx.getDiscipline());
+
+        for (PerformanceEntryDto entry : request.getPerformances()) {
+            ResultatRequest req = new ResultatRequest();
+            req.setEpreuveId(epreuveId);
+            req.setAthleteId(entry.getAthleteId());
+            req.setEquipeId(entry.getEquipeId());
+            req.setValeurPrincipale(entry.getValeurPrincipale());
+            req.setDetailsPerformance(entry.getDetailsPerformance());
+            req.setTypePerformance(typePerformance);
+            createOrUpdate(req);
+        }
+
+        classementService.calculerClassementAvecContexte(epreuveId, ctx);
+        return resultatRepository.findByEpreuveId(epreuveId);
+    }
+
+    /**
+     * Valide tous les résultats EN_ATTENTE d'une épreuve.
+     */
+    @Transactional
+    public List<Resultat> validerTout(Long epreuveId) {
+        List<Resultat> enAttente = resultatRepository.findByEpreuveId(epreuveId).stream()
+                .filter(r -> r.getStatut() == ResultatStatut.EN_ATTENTE)
+                .toList();
+        enAttente.forEach(r -> r.setStatut(ResultatStatut.VALIDE));
+        return resultatRepository.saveAll(enAttente);
+    }
+
+    private TypePerformance resolveTypePerformance(String discipline) {
+        if (discipline == null) return TypePerformance.TEMPS;
+        try {
+            return switch (Discipline.valueOf(discipline)) {
+                case NATATION, EAU_LIBRE -> TypePerformance.TEMPS;
+                case WATER_POLO -> TypePerformance.SCORE;
+                case PLONGEON, NATATION_ARTISTIQUE -> TypePerformance.POINTS;
+            };
+        } catch (IllegalArgumentException e) {
+            return TypePerformance.TEMPS;
+        }
     }
 
     public List<Resultat> getResultatsEquipe(Long equipeId, boolean publishedOnly) {

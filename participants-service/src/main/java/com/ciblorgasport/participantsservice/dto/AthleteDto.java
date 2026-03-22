@@ -2,6 +2,7 @@ package com.ciblorgasport.participantsservice.dto;
 
 import java.time.LocalDate;
 
+import com.ciblorgasport.participantsservice.model.Sexe;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
@@ -18,6 +19,7 @@ public class AthleteDto {
 
     private String pays;
     private boolean valide;
+    private Sexe sexe;
     private AthleteDocsDto docs;
     private String observation;
 
@@ -84,6 +86,14 @@ public class AthleteDto {
 
     public void setValide(boolean valide) {
         this.valide = valide;
+    }
+
+    public Sexe getSexe() {
+        return sexe;
+    }
+
+    public void setSexe(Sexe sexe) {
+        this.sexe = sexe;
     }
 
     public AthleteDocsDto getDocs() {

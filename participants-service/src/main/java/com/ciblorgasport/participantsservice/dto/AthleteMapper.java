@@ -28,6 +28,7 @@ public class AthleteMapper {
         dto.setDateNaissance(athlete.getDateNaissance());
         dto.setPays(athlete.getPays());
         dto.setValide(athlete.isValide());
+        dto.setSexe(athlete.getSexe());
         dto.setObservation(athlete.getObservation());
         dto.setMotifRefus(athlete.getMotifRefus());
         if (athlete.getEquipe() != null) {
@@ -42,7 +43,7 @@ public class AthleteMapper {
             AthleteDocs docs = athlete.getDocs();
             String certUrl = null;
             String passportUrl = null;
-            
+
             if (athleteId != null) {
                 if (docs.getCertificatMedical() != null && docs.getCertificatMedical().length > 0) {
                     certUrl = "/athlete/" + athleteId + "/doc/certificatMedical";
@@ -51,8 +52,10 @@ public class AthleteMapper {
                     passportUrl = "/athlete/" + athleteId + "/doc/passport";
                 }
             }
-            
-            dto.setDocs(new AthleteDocsDto(certUrl, passportUrl));
+
+            AthleteDocsDto docsDto = new AthleteDocsDto(certUrl, passportUrl);
+            docsDto.setDocumentGenre(docs.getDocumentGenre());
+            dto.setDocs(docsDto);
         } else {
             dto.setDocs(new AthleteDocsDto(null, null));
         }
@@ -62,6 +65,8 @@ public class AthleteMapper {
 
     public AthleteDocs toEntity(AthleteDocsDto dto) {
         if (dto == null) return null;
-        return new AthleteDocs(null, null);
+        AthleteDocs docs = new AthleteDocs(null, null);
+        docs.setDocumentGenre(dto.getDocumentGenre());
+        return docs;
     }
 }

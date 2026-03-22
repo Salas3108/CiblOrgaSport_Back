@@ -25,6 +25,7 @@ import com.ciblorgasport.eventservice.client.LieuServiceClient;
 import com.ciblorgasport.eventservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.eventservice.dto.EpreuveDTO;
 import com.ciblorgasport.eventservice.dto.EpreuveMapper;
+import com.ciblorgasport.eventservice.service.GenderEligibilityService;
 import com.ciblorgasport.eventservice.validator.EpreuveValidator;
 import com.ciblorgasport.eventservice.model.enums.TypeEpreuve;
 
@@ -48,6 +49,9 @@ public class EpreuveController {
 
     @Autowired
     private ParticipantsServiceClient participantsServiceClient;
+
+    @Autowired
+    private GenderEligibilityService genderEligibilityService;
 
     @GetMapping
     public List<EpreuveDTO> getAllEpreuves() {
@@ -119,9 +123,9 @@ public class EpreuveController {
         }
 
         List<Long> ids = new java.util.ArrayList<>();
-        for (Long athleteId : athleteIds) {
-            if (athleteId != null) {
-                ids.add(athleteId);
+        for (Object rawId : (Iterable<?>) athleteIds) {
+            if (rawId instanceof Number) {
+                ids.add(((Number) rawId).longValue());
             }
         }
 
@@ -175,6 +179,7 @@ public class EpreuveController {
         if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
         }
+        genderEligibilityService.validateAthlete(athleteId, e.getGenreEpreuve());
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
         e.getAthleteIds().add(athleteId);
         Epreuve saved = epreuveRepository.save(e);
@@ -221,6 +226,9 @@ public class EpreuveController {
         }
 
         validateEquipesExist(equipeIds);
+        for (Long eqId : equipeIds) {
+            genderEligibilityService.validateEquipe(eqId, e.getGenreEpreuve());
+        }
         if (e.getEquipeIds() == null) e.setEquipeIds(new HashSet<>());
         e.getEquipeIds().addAll(equipeIds);
         Epreuve saved = epreuveRepository.save(e);
@@ -234,14 +242,22 @@ public class EpreuveController {
         if (athleteIds == null || athleteIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'athleteIds' must be provided and non-empty");
         }
-        validateAthletesExist(athleteIds);
+        // Normaliser en Long (Jackson désérialise les petits nombres en Integer)
+        List<Long> normalizedIds = new java.util.ArrayList<>();
+        for (Object rawId : (List<?>) athleteIds) {
+            if (rawId instanceof Number) normalizedIds.add(((Number) rawId).longValue());
+        }
+        validateAthletesExist(normalizedIds);
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
         if (e.getTypeEpreuve() == TypeEpreuve.COLLECTIVE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
         }
+        for (Long aId : normalizedIds) {
+            genderEligibilityService.validateAthlete(aId, e.getGenreEpreuve());
+        }
         if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
-        e.getAthleteIds().addAll(athleteIds);
+        e.getAthleteIds().addAll(normalizedIds);
         Epreuve saved = epreuveRepository.save(e);
         return ResponseEntity.ok(epreuveMapper.toDto(saved));
     }

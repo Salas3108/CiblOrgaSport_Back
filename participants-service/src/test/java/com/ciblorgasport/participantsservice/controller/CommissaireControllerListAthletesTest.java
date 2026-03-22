@@ -2,8 +2,6 @@ package com.ciblorgasport.participantsservice.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,12 +19,6 @@ class CommissaireControllerListAthletesTest {
 
     @Test
     void getAllAthletes_returns_list_of_dtos() {
-        AthleteService athleteService = mock(AthleteService.class);
-        AthleteMapper athleteMapper = new AthleteMapper();
-        MessageMapper messageMapper = mock(MessageMapper.class);
-
-        CommissaireController controller = new CommissaireController(athleteService, athleteMapper, messageMapper);
-
         byte[] fakeCert = new byte[] {1,2,3};
         byte[] fakePass = new byte[] {4,5,6};
         Athlete a1 = new Athlete(1L, "Dupont", "Marie", LocalDate.parse("2000-03-22"), "Belgique", false,
@@ -34,7 +26,12 @@ class CommissaireControllerListAthletesTest {
         Athlete a2 = new Athlete(2L, "Titouche", "Salim", LocalDate.parse("2000-07-26"), "Algerie", true,
             null, "OK");
 
-        when(athleteService.findAll()).thenReturn(List.of(a1, a2));
+        List<Athlete> fakeList = List.of(a1, a2);
+        AthleteService athleteService = new AthleteService(null, null, null, null) {
+            @Override public List<Athlete> findAll() { return fakeList; }
+        };
+
+        CommissaireController controller = new CommissaireController(athleteService, new AthleteMapper(), new MessageMapper());
 
         ResponseEntity<List<com.ciblorgasport.participantsservice.dto.AthleteDto>> response = controller.getAllAthletes();
 
@@ -43,7 +40,6 @@ class CommissaireControllerListAthletesTest {
         assertEquals(2, response.getBody().size());
         assertEquals(1L, response.getBody().get(0).getId());
         assertEquals("Dupont", response.getBody().get(0).getNom());
-        // Vérifie que les URLs docs sont présentes
         assertNotNull(response.getBody().get(0).getDocs().getCertificatMedicalUrl());
         assertNotNull(response.getBody().get(0).getDocs().getPassportUrl());
         assertEquals(2L, response.getBody().get(1).getId());
@@ -51,16 +47,15 @@ class CommissaireControllerListAthletesTest {
 
     @Test
     void getValidatedAthletes_returns_only_validated_athletes() {
-        AthleteService athleteService = mock(AthleteService.class);
-        AthleteMapper athleteMapper = new AthleteMapper();
-        MessageMapper messageMapper = mock(MessageMapper.class);
-
-        CommissaireController controller = new CommissaireController(athleteService, athleteMapper, messageMapper);
-
         Athlete validated = new Athlete(2L, "Titouche", "Salim", LocalDate.parse("2000-07-26"), "Algerie", true,
                 null, "OK");
 
-        when(athleteService.findValidated()).thenReturn(List.of(validated));
+        List<Athlete> fakeValidated = List.of(validated);
+        AthleteService athleteService = new AthleteService(null, null, null, null) {
+            @Override public List<Athlete> findValidated() { return fakeValidated; }
+        };
+
+        CommissaireController controller = new CommissaireController(athleteService, new AthleteMapper(), new MessageMapper());
 
         ResponseEntity<List<com.ciblorgasport.participantsservice.dto.AthleteDto>> response = controller.getValidatedAthletes();
 

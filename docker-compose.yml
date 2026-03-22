@@ -77,7 +77,7 @@ services:
     build: ./analytics-service
     container_name: analytics-service
     ports:
-      - "8090:8090"
+      - "8092:8092"
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,6 +87,24 @@ services:
       DB_NAME: glop
       DB_USER: admin
       DB_PASSWORD: password
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  resultats-service:
+    build: ./resultats-service
+    container_name: resultats-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/glop
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: password
+      EVENT_SERVICE_URL: http://host.docker.internal:8084
+      PARTICIPANTS_SERVICE_URL: http://host.docker.internal:8087
     restart: unless-stopped
     networks:
       - appnet

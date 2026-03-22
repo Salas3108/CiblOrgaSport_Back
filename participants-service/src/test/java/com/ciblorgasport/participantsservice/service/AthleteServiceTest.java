@@ -18,6 +18,7 @@ import com.ciblorgasport.participantsservice.dto.request.ValidationRequest;
 import com.ciblorgasport.participantsservice.model.Athlete;
 import com.ciblorgasport.participantsservice.model.AthleteDocs;
 import com.ciblorgasport.participantsservice.model.Message;
+import com.ciblorgasport.participantsservice.model.Sexe;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
 import com.ciblorgasport.participantsservice.repository.JpaMessageRepository;
 
@@ -128,16 +129,11 @@ class AthleteServiceTest {
 
     @Test
     void commissaire_validate_refusal_sets_motifRefus_and_creates_message_if_provided() {
-        fakeStore.put(10L, new Athlete(
-            10L,
-            "Dupont",
-            "Marie",
-            LocalDate.parse("2000-03-22"),
-            "Belgique",
-            false,
-            new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6}),
-            null
-        ));
+        AthleteDocs docs10 = new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6});
+        docs10.setDocumentGenre("passport");
+        Athlete athlete10 = new Athlete(10L, "Dupont", "Marie", LocalDate.parse("2000-03-22"), "Belgique", false, docs10, null);
+        athlete10.setSexe(Sexe.FEMININ);
+        fakeStore.put(10L, athlete10);
 
         ValidationRequest validation = new ValidationRequest();
         validation.setValide(false);
@@ -157,16 +153,11 @@ class AthleteServiceTest {
 
     @Test
     void commissaire_validate_true_clears_motifRefus() {
-        fakeStore.put(11L, new Athlete(
-            11L,
-            "Dupont",
-            "Marie",
-            LocalDate.parse("2000-03-22"),
-            "Belgique",
-            false,
-            new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6}),
-            null
-        ));
+        AthleteDocs docs11 = new AthleteDocs(new byte[]{1,2,3}, new byte[]{4,5,6});
+        docs11.setDocumentGenre("passport");
+        Athlete athlete11 = new Athlete(11L, "Dupont", "Marie", LocalDate.parse("2000-03-22"), "Belgique", false, docs11, null);
+        athlete11.setSexe(Sexe.FEMININ);
+        fakeStore.put(11L, athlete11);
 
         ValidationRequest refuse = new ValidationRequest();
         refuse.setValide(false);

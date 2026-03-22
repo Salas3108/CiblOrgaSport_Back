@@ -21,6 +21,16 @@ public class ResultatDto {
     private ResultatStatut statut;
     private boolean published;
 
+    // Champs enrichis (nullable — absents si appel sans contexte inter-service)
+    private String athleteNom;
+    private String athletePrenom;
+    private String athletePays;
+    private String equipeNom;
+    private String equipePays;
+    private String epreuveNom;
+    private String discipline;
+    private String niveauEpreuve;
+
     public Long getId() {
         return id;
     }
@@ -124,4 +134,28 @@ public class ResultatDto {
     public void setPublished(boolean published) {
         this.published = published;
     }
+
+    public String getAthleteNom() { return athleteNom; }
+    public void setAthleteNom(String athleteNom) { this.athleteNom = athleteNom; }
+
+    public String getAthletePrenom() { return athletePrenom; }
+    public void setAthletePrenom(String athletePrenom) { this.athletePrenom = athletePrenom; }
+
+    public String getAthletePays() { return athletePays; }
+    public void setAthletePays(String athletePays) { this.athletePays = athletePays; }
+
+    public String getEquipeNom() { return equipeNom; }
+    public void setEquipeNom(String equipeNom) { this.equipeNom = equipeNom; }
+
+    public String getEquipePays() { return equipePays; }
+    public void setEquipePays(String equipePays) { this.equipePays = equipePays; }
+
+    public String getEpreuveNom() { return epreuveNom; }
+    public void setEpreuveNom(String epreuveNom) { this.epreuveNom = epreuveNom; }
+
+    public String getDiscipline() { return discipline; }
+    public void setDiscipline(String discipline) { this.discipline = discipline; }
+
+    public String getNiveauEpreuve() { return niveauEpreuve; }
+    public void setNiveauEpreuve(String niveauEpreuve) { this.niveauEpreuve = niveauEpreuve; }
 }

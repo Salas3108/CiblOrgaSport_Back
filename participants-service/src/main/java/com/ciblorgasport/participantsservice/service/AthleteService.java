@@ -112,6 +112,7 @@ public class AthleteService {
         if (request.getPrenom() != null) athlete.setPrenom(request.getPrenom());
         if (request.getDateNaissance() != null) athlete.setDateNaissance(request.getDateNaissance());
         if (request.getPays() != null) athlete.setPays(request.getPays());
+        if (request.getSexe() != null) athlete.setSexe(request.getSexe());
 
         store.addLog("ATHLETE updateInfo id=" + id);
         return athleteRepository.save(athlete);
@@ -202,6 +203,12 @@ public class AthleteService {
         }
         if (athlete.getDocs().getPassport() == null || athlete.getDocs().getPassport().length == 0) {
             throw new IllegalArgumentException("passport est obligatoire pour valider");
+        }
+        if (athlete.getSexe() == null) {
+            throw new IllegalArgumentException("Le genre (sexe) est obligatoire pour valider le profil");
+        }
+        if (athlete.getDocs().getDocumentGenre() == null || athlete.getDocs().getDocumentGenre().isBlank()) {
+            throw new IllegalArgumentException("Le document justificatif de genre est obligatoire pour valider le profil");
         }
     }
 
