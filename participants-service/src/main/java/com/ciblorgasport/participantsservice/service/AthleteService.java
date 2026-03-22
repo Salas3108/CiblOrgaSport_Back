@@ -207,9 +207,6 @@ public class AthleteService {
         if (athlete.getSexe() == null) {
             throw new IllegalArgumentException("Le genre (sexe) est obligatoire pour valider le profil");
         }
-        if (athlete.getDocs().getDocumentGenre() == null || athlete.getDocs().getDocumentGenre().isBlank()) {
-            throw new IllegalArgumentException("Le document justificatif de genre est obligatoire pour valider le profil");
-        }
     }
 
     public Message createMessage(Long athleteId, String contenu) {
