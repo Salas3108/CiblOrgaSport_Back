@@ -88,7 +88,8 @@ public class AnalyticsFilter implements GlobalFilter, Ordered {
         payload.put("durationMs", durationMs);
         payload.put("timestamp", LocalDateTime.now().format(ISO_FORMAT));
         payload.put("ipAddress", extractIp(request));
-        payload.put("eventType", resolveEventType(request.getURI().getPath()));
+        String httpMethod = request.getMethod() != null ? request.getMethod().name() : "";
+        payload.put("eventType", resolveEventType(request.getURI().getPath(), httpMethod));
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -130,18 +131,20 @@ public class AnalyticsFilter implements GlobalFilter, Ordered {
                 );
     }
 
-    private String resolveEventType(String path) {
+    private String resolveEventType(String path, String method) {
         if (path == null) return "PAGE_VIEW";
         if (path.contains("/auth/login")) return "USER_LOGIN";
         if (path.contains("/auth/logout")) return "USER_LOGOUT";
-        if (path.contains("/competitions") || path.contains("/events")) return "COMPETITION_VIEW";
-        if (path.contains("/results") || path.contains("/epreuves")) return "RESULT_VIEW";
-        if (path.contains("/notifications")) return "NOTIFICATION_SENT";
-        if (path.contains("/abonnements")) return "NOTIFICATION_SUBSCRIBED";
-        if (path.contains("/geo") || path.contains("/fanzones")) return "FANZONE_VIEW";
+        if (path.contains("/auth/register")) return "USER_REGISTER";
+        if (path.contains("/admin/validate-volunteer")) return "VOLUNTEER_VALIDATED";
+        if (path.contains("/epreuves")) return "EPREUVE_VIEW";
+        if (path.contains("/competitions")) return "COMPETITION_VIEW";
+        if (path.contains("/events")) return "EVENT_VIEW";
+        if (path.contains("/results") || path.contains("/resultats")) return "RESULT_VIEW";
         if (path.contains("/athlete")) return "ATHLETE_PROFILE_VIEW";
+        if (path.contains("/notifications") && "POST".equalsIgnoreCase(method)) return "NOTIFICATION_SENT";
+        if (path.contains("/abonnements") || path.contains("/subscribe")) return "NOTIFICATION_SUBSCRIBED";
         if (path.contains("/incidents")) return "INCIDENT_DECLARED";
-        if (path.contains("/search")) return "SEARCH_PERFORMED";
         return "PAGE_VIEW";
     }
 

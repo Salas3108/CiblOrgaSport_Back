@@ -65,8 +65,19 @@ public class AthleteMapper {
 
     public AthleteDocs toEntity(AthleteDocsDto dto) {
         if (dto == null) return null;
-        AthleteDocs docs = new AthleteDocs(null, null);
-        docs.setDocumentGenre(dto.getDocumentGenre());
-        return docs;
+        byte[] certBytes = decodeBase64OrNull(dto.getCertificatMedicalUrl());
+        byte[] passportBytes = decodeBase64OrNull(dto.getPassportUrl());
+        return new AthleteDocs(certBytes, passportBytes);
+    }
+
+    private byte[] decodeBase64OrNull(String base64) {
+        if (base64 == null || base64.isBlank()) return null;
+        try {
+            // Supporte le préfixe "data:application/pdf;base64,..."
+            String data = base64.contains(",") ? base64.split(",", 2)[1] : base64;
+            return java.util.Base64.getDecoder().decode(data);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

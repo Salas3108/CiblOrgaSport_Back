@@ -1,6 +1,5 @@
-package com.ciblorgasport.resultatsservice.analytics;
+package com.ciblorgasport.notificationsservice.analytics;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,39 +28,32 @@ public class AnalyticsClient {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Trackage d'un envoi de notifications déclenché par Kafka.
+     * Appelé après commit de la transaction dans NotificationGeneratorService.
+     *
+     * @param notificationType type métier : "INCIDENT", "EPREUVE_RAPPEL", etc.
+     * @param recipientCount   nombre de destinataires effectivement notifiés
+     */
     @Async
-    public void track(HttpServletRequest request, int statusCode, long durationMs,
-                      Long userId, String userRole) {
+    public void trackNotificationSent(String notificationType, int recipientCount) {
         try {
             Map<String, Object> body = new HashMap<>();
-            body.put("userId", userId);
-            body.put("userRole", userRole != null ? userRole : "ANONYMOUS");
-            body.put("endpoint", request.getRequestURI());
-            body.put("httpMethod", request.getMethod());
-            body.put("statusCode", statusCode);
-            body.put("durationMs", durationMs);
-            body.put("ipAddress", extractIp(request));
-            body.put("eventType", resolveEventType(request.getRequestURI(), request.getMethod()));
+            body.put("eventType", "NOTIFICATION_SENT");
+            body.put("endpoint", "kafka/notification");
+            body.put("httpMethod", "KAFKA");
+            body.put("statusCode", 200);
+            body.put("durationMs", 0);
+            body.put("userRole", "SYSTEM");
             body.put("timestamp", LocalDateTime.now().toString());
+            body.put("metadata", "{\"type\": \"" + notificationType + "\", \"recipients\": " + recipientCount + "}");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
             restTemplate.postForEntity(analyticsServiceUrl + "/api/analytics/events/track", entity, Void.class);
         } catch (Exception e) {
-            log.warn("[Analytics] Échec envoi événement (service down?) : {}", e.getMessage());
+            log.warn("[Analytics] Echec envoi evenement NOTIFICATION_SENT : {}", e.getMessage());
         }
-    }
-
-    private String extractIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isEmpty()) return forwarded.split(",")[0].trim();
-        return request.getRemoteAddr();
-    }
-
-    private String resolveEventType(String uri, String method) {
-        if (uri == null) return "RESULT_VIEW";
-        if (uri.contains("/results") || uri.contains("/epreuves") || uri.contains("/resultats")) return "RESULT_VIEW";
-        return "PAGE_VIEW";
     }
 }

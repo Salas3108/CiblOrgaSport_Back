@@ -61,11 +61,7 @@ public class AnalyticsClient {
 
     private String resolveEventType(String uri, String method) {
         if (uri == null) return "PAGE_VIEW";
-        if (uri.contains("/equipe")) return "EQUIPE_VIEW";
-        if (uri.contains("/athlete") || uri.contains("/commissaire")) {
-            return "POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
-                    ? "ATHLETE_VALIDATION" : "ATHLETE_PROFILE_VIEW";
-        }
+        if (uri.contains("/athlete") || uri.contains("/commissaire")) return "ATHLETE_PROFILE_VIEW";
         return "PAGE_VIEW";
     }
 }

@@ -94,21 +94,18 @@ public class AnalyticsAspect {
         if (uri.contains("/auth/login")) return "USER_LOGIN";
         if (uri.contains("/auth/logout")) return "USER_LOGOUT";
         if (uri.contains("/auth/register")) return "USER_REGISTER";
+        if (uri.contains("/admin/validate-volunteer")) return "VOLUNTEER_VALIDATED";
         if (uri.contains("/epreuves")) return "EPREUVE_VIEW";
         if (uri.contains("/competitions")) return "COMPETITION_VIEW";
         if (uri.contains("/events")) return "EVENT_VIEW";
-        if (uri.contains("/equipe")) return "EQUIPE_VIEW";
-        if (uri.contains("/athlete") || uri.contains("/commissaire")) {
-            return "POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
-                    ? "ATHLETE_VALIDATION" : "ATHLETE_PROFILE_VIEW";
+        if (uri.contains("/athlete") || uri.contains("/commissaire")) return "ATHLETE_PROFILE_VIEW";
+        if (uri.contains("/results") || uri.contains("/resultats")) return "RESULT_VIEW";
+        if (uri.contains("/notifications")) {
+            return "POST".equalsIgnoreCase(method) ? "NOTIFICATION_SENT" : "PAGE_VIEW";
         }
-        if (uri.contains("/results") || uri.contains("/resultats")) {
-            if ("POST".equalsIgnoreCase(method)) return "RESULT_SUBMIT";
-            if ("PUT".equalsIgnoreCase(method) && uri.contains("/publish")) return "RESULT_PUBLISHED";
-            return "RESULT_VIEW";
-        }
+        if (uri.contains("/abonnements") || uri.contains("/subscribe")) return "NOTIFICATION_SUBSCRIBED";
         if (uri.contains("/incidents")) {
-            return "POST".equalsIgnoreCase(method) ? "INCIDENT_DECLARED" : "INCIDENT_VIEW";
+            return "POST".equalsIgnoreCase(method) ? "INCIDENT_DECLARED" : "PAGE_VIEW";
         }
         return "PAGE_VIEW";
     }

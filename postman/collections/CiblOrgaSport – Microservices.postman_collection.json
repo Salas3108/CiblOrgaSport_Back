@@ -408,6 +408,57 @@
                                       "response":  [
 
                                                    ]
+                                  },
+                                  {
+                                      "name":  "Validate Volunteer (ADMIN)",
+                                      "id":  "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\"Response confirms validation\", function () {",
+                                                                                    "    pm.expect(pm.response.text()).to.include(\"Volontaire\");",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"username\": \"volontaire1\",\n  \"validated\": true\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{auth_base}}/auth/admin/validate-volunteer",
+                                                                  "host":  [
+                                                                               "{{auth_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "admin",
+                                                                               "validate-volunteer"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
                                   }
                               ],
                      "id":  "cdc3e964-7260-46ed-80cf-ff76f8f95b1f"

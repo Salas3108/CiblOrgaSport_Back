@@ -61,9 +61,7 @@ public class AnalyticsClient {
 
     private String resolveEventType(String uri, String method) {
         if (uri == null) return "PAGE_VIEW";
-        if (uri.contains("/incidents")) {
-            return "POST".equalsIgnoreCase(method) ? "INCIDENT_DECLARED" : "INCIDENT_VIEW";
-        }
+        if (uri.contains("/incidents") && "POST".equalsIgnoreCase(method)) return "INCIDENT_DECLARED";
         return "PAGE_VIEW";
     }
 }

@@ -64,6 +64,7 @@ public class AnalyticsClient {
         if (uri.contains("/auth/login")) return "USER_LOGIN";
         if (uri.contains("/auth/logout")) return "USER_LOGOUT";
         if (uri.contains("/auth/register")) return "USER_REGISTER";
+        if (uri.contains("/admin/validate-volunteer")) return "VOLUNTEER_VALIDATED";
         return "PAGE_VIEW";
     }
 }
