@@ -1,5 +1,75 @@
 package com.ciblorgasport.resultatsservice.client;
 
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class EventServiceClient {
+
+    private static final Logger log = LoggerFactory.getLogger(EventServiceClient.class);
+
+    @Value("${event-service.url:http://localhost:8084}")
+    private String eventServiceUrl;
+
+    public Optional<EpreuveSummary> getEpreuveSummary(Long epreuveId) {
+        if (epreuveId == null) {
+            return Optional.empty();
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = eventServiceUrl + "/api/epreuves/" + epreuveId;
+
+        try {
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                return Optional.empty();
+            }
+
+            Map<?, ?> body = response.getBody();
+            String nom = body.get("nom") != null ? String.valueOf(body.get("nom")) : null;
+
+            Long competitionId = null;
+            Object competitionObj = body.get("competitionId");
+            if (competitionObj instanceof Number number) {
+                competitionId = number.longValue();
+            } else if (competitionObj instanceof String str && !str.isBlank()) {
+                competitionId = Long.parseLong(str);
+            }
+
+            return Optional.of(new EpreuveSummary(nom, competitionId));
+        } catch (Exception ex) {
+            log.warn("Unable to fetch epreuve summary for epreuveId={}: {}", epreuveId, ex.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public static class EpreuveSummary {
+        private final String nom;
+        private final Long competitionId;
+
+        public EpreuveSummary(String nom, Long competitionId) {
+            this.nom = nom;
+            this.competitionId = competitionId;
+        }
+
+        public String getNom() {
+            return nom;
+        }
+
+        public Long getCompetitionId() {
+            return competitionId;
+        }
+    }
+}
+package com.ciblorgasport.resultatsservice.client;
+
 import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
