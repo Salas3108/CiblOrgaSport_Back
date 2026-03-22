@@ -1,6 +1,7 @@
 package com.ciblorgasport.participantsservice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,5 @@ public interface JpaEpreuveAthleteAssignmentRepository extends JpaRepository<Epr
     List<EpreuveAthleteAssignment> findByEpreuveId(Long epreuveId);
     List<EpreuveAthleteAssignment> findByEpreuveIdIn(List<Long> epreuveIds);
     boolean existsByEpreuveIdAndAthleteId(Long epreuveId, Long athleteId);
+    Optional<EpreuveAthleteAssignment> findByAthleteIdAndEpreuveId(Long athleteId, Long epreuveId);
 }

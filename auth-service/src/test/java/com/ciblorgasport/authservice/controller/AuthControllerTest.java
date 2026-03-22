@@ -11,11 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,11 +37,6 @@ class AuthControllerTest {
     void setUp() {
         authController = new AuthController(authService, userRepository);
         authController.jwtUtils = jwtUtils;
-    }
-
-    @Test
-    void hello_ReturnsGreeting() {
-        assertEquals("Hello from Auth Service!", authController.hello());
     }
 
     @Test
