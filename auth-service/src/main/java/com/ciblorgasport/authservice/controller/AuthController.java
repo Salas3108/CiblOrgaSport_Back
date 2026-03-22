@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+
 import com.ciblorgasport.authservice.dto.DocumentUploadRequest;
 import com.ciblorgasport.authservice.dto.InternalAthleteSummary;
 import com.ciblorgasport.authservice.dto.JwtResponse;
@@ -26,6 +28,7 @@ import com.ciblorgasport.authservice.dto.ValidateAthleteRequest;
 import com.ciblorgasport.authservice.entity.User;
 import com.ciblorgasport.authservice.entity.Role;
 import com.ciblorgasport.authservice.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import com.ciblorgasport.authservice.security.JwtUtils;
 import com.ciblorgasport.authservice.service.AuthService;
 import java.util.List;
@@ -159,11 +162,6 @@ public class AuthController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from Auth Service!";
-    }
-
     @PostMapping("/login")
     public JwtResponse login(@RequestBody LoginRequest loginRequest) {
         return authService.authenticateUser(loginRequest);
@@ -172,5 +170,28 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestBody RegisterRequest registerRequest) {
         return authService.registerUser(registerRequest);
+    }
+
+    // RGPD : Droit à l'oubli - suppression du compte utilisateur connecté
+    @DeleteMapping("/delete-account")
+    @Transactional
+    public ResponseEntity<?> deleteMyAccount(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
+        }
+        String token = authorization.substring(7);
+        if (!jwtUtils.validateJwtToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token);
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+        }
+        System.out.println("[deleteMyAccount] username=" + user.getUsername() + ", role=" + user.getRole() + ", validated=" + user.isValidated() + ", id=" + user.getId());
+        userRepository.delete(user);
+        userRepository.flush();
+        System.out.println("[deleteMyAccount] Suppression demandée pour id=" + user.getId() + ", username=" + user.getUsername());
+        return ResponseEntity.ok("Compte supprimé avec succès");
     }
 }

@@ -92,6 +92,8 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return role == Role.ADMIN || validated;
+        boolean enabled = role == Role.ADMIN || validated;
+        System.out.println("[isEnabled] username=" + username + ", role=" + role + ", validated=" + validated + ", enabled=" + enabled);
+        return enabled;
     }
 }
