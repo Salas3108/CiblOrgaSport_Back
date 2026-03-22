@@ -60,6 +60,40 @@
                                                    ]
                                   },
                                   {
+                                    "name": "Supprimer mon compte",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "pm.test(\"Statut 200 attendu\", function () {",
+                                                    "    pm.response.to.have.status(200);",
+                                                    "});",
+                                                    "pm.test(\"Message de confirmation\", function () {",
+                                                    "    pm.expect(pm.response.text()).to.include(\"Compte supprimé\");",
+                                                    "});"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "DELETE",
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "{{jwt}}"
+                                            }
+                                        ],
+                                        "url": {
+                                            "raw": "{{auth_base}}/auth/delete-account",
+                                            "host": ["{{auth_base}}"],
+                                            "path": ["auth", "delete-account"]
+                                        }
+                                    },
+                                    "response": []
+                                },
+                                  {
                                       "name":  "Register athlete",
                                       "event":  [
                                                     {
@@ -298,32 +332,6 @@
                                                                                "user",
                                                                                "username",
                                                                                "athlete6"
-                                                                           ]
-                                                              }
-                                                  },
-                                      "response":  [
-
-                                                   ]
-                                  },
-                                  {
-                                      "name":  "Hello",
-                                      "id":  "954d891f-1d98-4c04-846b-ee2d24018b36",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Authorization",
-                                                                         "value":  "{{jwt}}"
-                                                                     }
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{auth_base}}/auth/hello",
-                                                                  "host":  [
-                                                                               "{{auth_base}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "auth",
-                                                                               "hello"
                                                                            ]
                                                               }
                                                   },
