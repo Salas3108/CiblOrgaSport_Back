@@ -8,6 +8,7 @@ services:
       POSTGRES_DB: glop
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql  # ← AJOUT
     ports:
       - "5432:5432"
     healthcheck:
@@ -18,12 +19,11 @@ services:
       start_period: 20s
     networks:
       - appnet
- 
+
   kafka:
     image: confluentinc/cp-kafka:7.7.0
     container_name: kafka
     environment:
-      # KRaft mode – no Zookeeper needed
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -60,6 +60,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: password
     ports:
       - "8082:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
@@ -116,11 +118,11 @@ services:
       - "3001:3000"
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: glop
+      MB_DB_HOST: postgres
       MB_DB_PORT: 5432
+      MB_DB_DBNAME: metabase_db   
       MB_DB_USER: admin
       MB_DB_PASS: password
-      MB_DB_HOST: postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -130,10 +132,11 @@ services:
 
 volumes:
   postgres_data:
-    #external: true
     name: ciblorgasport_back_postgres_data
   kafka_data:
     name: ciblorgasport_back_kafka_data
+  pgadmin_data:
+    name: ciblorgasport_back_pgadmin_data
 
 networks:
   appnet:
