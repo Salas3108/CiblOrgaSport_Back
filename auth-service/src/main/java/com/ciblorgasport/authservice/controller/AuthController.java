@@ -57,6 +57,16 @@ public class AuthController {
             return request.isValidated() ? "Athlète validé." : "Athlète rejeté.";
         }
 
+        // ADMIN : valider ou rejeter un volontaire
+        @PostMapping("/admin/validate-volunteer")
+        @PreAuthorize("hasRole('ADMIN')")
+        public String validateVolunteer(@RequestBody ValidateAthleteRequest request) {
+            User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+            user.setValidated(request.isValidated());
+            userRepository.save(user);
+            return request.isValidated() ? "Volontaire validé." : "Volontaire rejeté.";
+        }
+
         // ADMIN : récupérer la liste des athlètes (validés ou non)
         @GetMapping("/admin/athletes")
         @PreAuthorize("hasRole('ADMIN')")
