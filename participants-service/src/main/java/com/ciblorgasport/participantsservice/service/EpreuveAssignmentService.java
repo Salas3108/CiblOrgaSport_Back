@@ -120,6 +120,12 @@ public class EpreuveAssignmentService {
         return response;
     }
 
+    public StatutParticipation getStatutParticipation(Long epreuveId, Long athleteId) {
+        return assignmentRepository.findByAthleteIdAndEpreuveId(athleteId, epreuveId)
+                .map(EpreuveAthleteAssignment::getStatutParticipation)
+                .orElse(StatutParticipation.INSCRIT);
+    }
+
     public Map<Long, List<Long>> listAllAssignments() {
         Map<Long, List<Long>> result = new LinkedHashMap<>();
         List<EpreuveAthleteAssignment> all = assignmentRepository.findAll();

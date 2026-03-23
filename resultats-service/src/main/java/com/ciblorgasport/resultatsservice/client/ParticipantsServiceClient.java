@@ -84,6 +84,31 @@ public class ParticipantsServiceClient {
         }
     }
 
+    /**
+     * Récupère le statut de participation d'un athlète pour une épreuve.
+     * Endpoint : GET /commissaire/epreuves/{epreuveId}/athletes/{athleteId}/statut
+     * Retourne null en cas d'erreur (dégradation gracieuse).
+     */
+    @SuppressWarnings("unchecked")
+    public String getStatutParticipation(Long epreuveId, Long athleteId) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<Void> entity = new HttpEntity<>(buildAuthHeaders());
+
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    participantsServiceUrl + "/commissaire/epreuves/" + epreuveId + "/athletes/" + athleteId + "/statut",
+                    HttpMethod.GET, entity, Map.class);
+
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                return null;
+            }
+            Object statut = response.getBody().get("statut");
+            return statut != null ? statut.toString() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private HttpHeaders buildAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
         String auth = resolveAuthorizationHeader();

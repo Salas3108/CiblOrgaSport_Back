@@ -48,7 +48,7 @@ public class PublicationService {
         }
 
         List<Resultat> aPublier = resultats.stream()
-                .filter(r -> !r.isPublished())
+                .filter(r -> !r.isPublished() && r.getStatut() != ResultatStatut.FORFAIT)
                 .toList();
 
         aPublier.forEach(r -> r.setPublished(true));

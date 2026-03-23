@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
 import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
 import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
@@ -22,10 +23,13 @@ public class ResultatService {
 
     private final ResultatRepository resultatRepository;
     private final ClassementService classementService;
+    private final ParticipantsServiceClient participantsClient;
 
-    public ResultatService(ResultatRepository resultatRepository, ClassementService classementService) {
+    public ResultatService(ResultatRepository resultatRepository, ClassementService classementService,
+                           ParticipantsServiceClient participantsClient) {
         this.resultatRepository = resultatRepository;
         this.classementService = classementService;
+        this.participantsClient = participantsClient;
     }
 
     public Resultat createOrUpdate(ResultatRequest request) {
@@ -35,7 +39,7 @@ public class ResultatService {
         if (request.getEpreuveId() == null) {
             throw new IllegalArgumentException("epreuveId est obligatoire");
         }
-        validateParticipant(request.getAthleteId(), request.getEquipeId());
+        validateParticipant(request.getAthleteId(), request.getEquipeId(), request.getEpreuveId());
 
         Resultat existing = findExisting(request.getEpreuveId(), request.getAthleteId(), request.getEquipeId());
         if (existing == null) {
@@ -93,6 +97,24 @@ public class ResultatService {
         TypePerformance typePerformance = resolveTypePerformance(ctx.getDiscipline());
 
         for (PerformanceEntryDto entry : request.getPerformances()) {
+            if (entry.getAthleteId() != null) {
+                String statut = participantsClient.getStatutParticipation(epreuveId, entry.getAthleteId());
+                if ("FORFAIT".equals(statut)) {
+                    Resultat existing = resultatRepository
+                            .findByEpreuveIdAndAthleteId(epreuveId, entry.getAthleteId())
+                            .orElse(null);
+                    if (existing == null) {
+                        Resultat forfait = new Resultat();
+                        forfait.setEpreuveId(epreuveId);
+                        forfait.setAthleteId(entry.getAthleteId());
+                        forfait.setValeurPrincipale("FORFAIT");
+                        forfait.setStatut(ResultatStatut.FORFAIT);
+                        forfait.setPublished(false);
+                        resultatRepository.save(forfait);
+                    }
+                    continue;
+                }
+            }
             ResultatRequest req = new ResultatRequest();
             req.setEpreuveId(epreuveId);
             req.setAthleteId(entry.getAthleteId());
@@ -184,12 +206,19 @@ public class ResultatService {
         }
     }
 
-    private void validateParticipant(Long athleteId, Long equipeId) {
+    private void validateParticipant(Long athleteId, Long equipeId, Long epreuveId) {
         if (athleteId == null && equipeId == null) {
             throw new IllegalArgumentException("athleteId ou equipeId est obligatoire");
         }
         if (athleteId != null && equipeId != null) {
             throw new IllegalArgumentException("athleteId et equipeId sont mutuellement exclusifs");
+        }
+        if (athleteId != null && epreuveId != null) {
+            String statut = participantsClient.getStatutParticipation(epreuveId, athleteId);
+            if ("FORFAIT".equals(statut)) {
+                throw new IllegalStateException(
+                        "Saisie impossible : l'athlète " + athleteId + " est en forfait pour l'épreuve " + epreuveId);
+            }
         }
     }
 

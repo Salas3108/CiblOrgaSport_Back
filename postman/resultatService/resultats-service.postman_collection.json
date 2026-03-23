@@ -2465,6 +2465,337 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "15 — Vérification Forfait sur Saisie de Résultat",
+            "id": "folder-forfait-resultat",
+            "item": [
+                {
+                    "name": "F1 — Vérifier statut INSCRIT avant forfait",
+                    "id": "req-fv-001",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Statut INSCRIT par défaut\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.statut).to.eql('INSCRIT');",
+                                    "    console.log('[F1] Statut actuel :', json.statut);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{participants_base}}/commissaire/epreuves/{{epreuve_id}}/athletes/{{athlete_id}}/statut",
+                            "host": ["{{participants_base}}"],
+                            "path": ["commissaire", "epreuves", "{{epreuve_id}}", "athletes", "{{athlete_id}}", "statut"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F2 — Saisie unitaire OK (athlète INSCRIT)",
+                    "id": "req-fv-002",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200 — saisie autorisée\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Résultat EN_ATTENTE créé\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.statut).to.eql('EN_ATTENTE');",
+                                    "    pm.collectionVariables.set('resultat_id', json.id);",
+                                    "    console.log('[F2] Résultat créé id=', json.id, '| statut=', json.statut);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"epreuveId\": {{epreuve_id}},\n  \"athleteId\": {{athlete_id}},\n  \"valeurPrincipale\": \"01:23.45\",\n  \"typePerformance\": \"TEMPS\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F3 — Déclarer forfait pour l'athlète",
+                    "id": "req-fv-003",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200 — forfait enregistré\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Statut = FORFAIT\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.statutParticipation).to.eql('FORFAIT');",
+                                    "    pm.expect(json.dateForfait).to.not.be.null;",
+                                    "    console.log('[F3] Forfait déclaré | dateForfait=', json.dateForfait);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"detailsPerformance\": {\n    \"raison\": \"Blessure au genou\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{participants_base}}/epreuves/{{epreuve_id}}/athletes/{{athlete_id}}/forfait",
+                            "host": ["{{participants_base}}"],
+                            "path": ["epreuves", "{{epreuve_id}}", "athletes", "{{athlete_id}}", "forfait"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F4 — Vérifier statut = FORFAIT",
+                    "id": "req-fv-004",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Statut est bien FORFAIT\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.statut).to.eql('FORFAIT');",
+                                    "    console.log('[F4] Statut confirmé :', json.statut);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{participants_base}}/commissaire/epreuves/{{epreuve_id}}/athletes/{{athlete_id}}/statut",
+                            "host": ["{{participants_base}}"],
+                            "path": ["commissaire", "epreuves", "{{epreuve_id}}", "athletes", "{{athlete_id}}", "statut"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F5 — Saisie unitaire BLOQUÉE (athlète FORFAIT → 409)",
+                    "id": "req-fv-005",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 409 — saisie bloquée\", () => pm.response.to.have.status(409));",
+                                    "pm.test(\"Message d'erreur forfait\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.error).to.include('forfait');",
+                                    "    console.log('[F5] Erreur attendue :', json.error);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"epreuveId\": {{epreuve_id}},\n  \"athleteId\": {{athlete_id}},\n  \"valeurPrincipale\": \"01:20.00\",\n  \"typePerformance\": \"TEMPS\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F6 — Saisie bulk : athlète FORFAIT auto-inséré",
+                    "id": "req-fv-006",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200 — bulk accepté\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Résultat FORFAIT présent dans la liste\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json).to.be.an('array');",
+                                    "    const forfait = json.find(r => r.statut === 'FORFAIT');",
+                                    "    pm.expect(forfait).to.not.be.undefined;",
+                                    "    pm.expect(forfait.valeurPrincipale).to.eql('FORFAIT');",
+                                    "    console.log('[F6] Résultat FORFAIT auto-inséré pour athleteId=', forfait.athleteId);",
+                                    "});",
+                                    "pm.test(\"Autres athlètes saisis normalement\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const normaux = json.filter(r => r.statut === 'EN_ATTENTE');",
+                                    "    console.log('[F6]', normaux.length, 'résultat(s) EN_ATTENTE');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"performances\": [\n    {\n      \"athleteId\": {{athlete_id}},\n      \"valeurPrincipale\": \"01:18.00\"\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/saisie",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "saisie"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F7 — Valider-tout : résultat FORFAIT ignoré",
+                    "id": "req-fv-007",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Seuls les EN_ATTENTE sont validés\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    json.forEach(r => {",
+                                    "        pm.expect(r.statut).to.eql('VALIDE');",
+                                    "        console.log('[F7] Validé id=', r.id);",
+                                    "    });",
+                                    "});",
+                                    "pm.test(\"Résultat FORFAIT non inclus dans la liste retournée\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const forfaits = json.filter(r => r.statut === 'FORFAIT');",
+                                    "    pm.expect(forfaits).to.be.empty;",
+                                    "    console.log('[F7] Aucun FORFAIT dans la liste validée ✓');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/valider-tout",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "valider-tout"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F8 — Publier-tout : résultat FORFAIT exclu de la publication",
+                    "id": "req-fv-008",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Publication réussie\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    pm.expect(json.success).to.be.true;",
+                                    "    console.log('[F8] Nb résultats publiés :', json.nbResultatsPublies, '(FORFAIT exclu)');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+                        ],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/commissaire/epreuves/{{epreuve_id}}/publier-tout",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "commissaire", "epreuves", "{{epreuve_id}}", "publier-tout"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "F9 — Vérification publique : résultat FORFAIT absent",
+                    "id": "req-fv-009",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                                    "pm.test(\"Aucun résultat FORFAIT visible publiquement\", () => {",
+                                    "    const json = pm.response.json();",
+                                    "    const forfaits = json.filter(r => r.statut === 'FORFAIT');",
+                                    "    pm.expect(forfaits).to.be.empty;",
+                                    "    console.log('[F9] Résultats publics :', json.length, '| FORFAIT visibles :', forfaits.length, '✓');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{resultats_base}}/resultats/public/epreuves/{{epreuve_id}}",
+                            "host": ["{{resultats_base}}"],
+                            "path": ["resultats", "public", "epreuves", "{{epreuve_id}}"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
         }
     ]
 }

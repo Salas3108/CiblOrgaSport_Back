@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ciblorgasport.participantsservice.dto.request.AssignAthletesRequest;
+import com.ciblorgasport.participantsservice.model.StatutParticipation;
 import com.ciblorgasport.participantsservice.service.EpreuveAssignmentService;
 
 @RestController
@@ -40,5 +41,12 @@ public class EpreuveAssignmentController {
                                                               @RequestBody AssignAthletesRequest request) {
         List<Long> athleteIds = assignmentService.assignAthletes(epreuveId, request);
         return ResponseEntity.ok(Map.of("epreuveId", epreuveId, "athleteIds", athleteIds));
+    }
+
+    @GetMapping("/{epreuveId}/athletes/{athleteId}/statut")
+    public ResponseEntity<Map<String, Object>> getStatutParticipation(@PathVariable Long epreuveId,
+                                                                       @PathVariable Long athleteId) {
+        StatutParticipation statut = assignmentService.getStatutParticipation(epreuveId, athleteId);
+        return ResponseEntity.ok(Map.of("epreuveId", epreuveId, "athleteId", athleteId, "statut", statut.name()));
     }
 }
