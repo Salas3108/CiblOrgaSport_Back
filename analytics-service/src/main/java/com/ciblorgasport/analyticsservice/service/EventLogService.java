@@ -2,6 +2,7 @@ package com.ciblorgasport.analyticsservice.service;
 
 import com.ciblorgasport.analyticsservice.dto.EventLogRequest;
 import com.ciblorgasport.analyticsservice.entity.EventLog;
+import com.ciblorgasport.analyticsservice.enums.EventType;
 import com.ciblorgasport.analyticsservice.repository.EventLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class EventLogService {
             EventLog event = new EventLog();
             event.setUserId(request.getUserId());
             event.setUserRole(request.getUserRole() != null ? request.getUserRole() : "ANONYMOUS");
-            event.setEventType(request.getEventType() != null ? request.getEventType() : "PAGE_VIEW");
+            event.setEventType(request.getEventType() != null ? request.getEventType() : EventType.PAGE_VIEW.name());
             event.setEndpoint(truncate(request.getEndpoint(), 255));
             event.setHttpMethod(request.getHttpMethod());
             event.setStatusCode(request.getStatusCode());

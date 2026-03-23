@@ -1,0 +1,3070 @@
+{
+  "info": {
+    "_postman_id": "eaf41c3a-c1b3-426f-ab27-d6445c6e590c",
+    "name": "CiblOrgaSport-Microservices",
+    "description": "Collections de tests pour tous les microservices CiblOrgaSport.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "auth-service",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d796f48c-41c1-48f4-b702-928c6fe1e1f4",
+                "exec": [
+                  "pm.test(\"Status code is 201 or 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "9ae072ef-4dd1-4852-be6d-0f2420c7f3f2",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "ff16bfe2-e4c8-4c98-a5a4-a7a77e3924b0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"volontaire1\",\n  \"email\": \"volontaire1@example.com\",\n  \"password\": \"volontaire1\",\n  \"role\": \"VOLONTAIRE\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/register",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register athlete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "9a0b3797-d1bd-43f2-ac68-ec5b252c9b93",
+                "exec": [
+                  "pm.test(\"Status code is 201 or 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "295a5124-3e95-406b-b59c-8ed73c9beec8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"athlete6\",\n  \"email\": \"athlete6@example.com\",\n  \"password\": \"athlete\",\n  \"role\": \"ATHLETE\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/register",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-comm",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "7b33d2ce-e4c2-4de0-bf8a-59bdec2fd46a",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "abfbd559-bd58-4d74-906f-32784a12c3eb",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "10cedb5f-f3ee-4bc0-9cb1-7b220df83f31",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"commissaire2\",\n  \"password\": \"commissaire2\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/login",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d4e61224-5e5b-4cde-8ef7-fd4fb4416270",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "b4c59135-d276-4c86-8b8a-13e1e296428d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin3\",\n  \"password\": \"admin3\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/login",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-athlete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d2521549-adc7-472c-aeba-83b3615fbc04",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "dee627cd-49a3-4e51-b2c1-fea748086ed9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "83cffdf3-de2f-4428-bb83-a6f566b3f3e6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"athlete2\",\n  \"password\": \"athlete\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/login",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-volontaire",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d2521549-adc7-472c-aeba-83b3615fbc04",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "dee627cd-49a3-4e51-b2c1-fea748086ed9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "996c0446-8d25-4193-8480-d606ee9e2240",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"volontaire1\",\n  \"password\": \"volontaire1\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/login",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by Username",
+          "id": "e0aae7c5-93b7-4491-8cc0-0ff35b22d135",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_base}}/auth/user/username/admin3",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "user",
+                "username",
+                "admin3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hello",
+          "id": "5f0d0bb6-972d-4a07-bc54-a91732e93b69",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_base}}/auth/hello",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "hello"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Athlete (ADMIN)",
+          "id": "c6eacb7b-3536-4298-b28b-fd7da79addbd",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"athlete6\",\n  \"validated\": true\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/admin/validate-athlete",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "admin",
+                "validate-athlete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Volunteer (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response confirms volunteer validation\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Volontaire\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"volontaire1\",\n  \"validated\": true\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/admin/validate-volunteer",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "admin",
+                "validate-volunteer"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "0ce3df38-dd5f-4e70-a753-2673bc9bf121"
+    },
+    {
+      "name": "incident-service",
+      "item": [
+        {
+          "name": "List Incidents",
+          "id": "eb98becf-49fb-4955-9779-7ba4e586f79a",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{incident_base}}/api/incidents",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Incidents",
+          "id": "532f5565-e1b1-4b05-afde-a733cbd3f242",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{incident_base}}/api/incidents?status=ACTIF&type=TECHNIQUE&impact=MOYEN",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIF"
+                },
+                {
+                  "key": "type",
+                  "value": "TECHNIQUE"
+                },
+                {
+                  "key": "impact",
+                  "value": "MOYEN"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Incident-admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "12020333-440a-4221-99ad-4472b80c6507",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has incident ID\", function () {",
+                  "    // Validate response is valid JSON",
+                  "    let jsonData;",
+                  "    try {",
+                  "        jsonData = pm.response.json();",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Response is not valid JSON: \" + e.message);",
+                  "    }",
+                  "    ",
+                  "    // Ensure response is an object",
+                  "    pm.expect(jsonData).to.be.an('object', \"Response should be an object\");",
+                  "    ",
+                  "    // Check that 'id' property exists",
+                  "    pm.expect(jsonData).to.have.property('id', \"Response should have an 'id' property\");",
+                  "    ",
+                  "    // Ensure id is not null or undefined",
+                  "    pm.expect(jsonData.id).to.not.be.null;",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    ",
+                  "    // Validate id is of expected type (string or number)",
+                  "    pm.expect(jsonData.id).to.satisfy(",
+                  "        (id) => typeof id === 'string' || typeof id === 'number',",
+                  "        \"id should be a string or number\"",
+                  "    );",
+                  "    ",
+                  "    // If id is a string, ensure it's not empty",
+                  "    if (typeof jsonData.id === 'string') {",
+                  "        pm.expect(jsonData.id.trim()).to.not.be.empty;",
+                  "    }",
+                  "    ",
+                  "    // Set the environment variable (original functionality)",
+                  "    pm.environment.set('incident_id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "4921c43b-af62-4381-9dc6-0ad66197ddad",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "5931c761-c96e-4ed3-810d-1ac9511e1f65",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade principal - Piste 1\",\n  \"competitionId\": {{competition_id}}\n}"
+            },
+            "url": {
+              "raw": "{{incident_base}}/api/incidents",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Incident-com",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "14f9c4f5-0c3b-4a53-8ba1-5227690dece2",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has incident ID\", function () {",
+                  "    // Validate response is valid JSON",
+                  "    let jsonData;",
+                  "    try {",
+                  "        jsonData = pm.response.json();",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Response is not valid JSON: \" + e.message);",
+                  "    }",
+                  "    ",
+                  "    // Ensure response is an object",
+                  "    pm.expect(jsonData).to.be.an('object', \"Response should be an object\");",
+                  "    ",
+                  "    // Check that 'id' property exists",
+                  "    pm.expect(jsonData).to.have.property('id', \"Response should have an 'id' property\");",
+                  "    ",
+                  "    // Ensure id is not null or undefined",
+                  "    pm.expect(jsonData.id).to.not.be.null;",
+                  "    pm.expect(jsonData.id).to.not.be.undefined;",
+                  "    ",
+                  "    // Validate id is of expected type (string or number)",
+                  "    pm.expect(jsonData.id).to.satisfy(",
+                  "        (id) => typeof id === 'string' || typeof id === 'number',",
+                  "        \"id should be a string or number\"",
+                  "    );",
+                  "    ",
+                  "    // If id is a string, ensure it's not empty",
+                  "    if (typeof jsonData.id === 'string') {",
+                  "        pm.expect(jsonData.id.trim()).to.not.be.empty;",
+                  "    }",
+                  "    ",
+                  "    // Set the environment variable (original functionality)",
+                  "    pm.environment.set('incident_id', jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "1a49a0e3-c94e-4f33-a16d-a02dba8a881b",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "8e7d7b5e-47de-4b5b-a30f-5cde7f092fd7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade villejuif \"\n}"
+            },
+            "url": {
+              "raw": "{{incident_base}}/api/incidents",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents"
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "25aa9fc7-63ca-4e82-9473-d71e3e5dfb30",
+              "name": "Create Incident-com",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "{{jwt}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"Test incident 3\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade villejuif \"\n}"
+                },
+                "url": {
+                  "raw": "{{incident_base}}/api/incidents",
+                  "host": [
+                    "{{incident_base}}"
+                  ],
+                  "path": [
+                    "api",
+                    "incidents"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Method"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Access-Control-Request-Headers"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, no-store, max-age=0, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Expires",
+                  "value": "0"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "DENY"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "0"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 18 Jan 2026 16:00:34 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Get Incident by Id",
+          "id": "93be213e-2392-457a-a045-0fe989e118d5",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{incident_base}}/api/incidents/{{incident_id}}",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents",
+                "{{incident_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Incident",
+          "id": "164cc8fb-baca-493c-9224-86b36dd4ee33",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Mis a jour\"\n}"
+            },
+            "url": {
+              "raw": "{{incident_base}}/api/incidents/2",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Incident",
+          "id": "1a555795-2546-47f6-8988-92d2e847ffa7",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{incident_base}}/api/incidents/1",
+              "host": [
+                "{{incident_base}}"
+              ],
+              "path": [
+                "api",
+                "incidents",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "7a50e5a5-5318-45ce-923d-a60276b9609a"
+    },
+    {
+      "name": "notifications-service",
+      "item": [
+        {
+          "name": "Toutes les notifs du spectateur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "if (data.length > 0) pm.environment.set('notification_id', data[0].id);"
+                ],
+                "id": "6e5fbfa2-a8e9-4dc1-9cf0-a43b2164b228"
+              }
+            }
+          ],
+          "id": "c33cfcd1-a00b-4b35-b917-440be49775a6",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Notifications non lues",
+          "id": "e2d24abb-e5ce-4457-888f-d11d4ea20603",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/non-lues",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "non-lues"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Compteur non lues (badge)",
+          "id": "bd4b12df-b0f9-4dc3-8eea-c179909335d2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/compteur",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "compteur"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marquer une notif comme lue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lu=true\", () => pm.expect(pm.response.json().lu).to.equal(true));"
+                ],
+                "id": "3e3f86f4-f5e5-4b56-b95f-f6a5bc8e059e"
+              }
+            }
+          ],
+          "id": "de1ef617-48e2-4a5e-9b40-196373ed04b8",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}/lue",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}",
+                "lue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tout marquer comme lu",
+          "id": "8be8a26e-f66d-4de8-aaaf-8f9e44287c94",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/spectateur/{{spectateur_id}}/tout-lire",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "spectateur",
+                "{{spectateur_id}}",
+                "tout-lire"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer une notification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ],
+                "id": "0affb080-63de-4d20-84df-4b5323e6f481"
+              }
+            }
+          ],
+          "id": "c8024081-620a-4ba1-83eb-e8bd8df4ae0a",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{notif_base}}/api/notifications/{{notification_id}}",
+              "host": [
+                "{{notif_base}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "d656fed8-2104-4892-9d76-061c6cc7e2ce",
+      "description": "Notifications REST (port 8089). Push temps reel via WebSocket STOMP -> ws://localhost:8089/ws -> /topic/notifications/{spectateurId}"
+    },
+    {
+      "name": "lieu-service",
+      "item": [
+        {
+          "name": "Lieux - List",
+          "id": "b0130274-2c4f-482a-9e1f-5c6dcb401764",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux - Get by Id",
+          "id": "ed52cbec-4e49-43f3-9900-05e870b60a01",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux - Create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5879ea82-3f87-497d-b730-0f6ef2783198",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) { pm.environment.set('lieu_id', jsonData.id); }"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "67530b1f-7f81-495d-9286-bfc602d62f5d",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "2b8a6702-4e55-4dff-a325-82b001cf93ab",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique\",\n  \"adresse\": \"13 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75060\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 80000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux - Update",
+          "id": "2230862c-7c87-4ae4-8781-249e2ce2a176",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Stade Olympique MAJ\",\n  \"adresse\": \"2 Rue Olympique\",\n  \"ville\": \"Paris\",\n  \"codePostal\": \"75001\",\n  \"pays\": \"France\",\n  \"capaciteSpectateurs\": 90000\n}"
+            },
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lieux - Delete",
+          "id": "0319317b-7269-4efa-a5c9-5a04bbe9b8a8",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{lieu_base}}/lieux/{{lieu_id}}",
+              "host": [
+                "{{lieu_base}}"
+              ],
+              "path": [
+                "lieux",
+                "{{lieu_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "32c3ddca-a6cd-46ea-bf07-228c7b5daaed"
+    },
+    {
+      "name": "event-service",
+      "item": [
+        {
+          "name": "Events - List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
+                  "pm.test(\"La reponse est un tableau\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.test(\"Le premier event a la nouvelle structure\", function () {",
+                  "        const event = jsonData[0];",
+                  "        pm.expect(event).to.have.property('id');",
+                  "        pm.expect(event).to.have.property('name');",
+                  "        pm.expect(event).to.have.property('dateDebut');",
+                  "        pm.expect(event).to.have.property('dateFin');",
+                  "        pm.expect(event).to.have.property('description');",
+                  "        pm.expect(event).to.have.property('paysHote');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "id": "a5e3619a-08c4-453c-867e-9c94171fbd51"
+              }
+            }
+          ],
+          "id": "69a8ce60-c565-43a8-a43c-45a13c3edd7a",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/events",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Events - Create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "dbbefaa2-cae2-46d5-955f-a3db2827c062",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Event contient les nouveaux champs\", function () {",
+                  "    pm.expect(jsonData).to.have.property('dateDebut');",
+                  "    pm.expect(jsonData).to.have.property('dateFin');",
+                  "    pm.expect(jsonData).to.have.property('description');",
+                  "    pm.expect(jsonData).to.have.property('paysHote');",
+                  "    pm.expect(jsonData.paysHote).to.eql('France');",
+                  "});",
+                  "",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('event_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "2eb19c8d-9cd0-4245-a99a-873ff7e96da9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "9c4f60ef-dc81-4535-8995-4e47fe113256",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Championnat National de Natation\",\n  \"dateDebut\": \"2026-03-15\",\n  \"dateFin\": \"2026-06-20\",\n  \"description\": \"xx\",\n  \"paysHote\": \"France\"\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/events",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "events"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - List",
+          "id": "26bf6865-fe29-4712-9659-99f6205c5769",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Create",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "4148b366-d96f-4547-86e3-988b05042901",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "6cde42ab-2360-442d-bb37-ce89ff01bca7",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Epreuve contient les nouveaux champs\", function () {",
+                  "    pm.expect(jsonData).to.have.property('dateHeure');",
+                  "    pm.expect(jsonData).to.have.property('dureeMinutes');",
+                  "    pm.expect(jsonData).to.have.property('statut');",
+                  "    pm.expect(jsonData).to.have.property('competitionId');",
+                  "    pm.expect(jsonData.competitionId).to.eql(Number(pm.environment.get('competition_id')));",
+                  "    pm.expect(jsonData).to.have.property('lieuId');",
+                  "});",
+                  "",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('epreuve_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "16394a27-81ce-4991-bf26-bab2121e9906",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Finale 100m\",\n  \"description\": \"Epreuve individuelle de sprint\",\n  \"dateHeure\": \"2026-06-20T14:30:00\",\n  \"dureeMinutes\": 45,\n  \"statut\": \"PLANIFIE\",\n  \"typeEpreuve\": \"COLLECTIVE\",\n  \"genreEpreuve\": \"FEMININ\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}}\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/epreuves",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Competitions - List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
+                  "pm.test(\"La reponse est un tableau\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.test(\"La competition contient la nouvelle structure\", function () {",
+                  "        const competition = jsonData[0];",
+                  "        pm.expect(competition).to.have.property('id');",
+                  "        pm.expect(competition).to.have.property('discipline');",
+                  "        pm.expect(allowedDisciplines).to.include(competition.discipline);",
+                  "        pm.expect(competition).to.have.property('event');",
+                  "        pm.expect(competition.event).to.be.an('object');",
+                  "        pm.expect(competition.event).to.have.property('id');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "id": "91d77591-feb2-428a-ad1e-e055278243fc"
+              }
+            }
+          ],
+          "id": "429b5ed2-d1ad-4869-bdc0-ca9443e2b85a",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/competitions",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "competitions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Competitions - Create (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a2af9ce5-b482-402f-8622-a04fe2d8c824",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "const allowedDisciplines = ['NATATION', 'WATER_POLO', 'NATATION_ARTISTIQUE', 'PLONGEON', 'EAU_LIBRE'];",
+                  "pm.test(\"Competition contient la nouvelle structure\", function () {",
+                  "    pm.expect(jsonData).to.have.property('discipline');",
+                  "    pm.expect(allowedDisciplines).to.include(jsonData.discipline);",
+                  "    pm.expect(jsonData).to.have.property('event');",
+                  "    pm.expect(jsonData.event).to.be.an('object');",
+                  "    pm.expect(jsonData.event).to.have.property('id');",
+                  "});",
+                  "",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('competition_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "9124dfb6-ed63-419a-9fb8-0eeb33a1b15b",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "0bc3013c-bcb6-4f23-be6a-8b3896127894",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"discipline\": \"EAU_LIBRE\",\n  \"event\": {\n    \"id\": {{event_id}}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/competitions",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "competitions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Update (ADMIN)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "649c6647-af2d-4398-abad-fb721f7af4f6",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "90733f14-cf04-4778-93d8-f1ef3739f048",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Epreuve mise a jour avec nouvelle structure\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('dateHeure');",
+                  "    pm.expect(jsonData).to.have.property('dureeMinutes');",
+                  "    pm.expect(jsonData).to.have.property('statut');",
+                  "    pm.expect(jsonData).to.have.property('lieuId');",
+                  "    pm.expect(jsonData.lieuId).to.eql(Number(pm.environment.get('lieu_id')));",
+                  "    pm.expect(jsonData.statut).to.eql('EN_COURS');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "45845931-2439-42eb-a081-df714b7e9884",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Finale 100m Sprint - MAJ\",\n  \"description\": \"Epreuve en cours\",\n  \"dateHeure\": \"2026-06-20T18:30:00\",\n  \"dureeMinutes\": 70,\n  \"statut\": \"EN_COURS\",\n  \"typeEpreuve\": \"INDIVIDUELLE\",\n  \"genreEpreuve\": \"MIXTE\",\n  \"niveauEpreuve\": \"FINALE\",\n  \"competitionId\": {{competition_id}},\n  \"lieuId\": {{lieu_id}},\n  \"athleteIds\": [13, 11]\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Add Athlete (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Athlete added to epreuve\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('athleteIds');",
+                  "    pm.expect(jsonData.athleteIds).to.include(Number(pm.environment.get('athlete_id')));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "c5d6bc9f-2e78-4dd2-88bf-6c2fbb57a101"
+              }
+            }
+          ],
+          "id": "3dcabf0a-7d6f-4a3f-9b62-1914bd4c95b7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteId\": {{athlete_id}}\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}",
+                "athletes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Add Equipe (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Equipe added to epreuve\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('equipeIds');",
+                  "    pm.expect(jsonData.equipeIds).to.include(Number(pm.environment.get('equipe_id')));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "3f1e6632-a3dc-46d8-b5d9-6f7b0a4cd032"
+              }
+            }
+          ],
+          "id": "2d2d220c-0e8d-4f53-b9f5-4440a9df6c61",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipeIds\": [{{equipe_id}}]\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/equipes",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}",
+                "equipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Add Athletes Bulk (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Athletes added in bulk to epreuve\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('athleteIds');",
+                  "    pm.expect(jsonData.athleteIds).to.include(Number(pm.environment.get('athlete_id')));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "f13df9f2-195f-4867-b4e2-f94484f86af0"
+              }
+            }
+          ],
+          "id": "6ca47f66-07b9-4a10-a8d6-6bf4ef2d3d4f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"athleteIds\": [{{athlete_id}}]\n}"
+            },
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes/bulk",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}",
+                "athletes",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Get Equipes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Response is an array of equipe ids\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "7ba2d353-1258-490b-976f-c26daec5c97f"
+              }
+            }
+          ],
+          "id": "44fd8e80-95ad-4b48-bc26-fe633b65fa4c",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/equipes",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}",
+                "equipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Get Athletes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Response is an array of athlete ids\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "74111db6-4797-4a98-af57-56bcaa35d8e8"
+              }
+            }
+          ],
+          "id": "e97ee7ec-b0c6-44c6-8947-65b92e630a73",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}/athletes",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}",
+                "athletes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Get by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Response contains requested epreuve id\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.id).to.eql(Number(pm.environment.get('epreuve_id')));",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "2d17e4b6-2bcb-4b9a-aea8-f18db11358c6"
+              }
+            }
+          ],
+          "id": "77beccfc-b2ca-4253-b65d-8cb4c8b41f35",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Epreuves - Delete (ADMIN/COMMISSAIRE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "8f2f2638-875f-4499-a4a6-871f8ead5f76"
+              }
+            }
+          ],
+          "id": "d2e79345-7f72-499f-a527-90167de7beaa",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Events - Delete (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "aa459f2a-8686-46f2-8527-598bd3413fff"
+              }
+            }
+          ],
+          "id": "b8415ccc-a99f-4672-b01e-63757e995f10",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/events/{{event_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "events",
+                "{{event_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Competitions - Delete (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "41155f90-e63f-4156-a564-b59bb339e622"
+              }
+            }
+          ],
+          "id": "9fe80674-3140-4094-b268-265fe17f71ec",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{event_base}}/competitions/{{competition_id}}",
+              "host": [
+                "{{event_base}}"
+              ],
+              "path": [
+                "competitions",
+                "{{competition_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "80e9f480-296f-493e-82af-7af64bf3a4df"
+    },
+    {
+      "name": "abonnement-service",
+      "item": [
+        {
+          "name": "Mes Abonnements",
+          "id": "46a97fc5-24bd-4cf6-8a11-58700fc681ff",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{abonnement_base}}/api/abonnements/user/1",
+              "host": [
+                "{{abonnement_base}}"
+              ],
+              "path": [
+                "api",
+                "abonnements",
+                "user",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S'abonner a une competition",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "df8f5436-5590-42ad-a40d-11038af81a5b"
+              }
+            }
+          ],
+          "id": "a55fb9ae-fec3-441f-8647-255fdae57cb1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{abonnement_base}}/api/abonnements/subscribe?userId=1&competitionId={{competition_id}}",
+              "host": [
+                "{{abonnement_base}}"
+              ],
+              "path": [
+                "api",
+                "abonnements",
+                "subscribe"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1"
+                },
+                {
+                  "key": "competitionId",
+                  "value": "{{competition_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se desabonner",
+          "id": "5dc61f3b-bbda-427f-ae85-19bf62583bb5",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{abonnement_base}}/api/abonnements/unsubscribe?userId=1&competitionId=00000000-0000-0000-0000-000000000001",
+              "host": [
+                "{{abonnement_base}}"
+              ],
+              "path": [
+                "api",
+                "abonnements",
+                "unsubscribe"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1"
+                },
+                {
+                  "key": "competitionId",
+                  "value": "00000000-0000-0000-0000-000000000001"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "46100daf-c645-44df-8b12-a589c56a06b3"
+    },
+    {
+      "name": "resultats-service",
+      "item": [
+        {
+          "name": "Create Resultat (COMMISSAIRE)/ athlete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f3a7e1dc-3888-46d2-a142-29f65b0e9db8",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('resultat_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "f4183542-9af4-473d-9dae-9d6a06ff9789",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "cdda9dec-546f-4b61-b19a-79d180b85eb7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classement\": 1,\n  \"medaille\": \"OR\",\n  \"qualification\": true,\n  \"valeurPrincipale\": \"47.21\",\n  \"unite\": \"secondes\",\n  \"detailsPerformance\": {\n    \"vent\": \"1.3\",\n    \"serie\": \"A\"\n  },\n  \"typePerformance\": \"TEMPS\",\n  \"athleteId\": {{athlete_id}},\n  \"epreuveId\": {{epreuve_id}}\n}"
+            },
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Resultat (COMMISSAIRE)/ equipe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "7d71092e-e9b0-4b9b-8f69-2fa1e116fda3",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('resultat_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "4e01726b-182e-45d8-87c8-7a31b7ee97c0",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "b3021c2c-95dc-4b81-8a65-95708d333549",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classement\": 1,\n  \"medaille\": \"OR\",\n  \"qualification\": true,\n  \"valeurPrincipale\": \"47.21\",\n  \"unite\": \"secondes\",\n  \"detailsPerformance\": {\n    \"vent\": \"1.3\",\n    \"serie\": \"A\"\n  },\n  \"typePerformance\": \"TEMPS\",\n  \"equipeId\": {{equipe_id}},\n  \"epreuveId\": {{epreuve_id}}\n}"
+            },
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Resultat (COMMISSAIRE)",
+          "id": "47c57ca9-0bc2-4f53-8b0b-90c420b42c95",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/{{resultat_id}}/validation",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "{{resultat_id}}",
+                "validation"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Resultat (COMMISSAIRE)",
+          "id": "8ea8d38e-0843-4f50-a947-bb0fc4f01be7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/{{resultat_id}}/publier",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "{{resultat_id}}",
+                "publier"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Classement Epreuve (COMMISSAIRE)",
+          "id": "e103633a-52bb-40b8-862c-bc1c29f34e80",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{resultats_base}}/api/commissaire/resultats/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "commissaire",
+                "resultats",
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Classement Epreuve (PUBLIC)",
+          "id": "6cec194d-276b-4419-bae4-d75e8271b96b",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/epreuves/{{epreuve_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "epreuves",
+                "{{epreuve_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultats Athlete (PUBLIC)",
+          "id": "fa8a00db-427d-484e-b8b8-c43959ce0576",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/athletes/{{athlete_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "athletes",
+                "{{athlete_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultats Equipe (PUBLIC)",
+          "id": "a019881b-6696-4343-809b-9b403dadc205",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{resultats_base}}/api/public/resultats/equipes/{{equipe_id}}",
+              "host": [
+                "{{resultats_base}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "resultats",
+                "equipes",
+                "{{equipe_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "c731b098-e3aa-4567-9f8f-70fba87aa5b0"
+    },
+    {
+      "name": "billetterie",
+      "item": [
+        {
+          "name": "List Tickets",
+          "id": "35661f50-21ab-4e5e-ba71-74c6934f0d40",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ticket by Id",
+          "id": "3587daed-4667-4c65-a12f-e68ec75e08b1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets/{{ticket_id}}",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "{{ticket_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.environment.set('ticket_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "id": "a68c0bbe-ce8f-4131-9b22-4bf354494591"
+              }
+            }
+          ],
+          "id": "32122fc4-322f-4661-84ac-c9962e89b27b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spectatorId\": 1,\n  \"eventId\": \"{{event_id}}\",\n  \"seat\": \"A12\",\n  \"category\": \"STANDARD\",\n  \"price\": 25.00\n}"
+            },
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Ticket",
+          "id": "49281af4-b0dc-4ab8-8a8e-1e22ece1d6d0",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"seat\": \"B10\" }"
+            },
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets/1",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Ticket",
+          "id": "ba5eaa2a-1cc1-4790-bd03-733c2f792fed",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets/1",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Price by Category",
+          "id": "83b01de5-dc59-48be-a2a5-11fb04de0f76",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{billetterie_base}}/api/tickets/price?category=VIP",
+              "host": [
+                "{{billetterie_base}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "price"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "VIP"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "df1bf073-2f82-4cdf-971f-6aeeab1872c3"
+    },
+    {
+      "name": "ciblorgasport (monolith API)",
+      "item": [
+        {
+          "name": "Auth - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "id": "99b35b41-0249-4b26-82c1-3e424f5d2ae5"
+              }
+            }
+          ],
+          "id": "56fc9569-98a9-42d8-88af-1ba4aeee0fa4",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test123!\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/api/auth/login",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User - Upload Documents",
+          "id": "851021de-5be6-4df1-88f4-efb25d7f8434",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "passeport",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "certificat",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{api_base}}/api/user/upload-documents",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "upload-documents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User - Update Profile",
+          "id": "9c8dff90-72f4-4b88-960e-d0dd4fef9159",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"username\": \"user1_new\", \"email\": \"user1_new@example.com\" }"
+            },
+            "url": {
+              "raw": "{{api_base}}/api/user/update-profile",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "update-profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Pending Users",
+          "id": "ace48a95-9319-4a90-9cff-a163ece0f23b",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/admin/pending-users",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "pending-users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Validate User",
+          "id": "53ef88f5-524b-4640-bad9-6f038416b4f7",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/admin/validate/1",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "validate",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Competitions - List + abonnement flags",
+          "id": "a9012e07-47a3-4f4c-b748-35910fa5983a",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/competitions",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "competitions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mes abonnements (via monolith)",
+          "id": "a951cbad-3a2c-426d-9ca1-1e347c3fa254",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/mes-abonnements",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "mes-abonnements"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S'abonner competition (proxy)",
+          "id": "d1df5d39-2dff-4ef6-85e8-cb07ff63f8df",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/competitions/{{competition_id}}/sabonner",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "competitions",
+                "{{competition_id}}",
+                "sabonner"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se desabonner competition (proxy)",
+          "id": "ba008286-92a2-4ba8-a865-82a96e88dddb",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{api_base}}/api/competitions/{{competition_id}}/desabonner",
+              "host": [
+                "{{api_base}}"
+              ],
+              "path": [
+                "api",
+                "competitions",
+                "{{competition_id}}",
+                "desabonner"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "eceea853-cf00-456b-859c-37f86eda4dad"
+    }
+  ],
+  "variable": [
+    {
+      "id": "17c361b2-8b29-4458-ba6a-c25c7f758e74",
+      "key": "api_base",
+      "value": "http://localhost:3000"
+    },
+    {
+      "id": "bba0eada-8b03-4391-8da8-eaa781069c55",
+      "key": "incident_base",
+      "value": "http://localhost:8084"
+    },
+    {
+      "id": "6a50ca63-72a9-442b-969d-b7c7ab308c42",
+      "key": "event_base",
+      "value": "http://localhost:8084"
+    },
+    {
+      "id": "ec795b03-0616-486c-b154-31050cca8045",
+      "key": "resultats_base",
+      "value": "http://localhost:8088"
+    },
+    {
+      "id": "9836cbcc-ed65-492d-8f3b-3986fdfb4aaa",
+      "key": "auth_base",
+      "value": "http://localhost:8080"
+    },
+    {
+      "id": "c53178eb-7d95-420f-9582-98d06630dbb8",
+      "key": "billetterie_base",
+      "value": "http://localhost:8081"
+    },
+    {
+      "id": "a49f75cb-7271-4d1e-bb11-b38c1db07e53",
+      "key": "abonnement_base",
+      "value": "http://localhost:8082"
+    },
+    {
+      "id": "3b51d5fb-2622-4603-abc3-5ee7c5e663ee",
+      "key": "jwt",
+      "value": "Bearer {{token}}"
+    },
+    {
+      "id": "2f822600-d7af-4945-8ddc-e000eee80dc0",
+      "key": "token",
+      "value": ""
+    },
+    {
+      "id": "3dac88bb-1627-40d2-8ed8-3dc4eb1ee26c",
+      "key": "epreuve_id",
+      "value": "1"
+    },
+    {
+      "id": "435af6c0-ea3d-4472-98a5-4f84ab13f6dd",
+      "key": "athlete_id",
+      "value": "1"
+    },
+    {
+      "id": "d7101417-35cd-4c3b-8bb1-4863da6f12ce",
+      "key": "equipe_id",
+      "value": "1"
+    },
+    {
+      "id": "cbaa2350-81a5-49f8-9fd7-6f8ad283390e",
+      "key": "resultat_id",
+      "value": ""
+    },
+    {
+      "id": "3a3579af-3135-41a1-837f-8f2c6996a0db",
+      "key": "notif_base",
+      "value": "http://localhost:8089"
+    },
+    {
+      "id": "64bfaa9d-e67a-4286-8d41-0ead0b539042",
+      "key": "spectateur_id",
+      "value": "1"
+    },
+    {
+      "id": "730d8c18-9801-4eda-970b-d2b1c71ff603",
+      "key": "notification_id",
+      "value": ""
+    },
+    {
+      "id": "c1940acf-69f7-4468-bf67-551071537c7f",
+      "key": "lieu_base",
+      "value": "http://localhost:8090"
+    },
+    {
+      "id": "eb0be697-8043-4b43-8bc3-35a3df443bb4",
+      "key": "lieu_id",
+      "value": "1"
+    }
+  ]
+}

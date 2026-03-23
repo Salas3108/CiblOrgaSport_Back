@@ -71,6 +71,12 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- AOP pour analytics -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- TESTS -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

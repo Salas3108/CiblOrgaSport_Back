@@ -60,6 +60,40 @@
                                                    ]
                                   },
                                   {
+                                    "name": "Supprimer mon compte",
+                                    "event": [
+                                        {
+                                            "listen": "test",
+                                            "script": {
+                                                "type": "text/javascript",
+                                                "exec": [
+                                                    "pm.test(\"Statut 200 attendu\", function () {",
+                                                    "    pm.response.to.have.status(200);",
+                                                    "});",
+                                                    "pm.test(\"Message de confirmation\", function () {",
+                                                    "    pm.expect(pm.response.text()).to.include(\"Compte supprimé\");",
+                                                    "});"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "request": {
+                                        "method": "DELETE",
+                                        "header": [
+                                            {
+                                                "key": "Authorization",
+                                                "value": "{{jwt}}"
+                                            }
+                                        ],
+                                        "url": {
+                                            "raw": "{{auth_base}}/auth/delete-account",
+                                            "host": ["{{auth_base}}"],
+                                            "path": ["auth", "delete-account"]
+                                        }
+                                    },
+                                    "response": []
+                                },
+                                  {
                                       "name":  "Register athlete",
                                       "event":  [
                                                     {
@@ -306,32 +340,6 @@
                                                    ]
                                   },
                                   {
-                                      "name":  "Hello",
-                                      "id":  "954d891f-1d98-4c04-846b-ee2d24018b36",
-                                      "request":  {
-                                                      "method":  "GET",
-                                                      "header":  [
-                                                                     {
-                                                                         "key":  "Authorization",
-                                                                         "value":  "{{jwt}}"
-                                                                     }
-                                                                 ],
-                                                      "url":  {
-                                                                  "raw":  "{{auth_base}}/auth/hello",
-                                                                  "host":  [
-                                                                               "{{auth_base}}"
-                                                                           ],
-                                                                  "path":  [
-                                                                               "auth",
-                                                                               "hello"
-                                                                           ]
-                                                              }
-                                                  },
-                                      "response":  [
-
-                                                   ]
-                                  },
-                                  {
                                       "name":  "Upload Documents (ATHLETE)",
                                       "id":  "753cc29d-7357-45c3-b91b-e97467375f6e",
                                       "request":  {
@@ -394,6 +402,57 @@
                                                                                "auth",
                                                                                "admin",
                                                                                "validate-athlete"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Validate Volunteer (ADMIN)",
+                                      "id":  "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\"Response confirms validation\", function () {",
+                                                                                    "    pm.expect(pm.response.text()).to.include(\"Volontaire\");",
+                                                                                    "});"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "{{jwt}}"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"username\": \"volontaire1\",\n  \"validated\": true\n}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{auth_base}}/auth/admin/validate-volunteer",
+                                                                  "host":  [
+                                                                               "{{auth_base}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "admin",
+                                                                               "validate-volunteer"
                                                                            ]
                                                               }
                                                   },

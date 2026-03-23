@@ -74,7 +74,7 @@ public class AnalyticsAspect {
         event.setStatusCode(statusCode);
         event.setDurationMs(durationMs);
         event.setIpAddress(extractIp(request));
-        event.setEventType(resolveEventType(request.getRequestURI()));
+        event.setEventType(resolveEventType(request.getRequestURI(), request.getMethod()));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
@@ -89,18 +89,24 @@ public class AnalyticsAspect {
         eventLogService.saveAsync(event);
     }
 
-    private String resolveEventType(String uri) {
+    private String resolveEventType(String uri, String method) {
         if (uri == null) return "PAGE_VIEW";
         if (uri.contains("/auth/login")) return "USER_LOGIN";
         if (uri.contains("/auth/logout")) return "USER_LOGOUT";
-        if (uri.contains("/competitions") || uri.contains("/events")) return "COMPETITION_VIEW";
-        if (uri.contains("/results") || uri.contains("/epreuves")) return "RESULT_VIEW";
-        if (uri.contains("/notifications")) return "NOTIFICATION_SENT";
-        if (uri.contains("/abonnements")) return "NOTIFICATION_SUBSCRIBED";
-        if (uri.contains("/fanzones") || uri.contains("/geo")) return "FANZONE_VIEW";
-        if (uri.contains("/athlete")) return "ATHLETE_PROFILE_VIEW";
-        if (uri.contains("/incidents")) return "INCIDENT_DECLARED";
-        if (uri.contains("/search")) return "SEARCH_PERFORMED";
+        if (uri.contains("/auth/register")) return "USER_REGISTER";
+        if (uri.contains("/admin/validate-volunteer")) return "VOLUNTEER_VALIDATED";
+        if (uri.contains("/epreuves")) return "EPREUVE_VIEW";
+        if (uri.contains("/competitions")) return "COMPETITION_VIEW";
+        if (uri.contains("/events")) return "EVENT_VIEW";
+        if (uri.contains("/athlete") || uri.contains("/commissaire")) return "ATHLETE_PROFILE_VIEW";
+        if (uri.contains("/results") || uri.contains("/resultats")) return "RESULT_VIEW";
+        if (uri.contains("/notifications")) {
+            return "POST".equalsIgnoreCase(method) ? "NOTIFICATION_SENT" : "PAGE_VIEW";
+        }
+        if (uri.contains("/abonnements") || uri.contains("/subscribe")) return "NOTIFICATION_SUBSCRIBED";
+        if (uri.contains("/incidents")) {
+            return "POST".equalsIgnoreCase(method) ? "INCIDENT_DECLARED" : "PAGE_VIEW";
+        }
         return "PAGE_VIEW";
     }
 

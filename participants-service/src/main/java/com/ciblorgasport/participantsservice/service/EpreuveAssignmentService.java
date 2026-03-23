@@ -1,5 +1,6 @@
 package com.ciblorgasport.participantsservice.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,10 +9,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ciblorgasport.participantsservice.dto.ForfaitResponse;
 import com.ciblorgasport.participantsservice.dto.request.AssignAthletesRequest;
+import com.ciblorgasport.participantsservice.dto.request.ForfaitRequest;
 import com.ciblorgasport.participantsservice.model.EpreuveAthleteAssignment;
+import com.ciblorgasport.participantsservice.model.StatutParticipation;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
 import com.ciblorgasport.participantsservice.repository.JpaEpreuveAthleteAssignmentRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class EpreuveAssignmentService {
@@ -19,13 +25,16 @@ public class EpreuveAssignmentService {
     private final JpaEpreuveAthleteAssignmentRepository assignmentRepository;
     private final JpaAthleteRepository athleteRepository;
     private final ParticipantsStore store;
+    private final ObjectMapper objectMapper;
 
     public EpreuveAssignmentService(JpaEpreuveAthleteAssignmentRepository assignmentRepository,
                                     JpaAthleteRepository athleteRepository,
-                                    ParticipantsStore store) {
+                                    ParticipantsStore store,
+                                    ObjectMapper objectMapper) {
         this.assignmentRepository = assignmentRepository;
         this.athleteRepository = athleteRepository;
         this.store = store;
+        this.objectMapper = objectMapper;
     }
 
     public List<Long> assignAthletes(Long epreuveId, AssignAthletesRequest request) {
@@ -74,6 +83,41 @@ public class EpreuveAssignmentService {
                 .map(EpreuveAthleteAssignment::getAthleteId)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public ForfaitResponse declarerForfait(Long epreuveId, Long athleteId, ForfaitRequest request) {
+        EpreuveAthleteAssignment assignment = assignmentRepository
+                .findByAthleteIdAndEpreuveId(athleteId, epreuveId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Participation introuvable pour epreuveId=" + epreuveId + " et athleteId=" + athleteId));
+
+        if (StatutParticipation.TERMINE.equals(assignment.getStatutParticipation())) {
+            throw new IllegalStateException(
+                    "Forfait impossible : l'athlète " + athleteId + " a déjà terminé l'épreuve " + epreuveId + " (statut TERMINE)");
+        }
+
+        assignment.setStatutParticipation(StatutParticipation.FORFAIT);
+        assignment.setDateForfait(LocalDateTime.now());
+
+        if (request != null && request.getDetailsPerformance() != null) {
+            try {
+                assignment.setDetailsPerformance(objectMapper.writeValueAsString(request.getDetailsPerformance()));
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("detailsPerformance invalide : " + e.getMessage());
+            }
+        }
+
+        assignmentRepository.save(assignment);
+        store.addLog("FORFAIT epreuveId=" + epreuveId + " athleteId=" + athleteId);
+
+        ForfaitResponse response = new ForfaitResponse();
+        response.setEpreuveId(epreuveId);
+        response.setAthleteId(athleteId);
+        response.setStatutParticipation(StatutParticipation.FORFAIT.name());
+        response.setDateForfait(assignment.getDateForfait());
+        response.setDetailsPerformance(assignment.getDetailsPerformance());
+        response.setMessage("Forfait enregistré avec succès");
+        return response;
     }
 
     public Map<Long, List<Long>> listAllAssignments() {

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.ciblorgasport.notificationsservice.analytics.AnalyticsClient;
 import com.ciblorgasport.notificationsservice.client.AbonnementServiceClient;
 import com.ciblorgasport.notificationsservice.dto.NotificationDTO;
 import com.ciblorgasport.notificationsservice.kafka.event.EpreuveRappelEventV1;
@@ -30,13 +31,16 @@ public class NotificationGeneratorService {
     private final AbonnementServiceClient abonnementServiceClient;
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AnalyticsClient analyticsClient;
 
     public NotificationGeneratorService(AbonnementServiceClient abonnementServiceClient,
                                         NotificationRepository notificationRepository,
-                                        SimpMessagingTemplate messagingTemplate) {
+                                        SimpMessagingTemplate messagingTemplate,
+                                        AnalyticsClient analyticsClient) {
         this.abonnementServiceClient = abonnementServiceClient;
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
+        this.analyticsClient = analyticsClient;
     }
 
     @Transactional
@@ -101,6 +105,7 @@ public class NotificationGeneratorService {
         // Push WebSocket APRÈS le commit de la transaction
         // (évite d'envoyer si la transaction rollback)
         List<NotificationDTO> dtos = saved.stream().map(NotificationDTO::from).toList();
+        int sentCount = saved.size();
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -111,6 +116,7 @@ public class NotificationGeneratorService {
                             dto
                     );
                 });
+                analyticsClient.trackNotificationSent("INCIDENT", sentCount);
             }
         });
     }
@@ -197,6 +203,7 @@ public class NotificationGeneratorService {
         log.debug("Persisted {} rappel notification(s) for sourceEventId={}", saved.size(), sourceEventId);
 
         List<NotificationDTO> dtos = saved.stream().map(NotificationDTO::from).toList();
+        int sentCount = saved.size();
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -207,6 +214,7 @@ public class NotificationGeneratorService {
                             dto
                     );
                 });
+                analyticsClient.trackNotificationSent("EPREUVE_RAPPEL", sentCount);
             }
         });
     }

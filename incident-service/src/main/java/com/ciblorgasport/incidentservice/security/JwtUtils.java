@@ -57,6 +57,18 @@ public class JwtUtils {
                 .getBody()
                 .get("role", String.class);
     }
+    public Long getUserIdFromJwtToken(String token) {
+        Object val = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId");
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).longValue();
+        try { return Long.parseLong(val.toString()); } catch (NumberFormatException e) { return null; }
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
