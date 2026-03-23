@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
 import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
 import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
@@ -33,6 +34,7 @@ class ResultatServiceTest {
 
     private ResultatRepository resultatRepository;
     private ClassementService classementService;
+    private ParticipantsServiceClient participantsClient;
     private ResultatService resultatService;
     private Map<Long, Resultat> fakeStore;
 
@@ -41,9 +43,13 @@ class ResultatServiceTest {
         fakeStore = new HashMap<>();
         resultatRepository = mock(ResultatRepository.class);
         classementService = mock(ClassementService.class);
-        resultatService = new ResultatService(resultatRepository, classementService);
+        participantsClient = mock(ParticipantsServiceClient.class);
+        resultatService = new ResultatService(resultatRepository, classementService, participantsClient);
 
-        when(resultatRepository.save(any(Resultat.class))).thenAnswer(inv -> {
+        // Par défaut : athlète non en forfait
+        when(participantsClient.getStatutParticipation(any(Long.class), any(Long.class))).thenReturn(null);
+
+        when(resultatRepository.save(any())).thenAnswer(inv -> {
             Resultat r = inv.getArgument(0);
             if (r.getId() == null) r.setId((long) (fakeStore.size() + 1));
             fakeStore.put(r.getId(), r);
@@ -255,7 +261,7 @@ class ResultatServiceTest {
 
         resultatService.saisirBulk(10L, request, ctx);
 
-        verify(resultatRepository).save(any(Resultat.class));
+        verify(resultatRepository).save(any());
     }
 
     // ── validerTout ──────────────────────────────────────────────────────────
@@ -295,5 +301,73 @@ class ResultatServiceTest {
 
         verify(resultatRepository).saveAll(List.of());
         assertEquals(0, result.size());
+    }
+
+    // ── modifier epreuve (forfait) ────────────────────────────────────────────
+
+    @Test
+    void createOrUpdate_rejects_athlete_en_forfait() {
+        when(participantsClient.getStatutParticipation(10L, 5L)).thenReturn("FORFAIT");
+
+        ResultatRequest request = new ResultatRequest();
+        request.setEpreuveId(10L);
+        request.setAthleteId(5L);
+        request.setValeurPrincipale("47.21");
+
+        assertThrows(IllegalStateException.class, () -> resultatService.createOrUpdate(request));
+    }
+
+    @Test
+    void saisirBulk_creates_forfait_resultat_for_forfait_athlete() {
+        when(participantsClient.getStatutParticipation(10L, 1L)).thenReturn("FORFAIT");
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 1L)).thenReturn(Optional.empty());
+        when(resultatRepository.findByEpreuveId(10L)).thenReturn(new ArrayList<>());
+
+        EpreuveContextDto ctx = new EpreuveContextDto();
+        ctx.setId(10L);
+        ctx.setDiscipline("NATATION");
+        ctx.setNiveauEpreuve("FINALE");
+
+        PerformanceEntryDto e1 = new PerformanceEntryDto();
+        e1.setAthleteId(1L);
+        e1.setValeurPrincipale("47.21");
+
+        BulkResultatRequest request = new BulkResultatRequest();
+        request.setPerformances(List.of(e1));
+
+        resultatService.saisirBulk(10L, request, ctx);
+
+        verify(resultatRepository).save(any());
+    }
+
+    @Test
+    void saisirBulk_skips_existing_forfait_resultat_for_forfait_athlete() {
+        when(participantsClient.getStatutParticipation(10L, 1L)).thenReturn("FORFAIT");
+
+        Resultat existing = new Resultat();
+        existing.setId(1L);
+        existing.setAthleteId(1L);
+        existing.setStatut(ResultatStatut.FORFAIT);
+        when(resultatRepository.findByEpreuveIdAndAthleteId(10L, 1L)).thenReturn(Optional.of(existing));
+        when(resultatRepository.findByEpreuveId(10L)).thenReturn(new ArrayList<>(List.of(existing)));
+
+        EpreuveContextDto ctx = new EpreuveContextDto();
+        ctx.setId(10L);
+        ctx.setDiscipline("NATATION");
+        ctx.setNiveauEpreuve("FINALE");
+
+        PerformanceEntryDto e1 = new PerformanceEntryDto();
+        e1.setAthleteId(1L);
+        e1.setValeurPrincipale("47.21");
+
+        BulkResultatRequest request = new BulkResultatRequest();
+        request.setPerformances(List.of(e1));
+
+        List<Resultat> resultats = resultatService.saisirBulk(10L, request, ctx);
+
+        // Aucun nouveau save (l'existant est deja FORFAIT)
+        verify(resultatRepository, org.mockito.Mockito.never()).save(any());
+        assertEquals(1, resultats.size());
+        assertEquals(ResultatStatut.FORFAIT, resultats.get(0).getStatut());
     }
 }

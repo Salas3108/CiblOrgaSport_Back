@@ -12,22 +12,22 @@ import org.springframework.stereotype.Service;
 import com.ciblorgasport.participantsservice.dto.ForfaitResponse;
 import com.ciblorgasport.participantsservice.dto.request.AssignAthletesRequest;
 import com.ciblorgasport.participantsservice.dto.request.ForfaitRequest;
-import com.ciblorgasport.participantsservice.model.EpreuveAthleteAssignment;
+import com.ciblorgasport.participantsservice.model.EpreuveAthlete;
 import com.ciblorgasport.participantsservice.model.StatutParticipation;
 import com.ciblorgasport.participantsservice.repository.JpaAthleteRepository;
-import com.ciblorgasport.participantsservice.repository.JpaEpreuveAthleteAssignmentRepository;
+import com.ciblorgasport.participantsservice.repository.JpaEpreuveAthleteRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class EpreuveAssignmentService {
 
-    private final JpaEpreuveAthleteAssignmentRepository assignmentRepository;
+    private final JpaEpreuveAthleteRepository assignmentRepository;
     private final JpaAthleteRepository athleteRepository;
     private final ParticipantsStore store;
     private final ObjectMapper objectMapper;
 
-    public EpreuveAssignmentService(JpaEpreuveAthleteAssignmentRepository assignmentRepository,
+    public EpreuveAssignmentService(JpaEpreuveAthleteRepository assignmentRepository,
                                     JpaAthleteRepository athleteRepository,
                                     ParticipantsStore store,
                                     ObjectMapper objectMapper) {
@@ -50,9 +50,9 @@ public class EpreuveAssignmentService {
                 throw new IllegalArgumentException("athleteIds ne doit pas contenir de null");
             }
         }
-        List<EpreuveAthleteAssignment> existing = assignmentRepository.findByEpreuveId(epreuveId);
+        List<EpreuveAthlete> existing = assignmentRepository.findByEpreuveId(epreuveId);
         List<Long> existingIds = existing.stream()
-                .map(EpreuveAthleteAssignment::getAthleteId)
+                .map(EpreuveAthlete::getAthleteId)
                 .collect(Collectors.toList());
         List<Long> alreadyAssigned = ids.stream()
                 .filter(existingIds::contains)
@@ -66,9 +66,9 @@ public class EpreuveAssignmentService {
         if (!missingAthletes.isEmpty()) {
             throw new IllegalArgumentException("Athlete(s) introuvable(s): " + missingAthletes);
         }
-        List<EpreuveAthleteAssignment> toSave = new ArrayList<>();
+        List<EpreuveAthlete> toSave = new ArrayList<>();
         for (Long athleteId : ids) {
-            toSave.add(new EpreuveAthleteAssignment(epreuveId, athleteId));
+            toSave.add(new EpreuveAthlete(epreuveId, athleteId));
         }
         assignmentRepository.saveAll(toSave);
         store.addLog("COMMISSAIRE assign athletes epreuveId=" + epreuveId + " count=" + ids.size());
@@ -80,13 +80,13 @@ public class EpreuveAssignmentService {
             throw new IllegalArgumentException("epreuveId est obligatoire");
         }
         return assignmentRepository.findByEpreuveId(epreuveId).stream()
-                .map(EpreuveAthleteAssignment::getAthleteId)
+                .map(EpreuveAthlete::getAthleteId)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     public ForfaitResponse declarerForfait(Long epreuveId, Long athleteId, ForfaitRequest request) {
-        EpreuveAthleteAssignment assignment = assignmentRepository
+        EpreuveAthlete assignment = assignmentRepository
                 .findByAthleteIdAndEpreuveId(athleteId, epreuveId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Participation introuvable pour epreuveId=" + epreuveId + " et athleteId=" + athleteId));
@@ -122,14 +122,14 @@ public class EpreuveAssignmentService {
 
     public StatutParticipation getStatutParticipation(Long epreuveId, Long athleteId) {
         return assignmentRepository.findByAthleteIdAndEpreuveId(athleteId, epreuveId)
-                .map(EpreuveAthleteAssignment::getStatutParticipation)
+                .map(EpreuveAthlete::getStatutParticipation)
                 .orElse(StatutParticipation.INSCRIT);
     }
 
     public Map<Long, List<Long>> listAllAssignments() {
         Map<Long, List<Long>> result = new LinkedHashMap<>();
-        List<EpreuveAthleteAssignment> all = assignmentRepository.findAll();
-        for (EpreuveAthleteAssignment assignment : all) {
+        List<EpreuveAthlete> all = assignmentRepository.findAll();
+        for (EpreuveAthlete assignment : all) {
             Long epreuveId = assignment.getEpreuveId();
             result.computeIfAbsent(epreuveId, key -> new ArrayList<>())
                   .add(assignment.getAthleteId());

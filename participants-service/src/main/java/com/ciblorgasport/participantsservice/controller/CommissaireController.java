@@ -147,6 +147,7 @@ public class CommissaireController {
     @PostMapping("/athletes/{id}/validation")
     @PreAuthorize("hasRole('COMMISSAIRE')")
     public ResponseEntity<AthleteDto> postValidation(@PathVariable Long id, @RequestBody ValidationRequest request) {
+        // Suppression du contrôle lié au document justificatif de genre
         return ResponseEntity.ok(athleteMapper.toDto(athleteService.validate(id, request)));
     }
 

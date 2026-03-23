@@ -12,21 +12,13 @@ public class EpreuveValidator {
     public void validate(EpreuveDTO dto) {
         validateCommon(dto);
 
-        // strict rules (kept for update/full payload validation)
-        if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE) {
-            if (dto.getAthleteIds() == null || dto.getAthleteIds().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must have at least one athlete id");
-            }
-            if (dto.getEquipeIds() != null && !dto.getEquipeIds().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
-            }
-        } else { // COLLECTIVE or others
-            if (dto.getEquipeIds() == null || dto.getEquipeIds().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must have at least one equipe id");
-            }
-            if (dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
-            }
+        // Participants are managed via dedicated endpoints (/athletes, /equipes, /athletes/bulk).
+        // PUT only updates metadata — same relaxed rules as validateForCreate.
+        if (dto.getTypeEpreuve() == TypeEpreuve.INDIVIDUELLE && dto.getEquipeIds() != null && !dto.getEquipeIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
+        }
+        if (dto.getTypeEpreuve() == TypeEpreuve.COLLECTIVE && dto.getAthleteIds() != null && !dto.getAthleteIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
         }
     }
 

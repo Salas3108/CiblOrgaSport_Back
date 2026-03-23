@@ -1,8 +1,10 @@
 package com.ciblorgasport.eventservice.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
@@ -11,6 +13,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -53,11 +56,53 @@ public class EpreuveController {
     @Autowired
     private GenderEligibilityService genderEligibilityService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // ── Helpers : lecture/écriture dans epreuve_athletes ────────────
+
+    private Set<Long> fetchAthleteIds(Long epreuveId) {
+        return new HashSet<>(jdbcTemplate.queryForList(
+            "SELECT athlete_id FROM epreuve_athletes WHERE epreuve_id = ?",
+            Long.class, epreuveId));
+    }
+
+    private Map<Long, Set<Long>> fetchAthleteIdsBatch(List<Long> epreuveIds) {
+        Map<Long, Set<Long>> result = new HashMap<>();
+        if (epreuveIds == null || epreuveIds.isEmpty()) return result;
+        String placeholders = epreuveIds.stream().map(id -> "?").collect(Collectors.joining(","));
+        String sql = "SELECT epreuve_id, athlete_id FROM epreuve_athletes WHERE epreuve_id IN (" + placeholders + ")";
+        jdbcTemplate.query(sql, epreuveIds.toArray(), rs -> {
+            Long epId = rs.getLong("epreuve_id");
+            Long athId = rs.getLong("athlete_id");
+            result.computeIfAbsent(epId, k -> new HashSet<>()).add(athId);
+        });
+        return result;
+    }
+
+    private void insertAssignment(Long epreuveId, Long athleteId) {
+        jdbcTemplate.update(
+            "INSERT INTO epreuve_athletes (epreuve_id, athlete_id) " +
+            "VALUES (?, ?) ON CONFLICT (epreuve_id, athlete_id) DO NOTHING",
+            epreuveId, athleteId);
+    }
+
+    private EpreuveDTO toEnrichedDto(Epreuve e) {
+        EpreuveDTO dto = epreuveMapper.toDto(e);
+        dto.setAthleteIds(fetchAthleteIds(e.getId()));
+        return dto;
+    }
+
     @GetMapping
     public List<EpreuveDTO> getAllEpreuves() {
-        return epreuveRepository.findAll().stream()
-            .map(epreuveMapper::toDto)
-            .collect(Collectors.toList());
+        List<Epreuve> all = epreuveRepository.findAll();
+        List<Long> ids = all.stream().map(Epreuve::getId).collect(Collectors.toList());
+        Map<Long, Set<Long>> athleteMap = fetchAthleteIdsBatch(ids);
+        return all.stream().map(e -> {
+            EpreuveDTO dto = epreuveMapper.toDto(e);
+            dto.setAthleteIds(athleteMap.getOrDefault(e.getId(), new HashSet<>()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @PostMapping
@@ -74,14 +119,14 @@ public class EpreuveController {
         validateAthletesExist(epreuveDto.getAthleteIds());
         validateEquipesExist(epreuveDto.getEquipeIds());
         Epreuve saved = epreuveRepository.save(entity);
-        return new ResponseEntity<>(epreuveMapper.toDto(saved), HttpStatus.CREATED);
+        return new ResponseEntity<>(toEnrichedDto(saved), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EpreuveDTO> getEpreuveById(@PathVariable Long id) {
         Epreuve e = epreuveRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
-        return ResponseEntity.ok(epreuveMapper.toDto(e));
+        return ResponseEntity.ok(toEnrichedDto(e));
     }
 
     @PutMapping("/{id}")
@@ -100,7 +145,7 @@ public class EpreuveController {
         validateAthletesExist(epreuveDetails.getAthleteIds());
         validateEquipesExist(epreuveDetails.getEquipeIds());
         Epreuve updated = epreuveRepository.save(existing);
-        return ResponseEntity.ok(epreuveMapper.toDto(updated));
+        return ResponseEntity.ok(toEnrichedDto(updated));
     }
 
     private void validateLieuExists(Long lieuId) {
@@ -180,10 +225,8 @@ public class EpreuveController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COLLECTIVE epreuve must not have athleteIds");
         }
         genderEligibilityService.validateAthlete(athleteId, e.getGenreEpreuve());
-        if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
-        e.getAthleteIds().add(athleteId);
-        Epreuve saved = epreuveRepository.save(e);
-        return ResponseEntity.ok(epreuveMapper.toDto(saved));
+        insertAssignment(id, athleteId);
+        return ResponseEntity.ok(toEnrichedDto(e));
     }
 
     @PostMapping({"/{id}/equipe", "/{id}/equipes"})
@@ -221,7 +264,7 @@ public class EpreuveController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INDIVIDUELLE epreuve must not have equipeIds");
         }
 
-        if (e.getAthleteIds() != null && !e.getAthleteIds().isEmpty()) {
+        if (!fetchAthleteIds(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide either equipeIds or athleteIds, not both");
         }
 
@@ -232,7 +275,7 @@ public class EpreuveController {
         if (e.getEquipeIds() == null) e.setEquipeIds(new HashSet<>());
         e.getEquipeIds().addAll(equipeIds);
         Epreuve saved = epreuveRepository.save(e);
-        return ResponseEntity.ok(epreuveMapper.toDto(saved));
+        return ResponseEntity.ok(toEnrichedDto(saved));
     }
 
     @PostMapping("/{id}/athletes/bulk")
@@ -243,7 +286,7 @@ public class EpreuveController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'athleteIds' must be provided and non-empty");
         }
         // Normaliser en Long (Jackson désérialise les petits nombres en Integer)
-        List<Long> normalizedIds = new java.util.ArrayList<>();
+        List<Long> normalizedIds = new ArrayList<>();
         for (Object rawId : (List<?>) athleteIds) {
             if (rawId instanceof Number) normalizedIds.add(((Number) rawId).longValue());
         }
@@ -255,18 +298,17 @@ public class EpreuveController {
         }
         for (Long aId : normalizedIds) {
             genderEligibilityService.validateAthlete(aId, e.getGenreEpreuve());
+            insertAssignment(id, aId);
         }
-        if (e.getAthleteIds() == null) e.setAthleteIds(new HashSet<>());
-        e.getAthleteIds().addAll(normalizedIds);
-        Epreuve saved = epreuveRepository.save(e);
-        return ResponseEntity.ok(epreuveMapper.toDto(saved));
+        return ResponseEntity.ok(toEnrichedDto(e));
     }
 
     @GetMapping("/{id}/athletes")
     public ResponseEntity<Set<Long>> getAthletes(@PathVariable Long id) {
-        Epreuve e = epreuveRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
-        return ResponseEntity.ok(e.getAthleteIds() == null ? Collections.emptySet() : e.getAthleteIds());
+        if (!epreuveRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id);
+        }
+        return ResponseEntity.ok(fetchAthleteIds(id));
     }
 
     @GetMapping("/{id}/equipes")
@@ -278,9 +320,10 @@ public class EpreuveController {
 
     @GetMapping("/{id}/athletes/{athleteId}")
     public ResponseEntity<Map<String, Boolean>> isAthleteParticipating(@PathVariable Long id, @PathVariable Long athleteId) {
-        Epreuve e = epreuveRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id));
-        boolean participating = e.getAthleteIds() != null && e.getAthleteIds().contains(athleteId);
+        if (!epreuveRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Epreuve not found with id " + id);
+        }
+        boolean participating = fetchAthleteIds(id).contains(athleteId);
         return ResponseEntity.ok(Collections.singletonMap("participating", participating));
     }
 
@@ -289,9 +332,14 @@ public class EpreuveController {
         if (athleteId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing required athleteId");
         }
-        List<EpreuveDTO> epreuves = epreuveRepository.findByAthleteIdsContains(athleteId).stream()
-            .map(epreuveMapper::toDto)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(epreuves);
+        List<Epreuve> epreuves = epreuveRepository.findByAthleteId(athleteId);
+        List<Long> ids = epreuves.stream().map(Epreuve::getId).collect(Collectors.toList());
+        Map<Long, Set<Long>> athleteMap = fetchAthleteIdsBatch(ids);
+        List<EpreuveDTO> dtos = epreuves.stream().map(e -> {
+            EpreuveDTO dto = epreuveMapper.toDto(e);
+            dto.setAthleteIds(athleteMap.getOrDefault(e.getId(), new HashSet<>()));
+            return dto;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 }

@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import com.ciblorgasport.participantsservice.dto.ForfaitResponse;
 import com.ciblorgasport.participantsservice.dto.request.AssignAthletesRequest;
+import com.ciblorgasport.participantsservice.dto.request.ForfaitRequest;
 import com.ciblorgasport.participantsservice.model.StatutParticipation;
 import com.ciblorgasport.participantsservice.service.EpreuveAssignmentService;
 
@@ -48,5 +52,13 @@ public class EpreuveAssignmentController {
                                                                        @PathVariable Long athleteId) {
         StatutParticipation statut = assignmentService.getStatutParticipation(epreuveId, athleteId);
         return ResponseEntity.ok(Map.of("epreuveId", epreuveId, "athleteId", athleteId, "statut", statut.name()));
+    }
+
+    @PostMapping("/{epreuveId}/athletes/{athleteId}/forfait")
+    @PreAuthorize("hasRole('COMMISSAIRE') or hasRole('ADMIN')")
+    public ResponseEntity<ForfaitResponse> declarerForfait(@PathVariable Long epreuveId,
+                                                           @PathVariable Long athleteId,
+                                                           @RequestBody(required = false) ForfaitRequest request) {
+        return ResponseEntity.ok(assignmentService.declarerForfait(epreuveId, athleteId, request));
     }
 }

@@ -48,10 +48,9 @@ public class Epreuve {
     @Column(name = "equipe_id")
     private Set<Long> equipeIds = new HashSet<>();
 
-    // participants (IDs) -> permet d'ajouter des athlètes par leur id sans dépendre d'un entity Athlete
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "epreuve_athletes", joinColumns = @JoinColumn(name = "epreuve_id"))
-    @Column(name = "athlete_id")
+    // athleteIds are stored in epreuve_athlete_assignments (managed by participants-service).
+    // Event-service reads/writes via JdbcTemplate — not persisted by JPA here.
+    @Transient
     private Set<Long> athleteIds = new HashSet<>();
 
     // Getters et setters
