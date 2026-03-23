@@ -540,8 +540,8 @@
                                                         "script":  {
                                                                        "id":  "29c3244e-63e3-4bfa-8f2b-95ce000a2cbc",
                                                                        "exec":  [
-                                                                                    "pm.test(\"Status code is 201\", function () {",
-                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
                                                                                     "});",
                                                                                     "",
                                                                                     "pm.test(\"Response has incident ID\", function () {",
@@ -619,7 +619,7 @@
                                                                  ],
                                                       "body":  {
                                                                    "mode":  "raw",
-                                                                   "raw":  "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade principal - Piste 1\",\n  \"competitionId\": {{competition_id}}\n}"
+                                                                   "raw":  "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"lieuId\": {{lieu_id}},\n  \"competitionId\": {{competition_id}}\n}"
                                                                },
                                                       "url":  {
                                                                   "raw":  "{{incident_base}}/api/incidents",
@@ -644,8 +644,8 @@
                                                         "script":  {
                                                                        "id":  "29c3244e-63e3-4bfa-8f2b-95ce000a2cbc",
                                                                        "exec":  [
-                                                                                    "pm.test(\"Status code is 201\", function () {",
-                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "pm.test(\"Status code is 200\", function () {",
+                                                                                    "    pm.response.to.have.status(200);",
                                                                                     "});",
                                                                                     "",
                                                                                     "pm.test(\"Response has incident ID\", function () {",
@@ -723,7 +723,7 @@
                                                                  ],
                                                       "body":  {
                                                                    "mode":  "raw",
-                                                                   "raw":  "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade villejuif \"\n}"
+                                                                   "raw":  "{\n  \"description\": \"Test incident 4\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"lieuId\": {{lieu_id}},\n  \"competitionId\": {{competition_id}}\n}"
                                                                },
                                                       "url":  {
                                                                   "raw":  "{{incident_base}}/api/incidents",
@@ -754,7 +754,7 @@
                                                                                               ],
                                                                                    "body":  {
                                                                                                 "mode":  "raw",
-                                                                                                "raw":  "{\n  \"description\": \"Test incident 3\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"location\": \"Stade villejuif \"\n}"
+                                                                                                "raw":  "{\n  \"description\": \"Test incident 3\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"lieuId\": {{lieu_id}},\n  \"competitionId\": {{competition_id}}\n}"
                                                                                             },
                                                                                    "url":  {
                                                                                                "raw":  "{{incident_base}}/api/incidents",
@@ -875,7 +875,7 @@
                                                                  ],
                                                       "body":  {
                                                                    "mode":  "raw",
-                                                                   "raw":  "{\n  \"description\": \"Mis a jour\"\n}"
+                                                                   "raw":  "{\n  \"description\": \"Mis a jour\",\n  \"status\": \"ACTIF\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"lieuId\": {{lieu_id}},\n  \"reportedBy\": \"admin3\",\n  \"competitionId\": {{competition_id}}\n}"
                                                                },
                                                       "url":  {
                                                                   "raw":  "{{incident_base}}/api/incidents/2",

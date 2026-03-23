@@ -1,27 +1,30 @@
 package com.ciblorgasport.resultatsservice.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.ciblorgasport.resultatsservice.client.EventServiceClient;
+import com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
 import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
 import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
 import com.ciblorgasport.resultatsservice.dto.request.ResultatRequest;
+import com.ciblorgasport.resultatsservice.kafka.publisher.ResultatEventPublisher;
 import com.ciblorgasport.resultatsservice.model.Medaille;
 import com.ciblorgasport.resultatsservice.model.Resultat;
 import com.ciblorgasport.resultatsservice.model.ResultatStatut;
@@ -33,6 +36,9 @@ class ResultatServiceTest {
 
     private ResultatRepository resultatRepository;
     private ClassementService classementService;
+    private ResultatEventPublisher resultatEventPublisher;
+    private EventServiceClient eventServiceClient;
+    private ParticipantsServiceClient participantsServiceClient;
     private ResultatService resultatService;
     private Map<Long, Resultat> fakeStore;
 
@@ -41,7 +47,22 @@ class ResultatServiceTest {
         fakeStore = new HashMap<>();
         resultatRepository = mock(ResultatRepository.class);
         classementService = mock(ClassementService.class);
-        resultatService = new ResultatService(resultatRepository, classementService);
+        resultatEventPublisher = mock(ResultatEventPublisher.class);
+        eventServiceClient = mock(EventServiceClient.class);
+        participantsServiceClient = mock(ParticipantsServiceClient.class);
+        resultatService = new ResultatService(
+            resultatRepository, classementService,
+            resultatEventPublisher,
+            eventServiceClient,
+            participantsServiceClient
+        );
+
+        when(eventServiceClient.getEpreuveSummary(any(Long.class)))
+            .thenReturn(Optional.of(new EventServiceClient.EpreuveSummary("100m NL", 200L)));
+        when(participantsServiceClient.getAthleteDisplayName(any(Long.class)))
+            .thenReturn(Optional.of("Athlete Test"));
+        when(participantsServiceClient.getEquipeDisplayName(any(Long.class)))
+            .thenReturn(Optional.of("Equipe Test"));
 
         when(resultatRepository.save(any(Resultat.class))).thenAnswer(inv -> {
             Resultat r = inv.getArgument(0);
@@ -156,6 +177,7 @@ class ResultatServiceTest {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 resultatService.publishResultat(1L));
         assertEquals("resultat doit etre VALIDE avant publication", ex.getMessage());
+        verify(resultatEventPublisher, never()).publishResultatFinalized(any(), any());
     }
 
     @Test
@@ -163,11 +185,55 @@ class ResultatServiceTest {
         Resultat existing = new Resultat();
         existing.setId(1L);
         existing.setStatut(ResultatStatut.VALIDE);
+        existing.setEpreuveId(10L);
+        existing.setAthleteId(3L);
+        existing.setClassement(1);
         fakeStore.put(1L, existing);
+
+        when(resultatRepository.findByEpreuveIdAndPublishedTrue(org.mockito.ArgumentMatchers.eq(10L)))
+                .thenAnswer(inv -> fakeStore.values().stream()
+                        .filter(Resultat::isPublished)
+                .filter(r -> Long.valueOf(10L).equals(r.getEpreuveId()))
+                        .toList());
 
         Resultat published = resultatService.publishResultat(1L);
 
         assertEquals(true, published.isPublished());
+        verify(resultatEventPublisher).publishResultatFinalized(any(), org.mockito.ArgumentMatchers.eq("epreuve-10"));
+    }
+
+    @Test
+    void publishResultat_duel_mode_when_two_published_results() {
+        Resultat first = new Resultat();
+        first.setId(1L);
+        first.setEpreuveId(99L);
+        first.setStatut(ResultatStatut.VALIDE);
+        first.setPublished(true);
+        first.setClassement(1);
+        first.setEquipeId(7L);
+        first.setValeurPrincipale("15");
+
+        Resultat second = new Resultat();
+        second.setId(2L);
+        second.setEpreuveId(99L);
+        second.setStatut(ResultatStatut.VALIDE);
+        second.setPublished(false);
+        second.setClassement(2);
+        second.setEquipeId(8L);
+        second.setValeurPrincipale("13");
+
+        fakeStore.put(1L, first);
+        fakeStore.put(2L, second);
+
+        when(resultatRepository.findByEpreuveIdAndPublishedTrue(org.mockito.ArgumentMatchers.eq(99L)))
+                .thenAnswer(inv -> fakeStore.values().stream()
+                        .filter(Resultat::isPublished)
+                        .filter(r -> Long.valueOf(99L).equals(r.getEpreuveId()))
+                        .toList());
+
+        resultatService.publishResultat(2L);
+
+        verify(resultatEventPublisher).publishResultatFinalized(any(), org.mockito.ArgumentMatchers.eq("epreuve-99"));
     }
 
     // ── getClassementEpreuve ─────────────────────────────────────────────────

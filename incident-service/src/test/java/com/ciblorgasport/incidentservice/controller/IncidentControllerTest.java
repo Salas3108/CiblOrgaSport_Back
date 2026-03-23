@@ -1,6 +1,7 @@
 package com.ciblorgasport.incidentservice.controller;
 
 import com.ciblorgasport.incidentservice.model.*;
+import com.ciblorgasport.incidentservice.client.LieuServiceClient;
 import com.ciblorgasport.incidentservice.dto.IncidentDTO;
 import com.ciblorgasport.incidentservice.dto.IncidentMapper;
 import com.ciblorgasport.incidentservice.service.IncidentService;
@@ -9,7 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -28,6 +31,9 @@ class IncidentControllerTest {
 
     @Mock
     private IncidentMapper incidentMapper;
+
+    @Mock
+    private LieuServiceClient lieuServiceClient;
 
     @InjectMocks
     private IncidentController incidentController;
@@ -105,11 +111,14 @@ class IncidentControllerTest {
         // Arrange
         IncidentDTO incidentToCreateDto = new IncidentDTO();
         incidentToCreateDto.setDescription("New Incident");
+        incidentToCreateDto.setLieuId(10L);
 
         Incident incidentEntity = new Incident();
         incidentEntity.setDescription("New Incident");
+        incidentEntity.setLieuId(10L);
 
         Incident createdIncident = createTestIncident(1L, "New Incident");
+        when(lieuServiceClient.existsById(10L)).thenReturn(true);
         when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(incidentEntity);
         when(incidentService.create(any(Incident.class))).thenReturn(createdIncident);
         when(incidentMapper.toDto(createdIncident)).thenReturn(toDto(createdIncident));
@@ -127,11 +136,14 @@ class IncidentControllerTest {
         // Arrange
         IncidentDTO updateDto = new IncidentDTO();
         updateDto.setDescription("Updated");
+        updateDto.setLieuId(10L);
 
         Incident updateEntity = new Incident();
         updateEntity.setDescription("Updated");
+        updateEntity.setLieuId(10L);
 
         Incident updatedIncident = createTestIncident(1L, "Updated");
+        when(lieuServiceClient.existsById(10L)).thenReturn(true);
         when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(updateEntity);
         when(incidentService.update(eq(1L), any(Incident.class))).thenReturn(updatedIncident);
         when(incidentMapper.toDto(updatedIncident)).thenReturn(toDto(updatedIncident));
@@ -147,15 +159,49 @@ class IncidentControllerTest {
     @Test
     void update_WhenNotExists_ReturnsNotFound() {
         // Arrange
+        when(lieuServiceClient.existsById(10L)).thenReturn(true);
         when(incidentService.update(eq(1L), any(Incident.class)))
             .thenThrow(new IllegalArgumentException("Not found"));
 
         // Act
-        when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(new Incident());
-        ResponseEntity<IncidentDTO> response = incidentController.update(1L, new IncidentDTO());
+        IncidentDTO dto = new IncidentDTO();
+        dto.setLieuId(10L);
+        Incident incident = new Incident();
+        incident.setLieuId(10L);
+        when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(incident);
+        ResponseEntity<IncidentDTO> response = incidentController.update(1L, dto);
 
         // Assert
         assertEquals(404, response.getStatusCodeValue());
+    }
+
+    @Test
+    void create_WhenLieuIdMissing_ThrowsBadRequest() {
+        IncidentDTO dto = new IncidentDTO();
+        Incident incident = new Incident();
+        incident.setDescription("Incident without lieu");
+        when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(incident);
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> incidentController.create(dto));
+
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+    }
+
+    @Test
+    void create_WhenLieuServiceUnavailable_ThrowsBadGateway() {
+        IncidentDTO dto = new IncidentDTO();
+        dto.setLieuId(10L);
+
+        Incident incident = new Incident();
+        incident.setDescription("Incident");
+        incident.setLieuId(10L);
+
+        when(incidentMapper.toEntity(any(IncidentDTO.class))).thenReturn(incident);
+        when(lieuServiceClient.existsById(10L)).thenThrow(new IllegalStateException("timeout"));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> incidentController.create(dto));
+
+        assertEquals(HttpStatus.BAD_GATEWAY, ex.getStatusCode());
     }
 
     @Test
@@ -175,7 +221,7 @@ class IncidentControllerTest {
         incident.setStatus(IncidentStatus.ACTIF);
         incident.setType(IncidentType.TECHNIQUE);
         incident.setImpactLevel(ImpactLevel.MOYEN);
-        incident.setLocation("Location");
+        incident.setLieuId(10L);
         incident.setReportedBy("user123");
         incident.setReportedAt(LocalDateTime.now());
         return incident;
@@ -187,7 +233,7 @@ class IncidentControllerTest {
         dto.setDescription(incident.getDescription());
         dto.setImpactLevel(incident.getImpactLevel());
         dto.setType(incident.getType());
-        dto.setLocation(incident.getLocation());
+        dto.setLieuId(incident.getLieuId());
         dto.setStatus(incident.getStatus());
         dto.setReportedBy(incident.getReportedBy());
         dto.setReportedAt(incident.getReportedAt());

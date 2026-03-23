@@ -10,4 +10,7 @@ public final class KafkaTopics {
 
     public static final String EPREUVE_RAPPEL_TOPIC = "ciblorgasport.epreuve.rappel.v1";
     public static final String EPREUVE_RAPPEL_DLQ_TOPIC = "ciblorgasport.epreuve.rappel.v1.dlq";
+
+    public static final String RESULTAT_FINAL_TOPIC = "ciblorgasport.resultat.finalized.v1";
+    public static final String RESULTAT_FINAL_DLQ_TOPIC = "ciblorgasport.resultat.finalized.v1.dlq";
 }

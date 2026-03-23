@@ -3,7 +3,6 @@ package com.ciblorgasport.incidentservice.dto;
 import org.springframework.stereotype.Component;
 
 import com.ciblorgasport.incidentservice.model.Incident;
-import com.ciblorgasport.incidentservice.model.IncidentStatus;
 
 @Component
 public class IncidentMapper {
@@ -15,7 +14,7 @@ public class IncidentMapper {
         dto.setDescription(i.getDescription());
         dto.setImpactLevel(i.getImpactLevel());
         dto.setType(i.getType());
-        dto.setLocation(i.getLocation());
+        dto.setLieuId(i.getLieuId());
         dto.setCompetitionId(i.getCompetitionId());
         dto.setStatus(i.getStatus());
         dto.setReportedBy(i.getReportedBy());
@@ -32,7 +31,7 @@ public class IncidentMapper {
         i.setDescription(dto.getDescription());
         i.setImpactLevel(dto.getImpactLevel());
         i.setType(dto.getType());
-        i.setLocation(dto.getLocation());
+        i.setLieuId(dto.getLieuId());
         i.setCompetitionId(dto.getCompetitionId());
         i.setStatus(dto.getStatus());
         i.setReportedBy(dto.getReportedBy());

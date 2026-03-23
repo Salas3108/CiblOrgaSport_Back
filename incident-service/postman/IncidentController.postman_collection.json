@@ -31,7 +31,7 @@
   ],
   "item": [
     {
-      "name": "POST /api/incidents/{{id}} (auth)",
+      "name": "POST /api/incidents (auth)",
       "request": {
         "method": "POST",
         "header": [
@@ -40,9 +40,9 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Incident modifié\",\n  \"description\": \"Mise à jour via POST\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"status\": \"ACTIF\"\n}"
+          "raw": "{\n  \"description\": \"Création incident via POST\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"status\": \"ACTIF\",\n  \"lieuId\": {{lieu_id}},\n  \"competitionId\": {{competition_id}}\n}"
         },
-        "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
+        "url": { "raw": "{{incident_base}}/api/incidents" }
       },
       "event": [
         {
@@ -71,7 +71,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Incident modifié PUT\",\n  \"description\": \"Mise à jour via PUT\",\n  \"type\": \"ORGANISATION\",\n  \"impactLevel\": \"ELEVE\",\n  \"status\": \"ACTIF\"\n}"
+          "raw": "{\n  \"description\": \"Mise à jour via PUT\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"ELEVE\",\n  \"status\": \"ACTIF\",\n  \"lieuId\": {{lieu_id}},\n  \"reportedBy\": \"{{jwt_subject}}\",\n  \"competitionId\": {{competition_id}}\n}"
         },
         "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
       },
@@ -92,7 +92,7 @@
       ]
     },
     {
-      "name": "POST /api/incidents/{{id}} (no auth -> 401)",
+      "name": "POST /api/incidents (no auth -> 401)",
       "request": {
         "method": "POST",
         "header": [
@@ -102,7 +102,7 @@
           "mode": "raw",
           "raw": "{ \"title\": \"Attempt no auth\" }"
         },
-        "url": { "raw": "{{incident_base}}/api/incidents/{{id}}" }
+        "url": { "raw": "{{incident_base}}/api/incidents" }
       },
       "event": [
         {
@@ -121,14 +121,17 @@
       ]
     },
     {
-      "name": "POST /api/incidents/{{id_not_found}} (not found -> 404)",
+      "name": "PUT /api/incidents/{{id_not_found}} (not found -> 404)",
       "request": {
-        "method": "POST",
+        "method": "PUT",
         "header": [
           { "key": "Authorization", "value": "Bearer {{token}}" },
           { "key": "Content-Type", "value": "application/json" }
         ],
-        "body": { "mode": "raw", "raw": "{ \"title\": \"Should 404\" }" },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Should 404\",\n  \"type\": \"TECHNIQUE\",\n  \"impactLevel\": \"MOYEN\",\n  \"status\": \"ACTIF\",\n  \"lieuId\": {{lieu_id}},\n  \"reportedBy\": \"{{jwt_subject}}\",\n  \"competitionId\": {{competition_id}}\n}"
+        },
         "url": { "raw": "{{incident_base}}/api/incidents/{{id_not_found}}" }
       },
       "event": [

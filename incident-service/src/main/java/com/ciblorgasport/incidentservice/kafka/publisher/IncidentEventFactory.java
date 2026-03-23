@@ -24,7 +24,7 @@ public final class IncidentEventFactory {
         event.setStatus(incident.getStatus() != null ? incident.getStatus().name() : null);
 
         event.setDescription(incident.getDescription());
-        event.setLocation(incident.getLocation());
+        event.setLieuId(incident.getLieuId());
         event.setReportedBy(incident.getReportedBy());
         event.setCompetitionId(incident.getCompetitionId());
 
@@ -35,8 +35,8 @@ public final class IncidentEventFactory {
         if (incident.getCompetitionId() != null) {
             return "competition-" + incident.getCompetitionId();
         }
-        if (incident.getLocation() != null && !incident.getLocation().isBlank()) {
-            return "location-" + incident.getLocation();
+        if (incident.getLieuId() != null) {
+            return "lieu-" + incident.getLieuId();
         }
         return "incident-" + incident.getId();
     }

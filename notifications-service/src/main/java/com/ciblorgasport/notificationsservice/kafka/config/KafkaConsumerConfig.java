@@ -2,6 +2,7 @@ package com.ciblorgasport.notificationsservice.kafka.config;
 
 import com.ciblorgasport.notificationsservice.kafka.event.EpreuveRappelEventV1;
 import com.ciblorgasport.notificationsservice.kafka.event.IncidentCreatedEventV1;
+import com.ciblorgasport.notificationsservice.kafka.event.ResultatFinalizedEventV1;
 import com.ciblorgasport.notificationsservice.kafka.topic.KafkaTopics;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -83,6 +84,33 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
+    public ConsumerFactory<String, ResultatFinalizedEventV1> resultatFinalConsumerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, ResultatFinalizedEventV1.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ciblorgasport.notificationsservice.kafka.event");
+
+        JsonDeserializer<ResultatFinalizedEventV1> valueDeserializer = new JsonDeserializer<>();
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ResultatFinalizedEventV1> resultatFinalKafkaListenerContainerFactory(
+            ConsumerFactory<String, ResultatFinalizedEventV1> resultatFinalConsumerFactory,
+            DefaultErrorHandler resultatFinalErrorHandler,
+            KafkaProperties kafkaProperties) {
+        ConcurrentKafkaListenerContainerFactory<String, ResultatFinalizedEventV1> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(resultatFinalConsumerFactory);
+        factory.setCommonErrorHandler(resultatFinalErrorHandler);
+        Integer concurrency = kafkaProperties.getListener().getConcurrency();
+        if (concurrency != null) {
+            factory.setConcurrency(concurrency);
+        }
+        return factory;
+    }
+
+    @Bean
     public DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<Object, Object> kafkaTemplate) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
                 kafkaTemplate,
@@ -117,6 +145,29 @@ public class KafkaConsumerConfig {
         errorHandler.setRetryListeners((record, ex, deliveryAttempt) -> {
             if (record != null) {
                 LOG.warn("Kafka consume failed (attempt {}), topic={}, partition={}, offset={}, key={}, reason={}",
+                        deliveryAttempt,
+                        record.topic(),
+                        record.partition(),
+                        record.offset(),
+                        record.key(),
+                        ex != null ? ex.getMessage() : null);
+            }
+        });
+        return errorHandler;
+    }
+
+    @Bean
+    public DefaultErrorHandler resultatFinalErrorHandler(KafkaTemplate<Object, Object> kafkaTemplate) {
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
+                kafkaTemplate,
+                (record, ex) -> new TopicPartition(KafkaTopics.RESULTAT_FINAL_DLQ_TOPIC, record.partition()));
+
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 3L));
+        errorHandler.addNotRetryableExceptions(DeserializationException.class);
+        errorHandler.addNotRetryableExceptions(org.apache.kafka.common.errors.SerializationException.class);
+        errorHandler.setRetryListeners((record, ex, deliveryAttempt) -> {
+            if (record != null) {
+                LOG.warn("Kafka consume failed (attempt {}), topic={}, partition={}, offset={}, key={}, reason= {}",
                         deliveryAttempt,
                         record.topic(),
                         record.partition(),

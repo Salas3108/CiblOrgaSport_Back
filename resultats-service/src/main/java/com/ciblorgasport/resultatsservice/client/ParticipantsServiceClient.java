@@ -1,8 +1,10 @@
 package com.ciblorgasport.resultatsservice.client;
 
-import com.ciblorgasport.resultatsservice.client.dto.AthleteInfoDto;
-import com.ciblorgasport.resultatsservice.client.dto.EquipeInfoDto;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Map;
+import com.ciblorgasport.resultatsservice.client.dto.AthleteInfoDto;
+import com.ciblorgasport.resultatsservice.client.dto.EquipeInfoDto;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Client RestTemplate vers le participants-service.
@@ -21,6 +26,8 @@ import java.util.Map;
  */
 @Component
 public class ParticipantsServiceClient {
+
+    private static final Logger log = LoggerFactory.getLogger(ParticipantsServiceClient.class);
 
     @Value("${participants-service.url:http://localhost:8087}")
     private String participantsServiceUrl;
@@ -81,6 +88,59 @@ public class ParticipantsServiceClient {
             return dto;
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public Optional<String> getAthleteDisplayName(Long athleteId) {
+        if (athleteId == null) {
+            return Optional.empty();
+        }
+
+        String url = participantsServiceUrl + "/api/commissaire/athletes/" + athleteId + "/info";
+        return executeNameLookup(url, true);
+    }
+
+    public Optional<String> getEquipeDisplayName(Long equipeId) {
+        if (equipeId == null) {
+            return Optional.empty();
+        }
+
+        String url = participantsServiceUrl + "/api/commissaire/equipes/" + equipeId;
+        return executeNameLookup(url, false);
+    }
+
+    private Optional<String> executeNameLookup(String url, boolean athlete) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Void> entity = new HttpEntity<>(buildAuthHeaders());
+
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                return Optional.empty();
+            }
+
+            Map<?, ?> body = response.getBody();
+            if (!athlete) {
+                Object nomObj = body.get("nom");
+                if (nomObj != null) {
+                    return Optional.of(String.valueOf(nomObj));
+                }
+                return Optional.empty();
+            }
+
+            Object prenomObj = body.get("prenom");
+            Object nomObj = body.get("nom");
+            String prenom = prenomObj != null ? String.valueOf(prenomObj).trim() : "";
+            String nom = nomObj != null ? String.valueOf(nomObj).trim() : "";
+            String full = (prenom + " " + nom).trim();
+            if (full.isBlank()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(full);
+        } catch (Exception ex) {
+            log.debug("Unable to resolve participant label from {}: {}", url, ex.getMessage());
+            return Optional.empty();
         }
     }
 

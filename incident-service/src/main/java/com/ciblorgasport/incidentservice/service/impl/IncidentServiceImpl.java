@@ -58,7 +58,7 @@ public class IncidentServiceImpl implements IncidentService {
             existing.setDescription(incident.getDescription());
             existing.setImpactLevel(incident.getImpactLevel());
             existing.setType(incident.getType());
-            existing.setLocation(incident.getLocation());
+            existing.setLieuId(incident.getLieuId());
             existing.setStatus(incident.getStatus());
             existing.setReportedBy(incident.getReportedBy());
 
