@@ -83,7 +83,7 @@ public class EpreuveController {
     private void insertAssignment(Long epreuveId, Long athleteId) {
         jdbcTemplate.update(
             "INSERT INTO epreuve_athletes (epreuve_id, athlete_id) " +
-            "VALUES (?, ?) ON CONFLICT (epreuve_id, athlete_id) DO NOTHING",
+            "VALUES (?, ?) ON CONFLICT DO NOTHING",
             epreuveId, athleteId);
     }
 

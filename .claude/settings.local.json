@@ -39,7 +39,17 @@
       "Bash(__NEW_LINE_378f27d9b52e7ffe__ echo:*)",
       "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes/valides -H \"Authorization: Bearer $TOKEN\")",
       "Bash(echo \"=== GET /commissaire/athletes \\(COMMISSAIRE token manquant -> 403 attendu\\) ===\")",
-      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)"
+      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find /Users/salimtitouche/Glop/CiblOrgaSport_Back -name *.postman* -o -name *postman*.json)",
+      "Bash(grep -l \"athletes\" /Users/salimtitouche/Glop/CiblOrgaSport_Back/postman/postman/collections/*.json)",
+      "Bash(find /Users/salimtitouche/Glop/CiblOrgaSport_Back/event-service -name *Epreuve*Controller.java -o -name *epreuve*controller*.java)",
+      "Bash(docker ps:*)",
+      "Bash(curl -s http://localhost:8087/commissaire/epreuves/1/athletes -X POST -H \"Content-Type: application/json\" -d '{\"\"\"\"athleteIds\"\"\"\": [4]}')",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwidXNlcklkIjoxLCJpYXQiOjE3NzQyNjEyMTgsImV4cCI6MTc3NDM0NzYxOH0.Fp2N-p1nlLsCbjOj9PNrRqbs5lz51gANZyNmIq8fYFI\")",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS:%{http_code}\" http://localhost:8080/commissaire/epreuves/1/athletes -X POST -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"\"athleteIds\"\": [5]}')",
+      "Bash(find /Users/salimtitouche/Glop/CiblOrgaSport_Back -name *.yml -o -name docker-compose* -o -name k8s*)"
     ]
   }
 }
