@@ -1,14 +1,29 @@
 package com.ciblorgasport.resultatsservice.client;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+
+
 
 @Component
 public class EventServiceClient {
@@ -50,53 +65,9 @@ public class EventServiceClient {
         }
     }
 
-    public static class EpreuveSummary {
-        private final String nom;
-        private final Long competitionId;
-
-        public EpreuveSummary(String nom, Long competitionId) {
-            this.nom = nom;
-            this.competitionId = competitionId;
-        }
-
-        public String getNom() {
-            return nom;
-        }
-
-        public Long getCompetitionId() {
-            return competitionId;
-        }
-    }
-}
-package com.ciblorgasport.resultatsservice.client;
-
-import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.*;
-
-/**
- * Client RestTemplate vers l'event-service.
- * Retourne null en cas d'erreur (dégradation gracieuse).
- */
-@Component
-public class EventServiceClient {
-
-    @Value("${event-service.url:http://localhost:8084}")
-    private String eventServiceUrl;
-
     /**
-     * Récupère le contexte complet d'une épreuve (discipline incluse).
-     * Appelle GET /epreuves/{id} puis GET /competitions/{competitionId} si nécessaire.
+     * Recupere le contexte complet d'une epreuve (discipline incluse).
+     * Appelle GET /epreuves/{id} puis GET /competitions/{competitionId} si necessaire.
      */
     public EpreuveContextDto getEpreuveContext(Long epreuveId) {
         try {
@@ -120,7 +91,6 @@ public class EventServiceClient {
             ctx.setAthleteIds(toLongSet(body.get("athleteIds")));
             ctx.setEquipeIds(toLongSet(body.get("equipeIds")));
 
-            // Récupérer la discipline depuis la competition
             String discipline = extractDiscipline(body, restTemplate, entity);
             ctx.setDiscipline(discipline);
 
@@ -134,16 +104,18 @@ public class EventServiceClient {
     private String extractDiscipline(Map<String, Object> epreuveBody,
                                      RestTemplate restTemplate,
                                      HttpEntity<Void> entity) {
-        // Cas 1 : competition est sérialisée en objet inline
         Object competitionObj = epreuveBody.get("competition");
         if (competitionObj instanceof Map<?, ?> compMap) {
             Object disc = ((Map<String, Object>) compMap).get("discipline");
-            if (disc != null) return disc.toString();
+            if (disc != null) {
+                return disc.toString();
+            }
         }
 
-        // Cas 2 : seul competitionId est disponible → second appel
         Long competitionId = toLong(epreuveBody.get("competitionId"));
-        if (competitionId == null) return null;
+        if (competitionId == null) {
+            return null;
+        }
 
         try {
             ResponseEntity<Map> compResponse = restTemplate.exchange(
@@ -154,8 +126,9 @@ public class EventServiceClient {
                 return disc != null ? disc.toString() : null;
             }
         } catch (Exception ignored) {
-            // discipline non disponible, ClassementService logguera l'erreur
+            log.warn("Unable to fetch discipline for competitionId={}", competitionId);
         }
+
         return null;
     }
 
@@ -177,21 +150,48 @@ public class EventServiceClient {
     }
 
     private Long toLong(Object value) {
-        if (value instanceof Number n) return n.longValue();
+        if (value instanceof Number n) {
+            return n.longValue();
+        }
         if (value instanceof String s) {
-            try { return Long.parseLong(s); } catch (NumberFormatException ignored) {}
+            try {
+                return Long.parseLong(s);
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
         }
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private Set<Long> toLongSet(Object value) {
         Set<Long> result = new HashSet<>();
-        if (!(value instanceof Collection<?> col)) return result;
+        if (!(value instanceof Collection<?> col)) {
+            return result;
+        }
         for (Object item : col) {
             Long id = toLong(item);
-            if (id != null) result.add(id);
+            if (id != null) {
+                result.add(id);
+            }
         }
         return result;
+    }
+
+    public static class EpreuveSummary {
+        private final String nom;
+        private final Long competitionId;
+
+        public EpreuveSummary(String nom, Long competitionId) {
+            this.nom = nom;
+            this.competitionId = competitionId;
+        }
+
+        public String getNom() {
+            return nom;
+        }
+
+        public Long getCompetitionId() {
+            return competitionId;
+        }
     }
 }

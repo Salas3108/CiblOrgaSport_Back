@@ -1,8 +1,16 @@
 package com.ciblorgasport.resultatsservice.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -10,21 +18,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
+import com.ciblorgasport.resultatsservice.client.EventServiceClient;
+import com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.resultatsservice.client.dto.EpreuveContextDto;
 import com.ciblorgasport.resultatsservice.dto.request.BulkResultatRequest;
 import com.ciblorgasport.resultatsservice.dto.request.PerformanceEntryDto;
 import com.ciblorgasport.resultatsservice.dto.request.ResultatRequest;
-import com.ciblorgasport.resultatsservice.client.EventServiceClient;
-import com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient;
 import com.ciblorgasport.resultatsservice.kafka.publisher.ResultatEventPublisher;
 import com.ciblorgasport.resultatsservice.model.Medaille;
 import com.ciblorgasport.resultatsservice.model.Resultat;
@@ -191,7 +190,7 @@ class ResultatServiceTest {
         existing.setClassement(1);
         fakeStore.put(1L, existing);
 
-        when(resultatRepository.findByEpreuveIdAndPublishedTrue(eq(10L)))
+        when(resultatRepository.findByEpreuveIdAndPublishedTrue(org.mockito.ArgumentMatchers.eq(10L)))
                 .thenAnswer(inv -> fakeStore.values().stream()
                         .filter(Resultat::isPublished)
                 .filter(r -> Long.valueOf(10L).equals(r.getEpreuveId()))
@@ -200,7 +199,7 @@ class ResultatServiceTest {
         Resultat published = resultatService.publishResultat(1L);
 
         assertEquals(true, published.isPublished());
-        verify(resultatEventPublisher).publishResultatFinalized(any(), eq("epreuve-10"));
+        verify(resultatEventPublisher).publishResultatFinalized(any(), org.mockito.ArgumentMatchers.eq("epreuve-10"));
     }
 
     @Test
@@ -226,7 +225,7 @@ class ResultatServiceTest {
         fakeStore.put(1L, first);
         fakeStore.put(2L, second);
 
-        when(resultatRepository.findByEpreuveIdAndPublishedTrue(eq(99L)))
+        when(resultatRepository.findByEpreuveIdAndPublishedTrue(org.mockito.ArgumentMatchers.eq(99L)))
                 .thenAnswer(inv -> fakeStore.values().stream()
                         .filter(Resultat::isPublished)
                         .filter(r -> Long.valueOf(99L).equals(r.getEpreuveId()))
@@ -234,7 +233,7 @@ class ResultatServiceTest {
 
         resultatService.publishResultat(2L);
 
-        verify(resultatEventPublisher).publishResultatFinalized(any(), eq("epreuve-99"));
+        verify(resultatEventPublisher).publishResultatFinalized(any(), org.mockito.ArgumentMatchers.eq("epreuve-99"));
     }
 
     // ── getClassementEpreuve ─────────────────────────────────────────────────
