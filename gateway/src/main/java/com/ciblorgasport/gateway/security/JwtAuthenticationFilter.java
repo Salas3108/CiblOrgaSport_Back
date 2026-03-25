@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter implements WebFilter {
         System.out.println("🌐 Gateway Filter - Path: " + path);
         
         // Laisser passer les routes publiques sans vérification JWT
-        if (path.startsWith("/auth/")) {
+        if (path.startsWith("/auth/") || path.startsWith("/actuator")) {
             System.out.println("✅ Public path - allowing without JWT");
             return chain.filter(exchange);
         }

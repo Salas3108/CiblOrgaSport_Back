@@ -18,6 +18,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
             .authorizeExchange(exchanges -> exchanges
                 .anyExchange().permitAll()  // Désactiver Spring Security, JwtAuthenticationFilter gère tout
             );
