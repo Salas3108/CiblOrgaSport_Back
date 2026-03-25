@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/analytics/events/track").permitAll()
                         // Tout le reste réservé aux ADMIN
                         .requestMatchers("/api/analytics/**").hasRole("ADMIN")
+                        // monitoring endpoints for Prometheus scraping
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
