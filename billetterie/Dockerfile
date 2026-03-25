@@ -19,7 +19,7 @@ ENV DB_HOST=postgres \
     DB_PASSWORD=password
 
 # Ensure curl is available for healthcheck and wait-for script (Debian/Alpine differ; adapt if needed)
-RUN apt-get update && apt-get install -y curl netcat && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Copy wait-for script
 COPY wait-for.sh /usr/local/bin/wait-for.sh

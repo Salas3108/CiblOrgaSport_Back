@@ -13,7 +13,8 @@ check() {
   local url="$2"
   local http_code
   http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null)
-  if [ "$http_code" = "200" ]; then
+  # 200 = OK, 401/403 = service UP but secured by JWT (expected in prod)
+  if [ "$http_code" = "200" ] || [ "$http_code" = "401" ] || [ "$http_code" = "403" ]; then
     echo "  OK     [$http_code] $name"
     PASS=$((PASS + 1))
   else

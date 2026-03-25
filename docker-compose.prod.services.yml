@@ -1,11 +1,31 @@
 # docker-compose.prod.services.yml — à déployer sur vm-services
 # Usage: docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d
 #
-# Pré-requis : vm-database doit être up et accessible via ${DB_HOST} (IP privée vRack)
+# PostgreSQL tourne sur le même hôte dans le réseau Docker prod-net.
+# DB_HOST doit valoir "postgres" (nom du service Docker) dans .env.prod.
 
 services:
 
   # ─── Infrastructure ───────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - prod-net
 
   kafka:
     image: confluentinc/cp-kafka:7.7.0
@@ -42,7 +62,7 @@ services:
     container_name: gateway
     restart: always
     ports:
-      - "8080:8080"  # Exposé pour Nginx sur vm-gateway (vRack)
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
@@ -50,6 +70,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
       JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - prod-net
 
@@ -289,3 +312,5 @@ networks:
 volumes:
   kafka_data:
     name: ciblorgasport_kafka_data
+  postgres_data:
+    name: ciblorgasport_postgres_data
