@@ -45,3 +45,6 @@ claude/
 
 # Postman import artifacts
 #postman/postman/
+
+# Eco-benchmark logs
+eco-benchmark/
