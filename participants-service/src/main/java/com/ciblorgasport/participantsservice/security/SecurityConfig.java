@@ -43,6 +43,8 @@ public class SecurityConfig {
             	    .requestMatchers("/commissaire/epreuves/**", "/api/commissaire/epreuves/**").permitAll()
             	    .requestMatchers("/epreuves/**").permitAll()
             	    .requestMatchers("/error").permitAll()
+            	    // monitoring endpoints for Prometheus scraping
+                    .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
             	    .anyRequest().authenticated()
             	)
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
