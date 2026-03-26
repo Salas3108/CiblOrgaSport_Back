@@ -23,6 +23,8 @@ public class VolunteerTaskDTO {
     
     private LocalTime endTime;
     
+    private Long locationId;
+    // Pour compatibilité front : nom du lieu
     private String location;
     
     private TaskType taskType;
@@ -42,6 +44,7 @@ public class VolunteerTaskDTO {
             @JsonProperty("taskDate") LocalDate taskDate,
             @JsonProperty("startTime") LocalTime startTime,
             @JsonProperty("endTime") LocalTime endTime,
+            @JsonProperty("locationId") Long locationId,
             @JsonProperty("location") String location,
             @JsonProperty("taskType") TaskType taskType,
             @JsonProperty("requiredLanguages") Set<String> requiredLanguages) {
@@ -50,6 +53,7 @@ public class VolunteerTaskDTO {
         this.taskDate = taskDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.locationId = locationId;
         this.location = location;
         this.taskType = taskType;
         this.requiredLanguages = requiredLanguages;
@@ -57,7 +61,7 @@ public class VolunteerTaskDTO {
 
     // Constructeur complet pour la réponse
     public VolunteerTaskDTO(UUID id, String title, String description, LocalDate taskDate,
-                           LocalTime startTime, LocalTime endTime, String location,
+                           LocalTime startTime, LocalTime endTime, Long locationId, String location,
                            TaskType taskType, Set<UUID> assignedVolunteerIds, 
                            Set<String> requiredLanguages, boolean assigned) {
         this.id = id;
@@ -66,6 +70,7 @@ public class VolunteerTaskDTO {
         this.taskDate = taskDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.locationId = locationId;
         this.location = location;
         this.taskType = taskType;
         this.assignedVolunteerIds = assignedVolunteerIds;
@@ -80,6 +85,7 @@ public class VolunteerTaskDTO {
     public LocalDate getTaskDate() { return taskDate; }
     public LocalTime getStartTime() { return startTime; }
     public LocalTime getEndTime() { return endTime; }
+    public Long getLocationId() { return locationId; }
     public String getLocation() { return location; }
     public TaskType getTaskType() { return taskType; }
     public Set<UUID> getAssignedVolunteerIds() { return assignedVolunteerIds; }
@@ -93,6 +99,7 @@ public class VolunteerTaskDTO {
     public void setTaskDate(LocalDate taskDate) { this.taskDate = taskDate; }
     public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    public void setLocationId(Long locationId) { this.locationId = locationId; }
     public void setLocation(String location) { this.location = location; }
     public void setTaskType(TaskType taskType) { this.taskType = taskType; }
     public void setAssignedVolunteerIds(Set<UUID> assignedVolunteerIds) { 

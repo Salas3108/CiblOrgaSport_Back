@@ -2,6 +2,7 @@ package com.ciblorgasport.volunteerservice.controller;
 
 
 import com.ciblorgasport.volunteerservice.dto.VolunteerProfileDTO;
+// import com.ciblorgasport.volunteerservice.dto.VolunteerTaskDTO;
 import com.ciblorgasport.volunteerservice.entity.VolunteerTask;
 import com.ciblorgasport.volunteerservice.service.VolunteerProgramService;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class VolunteerController {
         VolunteerProfileDTO profile = service.getVolunteerProfileDTO(authUserId);
         return ResponseEntity.ok(profile);
     }
+
 
     @GetMapping("/schedule/today")
     public ResponseEntity<List<VolunteerTask>> getTodaySchedule(

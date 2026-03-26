@@ -1,4 +1,6 @@
 package com.ciblorgasport.volunteerservice.service;
+// import com.ciblorgasport.volunteerservice.client.LieuClient;
+
 
 import com.ciblorgasport.volunteerservice.dto.*;
 import com.ciblorgasport.volunteerservice.entity.*;
@@ -27,10 +29,11 @@ import java.util.stream.Collectors;
 public class VolunteerProgramService {
     private static final Logger logger = LoggerFactory.getLogger(VolunteerProgramService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
-
+    // LieuClient removed
     private final VolunteerRepository volunteerRepository;
     private final VolunteerTaskRepository taskRepository;
     private final RestTemplate restTemplate;
+
 
     @Value("${auth-service.base-url:http://localhost:8081}")
     private String authServiceBaseUrl;
@@ -43,6 +46,8 @@ public class VolunteerProgramService {
         this.taskRepository = taskRepository;
         this.restTemplate = restTemplate;
     }
+    // Conversion VolunteerTask -> DTO enrichi avec nom du lieu
+    // toDto method removed
 
     // ========== GESTION DES VOLONTAIRES ==========
     
@@ -196,7 +201,7 @@ public class VolunteerProgramService {
         task.setTaskDate(dto.getTaskDate());
         task.setStartTime(dto.getStartTime());
         task.setEndTime(dto.getEndTime());
-        task.setLocation(dto.getLocation());
+        task.setLocationId(dto.getLocationId());
         task.setTaskType(dto.getTaskType());
 
         // ✅ Un seul volontaire assigné possible (on prend le premier du Set)
