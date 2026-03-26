@@ -29,7 +29,7 @@ public class VolunteerTask {
     private LocalTime endTime;
     
     @Column(nullable = false)
-    private String location;
+    private Long locationId;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,14 +43,14 @@ public class VolunteerTask {
     public VolunteerTask() {}
 
     public VolunteerTask(String title, String description, LocalDate taskDate, 
-                        LocalTime startTime, LocalTime endTime, String location, 
+                        LocalTime startTime, LocalTime endTime, Long locationId, 
                         TaskType taskType) {
         this.title = title;
         this.description = description;
         this.taskDate = taskDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.location = location;
+        this.locationId = locationId;
         this.taskType = taskType;
     }
 
@@ -73,8 +73,8 @@ public class VolunteerTask {
     public LocalTime getEndTime() { return endTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
     
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public Long getLocationId() { return locationId; }
+    public void setLocationId(Long locationId) { this.locationId = locationId; }
     
     public TaskType getTaskType() { return taskType; }
     public void setTaskType(TaskType taskType) { this.taskType = taskType; }

@@ -301,9 +301,15 @@ class VolunteerProgramServiceTest {
         task.setTaskDate(date);
         task.setStartTime(start);
         task.setEndTime(end);
-        task.setLocation("Stade");
+        task.setLocationId(3L); // Test avec un id de lieu fictif
         task.setTaskType(taskType);
         return task;
+    }
+
+    @Test
+    void createVolunteerTask_setsLocationIdCorrectly() {
+        VolunteerTask task = buildTask(UUID.randomUUID(), LocalDate.of(2026, 4, 1), LocalTime.of(8, 0), LocalTime.of(12, 0), TaskType.ACCUEIL);
+        assertEquals(3L, task.getLocationId());
     }
 
     private String availabilityJson(String dayOfWeek, String startTime, String endTime) {
