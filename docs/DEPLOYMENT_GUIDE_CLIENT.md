@@ -1,346 +1,311 @@
-# Guide de déploiement complet — CiblOrgaSport
+# Guide de déploiement — CiblOrgaSport Backend
 
-## Pour le client / administrateur système
+## Retour d'expérience : comment nous avons déployé le backend en production
 
-Ce guide vous accompagne pas à pas pour déployer l'application CiblOrgaSport en production, depuis la création des comptes jusqu'à la vérification finale. Aucune connaissance préalable de Docker n'est requise pour suivre ce guide.
+Ce document décrit **exactement** ce que nous avons fait pour déployer l'application,
+dans l'ordre chronologique, avec les problèmes rencontrés et les solutions appliquées.
+Il sert de référence pour reproduire ou mettre à jour le déploiement.
+
+**URL de production finale :** [http://137.74.133.131](http://137.74.133.131)
+**VM de production :** OVH Public Cloud, Gravelines (GRA11), Ubuntu 25.04, 16 Go RAM
 
 ---
 
 ## Table des matières
 
-1. [Vue d'ensemble de l'architecture](#1-vue-densemble-de-larchitecture)
-2. [Pré-requis et comptes à créer](#2-pré-requis-et-comptes-à-créer)
-3. [Provisionner la VM OVH](#3-provisionner-la-vm-ovh)
-4. [Configurer l'accès SSH](#4-configurer-laccès-ssh)
-5. [Installer Docker sur la VM](#5-installer-docker-sur-la-vm)
-6. [Configurer les secrets de production](#6-configurer-les-secrets-de-production)
-7. [Builder et publier les images Docker](#7-builder-et-publier-les-images-docker)
-8. [Déployer l'application](#8-déployer-lapplication)
-9. [Configurer Nginx (reverse proxy)](#9-configurer-nginx-reverse-proxy)
-10. [Vérifier que tout fonctionne](#10-vérifier-que-tout-fonctionne)
-11. [Activer HTTPS avec un nom de domaine](#11-activer-https-avec-un-nom-de-domaine)
-12. [Maintenance et opérations courantes](#12-maintenance-et-opérations-courantes)
-13. [Résolution de problèmes](#13-résolution-de-problèmes)
+1. [Infrastructure OVH provisionnée](#1-infrastructure-ovh-provisionnée)
+2. [Création du compte Docker Hub](#2-création-du-compte-docker-hub)
+3. [Préparation du code : branche et Dockerfiles](#3-préparation-du-code--branche-et-dockerfiles)
+4. [Fichier de secrets .env.prod](#4-fichier-de-secrets-envprod)
+5. [Build et push des images Docker](#5-build-et-push-des-images-docker)
+6. [Installation de Docker sur la VM](#6-installation-de-docker-sur-la-vm)
+7. [Déploiement de la stack complète](#7-déploiement-de-la-stack-complète)
+8. [Configuration de Nginx](#8-configuration-de-nginx)
+9. [Vérification finale](#9-vérification-finale)
+10. [Problèmes rencontrés et solutions](#10-problèmes-rencontrés-et-solutions)
+11. [Mise à jour du déploiement](#11-mise-à-jour-du-déploiement)
 
 ---
 
-## 1. Vue d'ensemble de l'architecture
+## 1. Infrastructure OVH provisionnée
 
-L'application CiblOrgaSport est composée de **15 conteneurs Docker** qui tournent sur **une seule VM** :
+Nous avons démarré avec 3 VMs OVH Public Cloud prévues pour une architecture 3 tiers.
+Après plusieurs problèmes réseau entre régions OVH (voir section 10), nous avons simplifié
+à **une seule VM** qui fait tout tourner.
 
-```
-Internet
-    |
-    | Port 80 (HTTP) ou 443 (HTTPS)
-    |
-+---+----------------------------+
-|         VM OVH (Ubuntu)        |
-|                                |
-|  [Nginx]                       |  ← Point d'entrée unique
-|     |                          |
-|  [Spring Cloud Gateway :8080]  |  ← Routeur
-|     |                          |
-|  [13 microservices Spring Boot] |  ← Logique métier
-|  [PostgreSQL :5432]            |  ← Base de données
-|  [Kafka :9092]                 |  ← Messagerie interne
-+--------------------------------+
-```
+### VM de production active
 
-Les utilisateurs n'accèdent qu'au port 80 (ou 443 si HTTPS). Tous les autres ports sont internes à la VM et invisibles depuis Internet.
+| Paramètre | Valeur |
+| --------- | ------ |
+| IP publique | `137.74.133.131` |
+| OS | Ubuntu 25.04 LTS |
+| Région OVH | Gravelines (GRA11) |
+| RAM | 16 Go |
+| vCPU | 4 |
+| Utilisateur SSH | `ubuntu` |
 
----
+### Se connecter à la VM
 
-## 2. Pré-requis et comptes à créer
-
-Avant de commencer, vous devez disposer des éléments suivants. Prévoyez 30 à 60 minutes pour cette étape.
-
-### 2.1 Compte OVH Cloud
-
-1. Rendez-vous sur [ovhcloud.com](https://www.ovhcloud.com/fr/)
-2. Créez un compte ou connectez-vous
-3. Activez le **Public Cloud** (menu principal → Public Cloud)
-4. Ajoutez un moyen de paiement (carte bancaire)
-
-### 2.2 Compte Docker Hub
-
-Docker Hub est le registre qui stocke les images Docker de l'application.
-
-1. Rendez-vous sur [hub.docker.com](https://hub.docker.com/)
-2. Créez un compte (bouton "Sign Up")
-3. Notez votre nom d'utilisateur (exemple : `monentreprise`)
-4. Créez un **Personal Access Token** pour l'authentification :
-   - Cliquez sur votre avatar → Account Settings
-   - Menu "Security" → "New Access Token"
-   - Nom : `ciblorgasport-deploy`
-   - Permissions : **Read & Write**
-   - Copiez le token et conservez-le précieusement (il ne s'affiche qu'une fois)
-
-### 2.3 Machine locale avec Docker Desktop
-
-Les images Docker sont construites sur votre machine locale et envoyées sur Docker Hub. Vous devez avoir Docker Desktop installé :
-
-- **Windows / Mac** : téléchargez [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- **Linux** : exécutez `curl -fsSL https://get.docker.com | sh`
-
-Vérifiez l'installation :
 ```bash
-docker --version
-# Docker version 24.x.x ou plus récent attendu
+ssh ubuntu@137.74.133.131
 ```
 
 ---
 
-## 3. Provisionner la VM OVH
+## 2. Création du compte Docker Hub
 
-### 3.1 Créer la VM
+Docker Hub stocke les 13 images Docker de l'application.
 
-1. Dans l'interface OVH Public Cloud, cliquez sur **"Créer une instance"**
-2. Choisissez la configuration suivante :
+**Compte utilisé :** `salim26072000`
+**Images publiées :** `salim26072000/ciblorgasport-*:latest`
 
-| Paramètre | Valeur recommandée |
-|-----------|-------------------|
-| **Modèle** | B2-15 ou B3-30 (16 Go RAM minimum) |
-| **Région** | Gravelines (GRA) ou Roubaix (RBX) |
-| **Image** | Ubuntu 22.04 LTS ou Ubuntu 24.04 LTS |
-| **Clé SSH** | Ajouter votre clé (voir section 4) |
-| **Réseau** | Ext-Net (IP publique) |
+### Créer un Personal Access Token (PAT)
 
-> **Pourquoi 16 Go de RAM ?** L'application fait tourner 15 conteneurs simultanément. En dessous de 8 Go, certains services risquent de manquer de mémoire.
+Si tu dois te reconnecter ou changer de machine :
 
-3. Cliquez sur **"Créer une instance"**
-4. Attendez que le statut passe à **"Activée"**
-5. Notez l'**adresse IPv4 publique** (exemple : `137.74.133.131`)
+1. hub.docker.com → ton avatar → Account Settings → Security
+2. "New Access Token" → nom : `ciblorgasport` → permissions : **Read & Write**
+3. Copie le token (affiché une seule fois)
 
-### 3.2 Ouvrir le port 80 (Security Group)
+```bash
+# Se connecter avec le token (pas le mot de passe du compte)
+docker login -u salim26072000
+# Password: colle le Personal Access Token ici
+```
 
-Par défaut, OVH bloque tous les ports sauf le 22 (SSH). Vous devez ouvrir le port 80 :
-
-1. Dans OVH Public Cloud → **Réseau → Security Groups**
-2. Cliquez sur le security group associé à votre instance
-3. Onglet **"Règles entrantes"** → **"Ajouter une règle"**
-4. Remplissez :
-   - Protocole : **TCP**
-   - Port : **80**
-   - Source : **0.0.0.0/0** (Internet entier)
-5. Répétez pour le port **443** si vous souhaitez activer HTTPS plus tard
-6. Validez
+> **Attention :** Si tu t'es inscrit sur Docker Hub avec Google/Gmail, tu n'as pas de
+> mot de passe. Tu dois obligatoirement utiliser un Personal Access Token.
 
 ---
 
-## 4. Configurer l'accès SSH
+## 3. Préparation du code : branche et Dockerfiles
 
-SSH est le protocole qui vous permet de vous connecter à la VM pour l'administrer.
+### Branche de déploiement
 
-### 4.1 Générer une clé SSH (si vous n'en avez pas)
-
-Sur votre machine locale :
+Tout le code de déploiement est sur la branche `deploy/ovh-production` :
 
 ```bash
-# Sur Mac / Linux :
-ssh-keygen -t ed25519 -C "ciblorgasport-deploy"
-# Appuyez sur Entrée pour accepter les valeurs par défaut
-# La clé publique est dans : ~/.ssh/id_ed25519.pub
-
-# Sur Windows (PowerShell) :
-ssh-keygen -t ed25519 -C "ciblorgasport-deploy"
+git checkout deploy/ovh-production
 ```
 
-### 4.2 Ajouter la clé SSH dans OVH
+### Ce que nous avons créé / corrigé
 
-1. Dans OVH Public Cloud → **Clés SSH** → **"Ajouter une clé SSH"**
-2. Nom : `deploy-key`
-3. Contenu : copiez le contenu de `~/.ssh/id_ed25519.pub`
+**10 Dockerfiles manquants** créés (seuls `billetterie`, `resultats-service` et
+`notifications-service` en avaient un) :
 
-```bash
-# Pour afficher votre clé publique :
-cat ~/.ssh/id_ed25519.pub
+- `gateway/Dockerfile`
+- `auth-service/Dockerfile`
+- `event-service/Dockerfile`
+- `abonnement-service/Dockerfile`
+- `incident-service/Dockerfile`
+- `participants-service/Dockerfile`
+- `lieu-service/Dockerfile`
+- `geolocation-service/Dockerfile`
+- `volunteer-service/Dockerfile`
+
+**Modèle standard utilisé pour chaque Dockerfile :**
+
+```dockerfile
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN --mount=type=cache,target=/root/.m2 mvn -q -Dmaven.test.skip=true package
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar /app/app.jar
+EXPOSE <PORT>
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 ```
 
-### 4.3 Tester la connexion SSH
+**Corrections sur les Dockerfiles existants :**
 
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-# Exemple : ssh ubuntu@137.74.133.131
+- `billetterie/Dockerfile` : `EXPOSE 8080` corrigé en `EXPOSE 8083`
+- `notifications-service/Dockerfile` : `-DskipTests` remplacé par
+  `-Dmaven.test.skip=true` (le pom.xml ignorait le flag `-DskipTests`)
+- `gateway/pom.xml` : ajout de `spring-boot-maven-plugin` manquant (le JAR
+  généré sans ce plugin n'est pas exécutable → erreur "no main manifest attribute")
 
-# Si la connexion réussit, vous verrez :
-# Welcome to Ubuntu 22.04.x LTS ...
-# ubuntu@<nom-vm>:~$
+**Profile Spring Boot de production :**
+
+Fichier `gateway/src/main/resources/application-prod.properties` créé pour
+surcharger toutes les routes du gateway (localhost → noms de services Docker) :
+
+```properties
+spring.cloud.gateway.routes[0].uri=http://auth-service:8081
+spring.cloud.gateway.routes[1].uri=http://event-service:8084
+# ... (10 routes au total)
 ```
 
-Tapez `exit` pour vous déconnecter.
+Activé via `SPRING_PROFILES_ACTIVE=prod` dans le docker-compose.
 
 ---
 
-## 5. Installer Docker sur la VM
+## 4. Fichier de secrets .env.prod
 
-Connectez-vous à la VM et exécutez ces commandes une par une :
+Le fichier `.env.prod` est **sur ta machine locale uniquement**, jamais dans Git.
 
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
+**Emplacement local :** `CiblOrgaSport_Back/.env.prod`
 
-# Installer Docker
-curl -fsSL https://get.docker.com | sudo sh
-
-# Ajouter l'utilisateur ubuntu au groupe docker
-# (permet d'utiliser docker sans sudo)
-sudo usermod -aG docker ubuntu
-
-# Se déconnecter et se reconnecter pour activer le changement
-exit
-```
-
-Reconnectez-vous et vérifiez :
-
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-docker --version
-docker compose version
-# Docker version 24.x.x ...
-# Docker Compose version v2.x.x ...
-```
-
-Si les deux commandes affichent un numéro de version, Docker est correctement installé.
-
----
-
-## 6. Configurer les secrets de production
-
-Les secrets sont les informations sensibles de l'application : mots de passe, clés de chiffrement, etc.
-
-### 6.1 Sur votre machine locale
-
-Dans le dossier du projet CiblOrgaSport_Back :
-
-```bash
-# Copier le fichier exemple
-cp .env.prod.example .env.prod
-```
-
-Ouvrez `.env.prod` avec un éditeur de texte et remplissez chaque valeur :
+Contenu actuel (valeurs réelles) :
 
 ```dotenv
-# Nom du service Docker PostgreSQL — NE PAS CHANGER
+# PostgreSQL — nom du service Docker (ne pas changer)
 DB_HOST=postgres
 
 # Base de données
 POSTGRES_DB=glop
 POSTGRES_USER=admin
-POSTGRES_PASSWORD=<inventez un mot de passe fort, ex: K9x2mP!qR7nL4vB>
+POSTGRES_PASSWORD=<mot de passe configuré lors du déploiement>
 
-# Clé secrète JWT — générer avec la commande ci-dessous
-JWT_SECRET=<voir commande ci-dessous>
+# JWT — clé de signature des tokens (min 64 caractères)
+JWT_SECRET=<clé générée avec: openssl rand -hex 64>
 
-# Votre nom d'utilisateur Docker Hub
-DOCKERHUB_USERNAME=<votre-username-dockerhub>
+# Docker Hub
+DOCKERHUB_USERNAME=salim26072000
 
-# Identifiant Kafka — générer avec la commande ci-dessous
-KAFKA_CLUSTER_ID=<voir commande ci-dessous>
+# Kafka
+KAFKA_CLUSTER_ID=<ID généré avec kafka-storage random-uuid>
 
-# Profil Spring Boot — NE PAS CHANGER
+# Spring Boot
 SPRING_PROFILES_ACTIVE=prod
 ```
 
-### 6.2 Générer les valeurs secrètes
+### Générer de nouvelles valeurs secrètes si besoin
 
-**JWT_SECRET** (clé de chiffrement des tokens d'authentification) :
 ```bash
+# Nouveau JWT_SECRET
 openssl rand -hex 64
-# Exemple de résultat :
-# a3f8c2d1e4b7906f5e2c8a1d4b7e0f3c6a9d2e5b8c1f4a7d0e3b6c9f2a5d8e1b4c7f0a3d6
-```
 
-**KAFKA_CLUSTER_ID** (identifiant unique du cluster Kafka) :
-```bash
+# Nouveau KAFKA_CLUSTER_ID
 docker run --rm confluentinc/cp-kafka:7.7.0 kafka-storage random-uuid
-# Exemple de résultat :
-# gZIoGN-7RFewCbQlrYvGqQ
 ```
-
-Collez ces valeurs dans votre `.env.prod`.
-
-> **IMPORTANT** : Le fichier `.env.prod` contient des informations sensibles. Ne le commitez jamais dans Git. Il est déjà listé dans `.gitignore`.
 
 ---
 
-## 7. Builder et publier les images Docker
+## 5. Build et push des images Docker
 
-Cette étape construit le code source Java en images Docker et les envoie sur Docker Hub.
+### Lancer le build de toutes les images
 
-### 7.1 Se connecter à Docker Hub
-
-Sur votre machine locale :
+Depuis la racine du projet, sur ta machine locale :
 
 ```bash
-docker login -u <votre-username-dockerhub>
-# Saisissez votre Personal Access Token comme mot de passe (pas votre mot de passe Docker Hub)
-```
+# Se connecter à Docker Hub d'abord
+docker login -u salim26072000
 
-### 7.2 Lancer le build
-
-```bash
-# Depuis la racine du projet CiblOrgaSport_Back :
+# Builder et pousser les 13 images
 ./deploy/build-and-push.sh
 ```
 
-Ce script va :
-1. Construire 13 images Docker (une par microservice)
-2. Chaque build compile le code Java avec Maven et crée une image légère
-3. Pousser chaque image sur Docker Hub
+Ce script fait pour chaque service :
 
-**Durée estimée :** 20 à 40 minutes selon la vitesse de votre connexion Internet.
+1. `docker build -t salim26072000/ciblorgasport-<service>:latest ./<service>/`
+2. `docker push salim26072000/ciblorgasport-<service>:latest`
 
-Vous verrez défiler des messages comme :
-```
-─── [gateway] → monentreprise/ciblorgasport-gateway:latest
-...
-─── [auth-service] → monentreprise/ciblorgasport-auth:latest
-...
-Toutes les images ont été buildées et poussées avec succès.
-```
+**Durée :** environ 25-35 minutes la première fois (compilation Maven + upload).
+Les fois suivantes, Maven et Docker utilisent leur cache → beaucoup plus rapide.
 
-### 7.3 Vérifier sur Docker Hub
+### Images publiées
 
-Rendez-vous sur `https://hub.docker.com/u/<votre-username>`. Vous devriez voir 13 dépôts nommés `ciblorgasport-*`.
+| Image Docker Hub | Service |
+| ---------------- | ------- |
+| `salim26072000/ciblorgasport-gateway` | Spring Cloud Gateway |
+| `salim26072000/ciblorgasport-auth` | auth-service |
+| `salim26072000/ciblorgasport-billetterie` | billetterie |
+| `salim26072000/ciblorgasport-event` | event-service |
+| `salim26072000/ciblorgasport-abonnement` | abonnement-service |
+| `salim26072000/ciblorgasport-incident` | incident-service |
+| `salim26072000/ciblorgasport-participants` | participants-service |
+| `salim26072000/ciblorgasport-resultats` | resultats-service |
+| `salim26072000/ciblorgasport-notifications` | notifications-service |
+| `salim26072000/ciblorgasport-lieu` | lieu-service |
+| `salim26072000/ciblorgasport-geolocation` | geolocation-service |
+| `salim26072000/ciblorgasport-analytics` | analytics-service |
+| `salim26072000/ciblorgasport-volunteer` | volunteer-service |
 
 ---
 
-## 8. Déployer l'application
+## 6. Installation de Docker sur la VM
 
-### 8.1 Copier les fichiers de configuration sur la VM
-
-Depuis votre machine locale :
+**Fait une seule fois** lors de la mise en place. Si la VM est recréée, refaire ces étapes.
 
 ```bash
-scp docker-compose.prod.services.yml .env.prod ubuntu@<IP_DE_VOTRE_VM>:~/
+# Se connecter à la VM
+ssh ubuntu@137.74.133.131
+
+# Installer Docker
+curl -fsSL https://get.docker.com | sudo sh
+
+# Ajouter l'utilisateur ubuntu au groupe docker
+sudo usermod -aG docker ubuntu
+
+# Se déconnecter puis reconnecter pour activer le groupe
+exit
+ssh ubuntu@137.74.133.131
+
+# Vérifier
+docker --version
+docker compose version
 ```
 
-### 8.2 Lancer tous les conteneurs
+---
 
-Connectez-vous à la VM :
+## 7. Déploiement de la stack complète
 
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
+### Architecture finale : tout sur une seule VM
+
+Après les problèmes réseau OVH (voir section 10), nous avons intégré PostgreSQL
+directement dans le docker-compose des microservices. La stack complète tourne sur
+une seule VM avec le réseau Docker interne `prod-net`.
+
+```text
+VM 137.74.133.131
+└── Docker réseau prod-net
+    ├── postgres:16          (base de données)
+    ├── kafka:7.7.0          (messagerie)
+    ├── gateway:latest       (routeur Spring Cloud)
+    ├── auth-service:latest
+    ├── billetterie:latest
+    ├── event-service:latest
+    ├── abonnement-service:latest
+    ├── incident-service:latest
+    ├── participants-service:latest
+    ├── resultats-service:latest
+    ├── notifications-service:latest
+    ├── lieu-service:latest
+    ├── geolocation-service:latest
+    ├── analytics-service:latest
+    └── volunteer-service:latest
 ```
 
-Téléchargez les images et démarrez les conteneurs :
+### Commandes de déploiement
+
+**Depuis la machine locale :**
 
 ```bash
-# Télécharger toutes les images depuis Docker Hub (peut prendre quelques minutes)
+# Copier les fichiers de config sur la VM
+scp docker-compose.prod.services.yml .env.prod ubuntu@137.74.133.131:~/
+```
+
+**Depuis la VM :**
+
+```bash
+ssh ubuntu@137.74.133.131
+
+# Télécharger toutes les images depuis Docker Hub
 docker compose -f docker-compose.prod.services.yml --env-file .env.prod pull
 
-# Démarrer tous les conteneurs en arrière-plan
+# Démarrer tous les conteneurs
 docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d
-```
 
-### 8.3 Vérifier que les conteneurs démarrent
-
-```bash
+# Vérifier que tout est Up (attendre 1-2 minutes)
 docker ps --format "table {{.Names}}\t{{.Status}}"
 ```
 
-Vous devriez voir 15 lignes. Attendez que tous les statuts affichent `Up` :
+**Résultat attendu (15 conteneurs) :**
 
-```
+```text
 NAMES                    STATUS
 postgres                 Up 2 minutes (healthy)
 kafka                    Up 2 minutes (healthy)
@@ -359,24 +324,34 @@ analytics-service        Up 2 minutes
 volunteer-service        Up 2 minutes
 ```
 
-> Les microservices Spring Boot peuvent prendre 30 à 60 secondes à démarrer. Si un conteneur affiche `Restarting`, attendez 1 à 2 minutes — c'est normal pendant le démarrage initial (les services attendent que la base de données soit prête).
+> Les services Spring Boot mettent 30 à 60 secondes à démarrer. Un statut
+> `Restarting` pendant les 2 premières minutes est normal — les services attendent
+> que PostgreSQL et Kafka soient prêts. Avec `restart: always`, ils repartent
+> automatiquement dès que la base est disponible.
 
 ---
 
-## 9. Configurer Nginx (reverse proxy)
+## 8. Configuration de Nginx
 
-Nginx fait le lien entre Internet et votre application. Il reçoit les requêtes sur le port 80 et les transmet au Spring Cloud Gateway.
+Nginx est installé directement sur la VM (pas dans Docker) et fait le lien entre
+le port 80 public et le gateway Docker sur le port 8080 en localhost.
 
-Connectez-vous à la VM et exécutez ces commandes :
+### Pourquoi Nginx sur la VM et non dans Docker ?
+
+Le port 80 est accessible depuis Internet sur cette VM (OVH l'autorise par défaut).
+Le port 8080 du gateway Docker n'est pas accessible depuis l'extérieur à cause du
+pare-feu OVH. Nginx sur la VM fait le pont en localhost : aucune restriction réseau.
+
+### Installation et configuration
 
 ```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
+ssh ubuntu@137.74.133.131
 
 # Installer Nginx
-sudo apt-get update && sudo apt-get install -y nginx
+sudo apt-get install -y nginx
 
-# Créer la configuration
-sudo tee /etc/nginx/sites-available/ciblorgasport > /dev/null << 'NGINX_CONF'
+# Écrire la configuration
+sudo tee /etc/nginx/sites-available/glop > /dev/null << 'EOF'
 upstream gateway {
     server 127.0.0.1:8080;
 }
@@ -387,17 +362,14 @@ server {
     listen 80;
     server_name _;
 
-    # En-têtes de sécurité
     add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
 
-    # Vérification de santé Nginx
     location /nginx-health {
         return 200 "healthy\n";
         add_header Content-Type text/plain;
     }
 
-    # Toutes les requêtes API
     location / {
         limit_req zone=api burst=50 nodelay;
         proxy_pass http://gateway;
@@ -407,51 +379,36 @@ server {
         proxy_read_timeout 60s;
     }
 }
-NGINX_CONF
+EOF
 
-# Activer la configuration et désactiver le site par défaut
-sudo ln -sf /etc/nginx/sites-available/ciblorgasport /etc/nginx/sites-enabled/ciblorgasport
+# Activer la config et désactiver le site par défaut
+sudo ln -sf /etc/nginx/sites-available/glop /etc/nginx/sites-enabled/glop
 sudo rm -f /etc/nginx/sites-enabled/default
 
-# Tester la configuration (doit afficher "syntax is ok")
+# Tester, activer et démarrer
 sudo nginx -t
-
-# Démarrer Nginx et l'activer au démarrage
 sudo systemctl enable nginx
 sudo systemctl reload nginx
-
-# Vérifier que Nginx est actif
-sudo systemctl is-active nginx
 ```
-
-Si la dernière commande affiche `active`, Nginx est opérationnel.
 
 ---
 
-## 10. Vérifier que tout fonctionne
+## 9. Vérification finale
 
-### 10.1 Test rapide depuis votre navigateur
+### Health check complet
 
-Ouvrez un navigateur et allez sur :
-```
-http://<IP_DE_VOTRE_VM>/actuator/health
-```
-
-Vous devriez voir une réponse JSON avec `"status":"UP"`.
-
-### 10.2 Health check complet
-
-Depuis votre machine locale :
+Depuis ta machine locale :
 
 ```bash
-./deploy/health-check.sh <IP_DE_VOTRE_VM>
+./deploy/health-check.sh 137.74.133.131
 ```
 
-Résultat attendu :
-```
+Résultat obtenu lors de notre déploiement :
+
+```text
 ═══════════════════════════════════════════════════════
  Health Check — CiblOrgaSport Production
- Gateway: http://<IP_DE_VOTRE_VM>
+ Gateway: http://137.74.133.131
 ═══════════════════════════════════════════════════════
 
 [ Nginx ]
@@ -464,239 +421,258 @@ Résultat attendu :
   OK     [403] auth-service
   OK     [401] event-service
   OK     [401] lieu-service
-  ...
+  OK     [401] billetterie
+  OK     [401] abonnement-service
+  OK     [401] incident-service
+  OK     [401] participants-service
+  OK     [401] resultats-service
+  OK     [401] notifications-service
+  OK     [401] volunteer-service
 
 ═══════════════════════════════════════════════════════
  Résultat : 12 OK / 0 ECHEC
 ═══════════════════════════════════════════════════════
 ```
 
-> Les codes 401 et 403 sont **normaux** : ils indiquent que les services répondent et que la sécurité JWT est active. Ce n'est pas une erreur.
+> Les codes 401 et 403 sont normaux : les endpoints actuator sont protégés par
+> Spring Security. Cela confirme que les services répondent et que la sécurité JWT
+> est active.
 
-### 10.3 Premier appel API avec Postman
+### Test d'un appel API réel
 
-1. Ouvrez Postman
-2. Importez l'environnement `postman/postman/environments/CiblOrgaSport_Production.postman_environment.json`
-3. Sélectionnez l'environnement **"CiblOrgaSport Production"**
-4. Testez la connexion :
-   - Méthode : `POST`
-   - URL : `http://<IP_DE_VOTRE_VM>/auth/api/auth/signin`
-   - Body (JSON) :
-     ```json
-     {
-       "username": "admin",
-       "password": "password"
-     }
-     ```
-5. Vous recevrez un token JWT dans la réponse — copiez-le dans la variable `token` de l'environnement Postman
+```bash
+curl -X POST http://137.74.133.131/auth/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"password"}'
+```
+
+Réponse attendue :
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "username": "admin",
+  "role": "ADMIN"
+}
+```
 
 ---
 
-## 11. Activer HTTPS avec un nom de domaine
+## 10. Problèmes rencontrés et solutions
 
-Cette étape est optionnelle mais recommandée pour la production. Elle nécessite que vous possédiez un nom de domaine.
-
-### 11.1 Pointer le DNS vers votre VM
-
-Chez votre registrar de domaine (OVH, Gandi, etc.) :
-- Créez un enregistrement de type **A**
-- Hôte : `@` (ou `api` si vous souhaitez un sous-domaine)
-- Valeur : l'adresse IP de votre VM
-- TTL : 3600 (1 heure)
-
-Attendez 15 à 60 minutes que la propagation DNS s'effectue. Testez :
-```bash
-ping votre-domaine.fr
-# Doit résoudre vers l'IP de votre VM
-```
-
-### 11.2 Obtenir un certificat SSL gratuit (Let's Encrypt)
-
-Connectez-vous à la VM :
-
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-
-# Installer Certbot
-sudo apt install -y certbot python3-certbot-nginx
-
-# Obtenir et configurer le certificat automatiquement
-sudo certbot --nginx -d votre-domaine.fr --non-interactive --agree-tos -m admin@votre-domaine.fr
-
-# Tester le renouvellement automatique
-sudo certbot renew --dry-run
-```
-
-Après cette étape, votre API est accessible via `https://votre-domaine.fr`.
-
-Le certificat se renouvelle automatiquement tous les 90 jours.
+Cette section documente les problèmes réels que nous avons rencontrés pendant le
+déploiement et les solutions appliquées.
 
 ---
 
-## 12. Maintenance et opérations courantes
+### Problème 1 — Rocky Linux 10 incompatible avec Docker
 
-### 12.1 Voir les logs d'un service
+**VM concernée :** vm-database (57.130.46.227)
+**Symptôme :**
 
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-
-# Logs du gateway (les 100 dernières lignes)
-docker logs gateway --tail=100 -f
-
-# Logs de l'auth-service
-docker logs auth-service --tail=100 -f
-
-# Ctrl+C pour arrêter l'affichage en temps réel
+```text
+iptables v1.8.11 (nf_tables): RULE_APPEND failed (No such file or directory)
 ```
 
-### 12.2 Redémarrer un service
+**Cause :** Rocky Linux 10 utilise exclusivement `nftables`. Docker CE utilise
+`iptables` qui n'est pas disponible dans le noyau.
 
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-docker compose -f docker-compose.prod.services.yml --env-file .env.prod restart auth-service
+**Solution :** Re-imager la VM en Ubuntu 25.04 via le panneau OVH.
+Sur Ubuntu, Docker s'installe et fonctionne normalement.
+
+---
+
+### Problème 2 — OVH bloque les ports entre régions différentes
+
+**Symptôme :** `nc: connect to 137.74.133.131 port 8080 failed: Connection timed out`
+
+**Cause :** Les VMs étaient dans deux régions OVH différentes (Paris et Gravelines).
+OVH bloque les ports non-standard (8080, 5432, etc.) entre régions via ses Security
+Groups réseau. Seuls les ports 22 et 80 sont accessibles par défaut.
+
+**Solution :** Abandonner l'architecture 3 VMs et tout faire tourner sur une seule VM.
+Le gateway Docker expose le port 8080 en localhost, Nginx fait le proxy 80 → 8080
+en local. Aucune communication inter-VM nécessaire.
+
+---
+
+### Problème 3 — `no main manifest attribute` dans le gateway
+
+**Symptôme :** Le conteneur `gateway` redémarrait en boucle avec l'erreur :
+
+```text
+no main manifest attribute, in /app/app.jar
 ```
 
-### 12.3 Mettre à jour l'application (nouvelle version)
+**Cause :** Le `gateway/pom.xml` n'avait pas le plugin `spring-boot-maven-plugin`
+dans sa section `<build>`. Sans ce plugin, Maven génère un JAR standard (non
+exécutable) au lieu d'un fat JAR Spring Boot.
 
-Sur votre machine locale, après avoir modifié le code :
+**Solution :** Ajouter le plugin dans `gateway/pom.xml` :
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+Rebuild et push de l'image gateway.
+
+---
+
+### Problème 4 — `-DskipTests` ignoré dans notifications-service
+
+**Symptôme :** Le build Docker de `notifications-service` échoue avec des erreurs
+de tests unitaires malgré le flag `-DskipTests` dans le Dockerfile.
+
+**Cause :** Le `pom.xml` de `notifications-service` surcharge la propriété
+`skipTests` et l'ignore via la configuration du plugin Surefire.
+
+**Solution :** Remplacer `-DskipTests` par `-Dmaven.test.skip=true` dans le Dockerfile.
+Ce flag est prioritaire sur toute configuration pom.xml.
+
+```dockerfile
+# Avant (ignoré par pom.xml)
+RUN mvn -q -DskipTests package
+
+# Après (prioritaire sur tout)
+RUN mvn -q -Dmaven.test.skip=true package
+```
+
+---
+
+### Problème 5 — Docker Hub "insufficient_scope" (accès refusé au push)
+
+**Symptôme :**
+
+```text
+denied: requested access to the resource is denied
+```
+
+**Cause :** Deux causes successives :
+
+1. Première tentative sans être connecté à Docker Hub
+2. Personal Access Token créé avec les droits **Read-only** au lieu de **Read & Write**
+
+**Solution :**
+
+1. `docker login -u salim26072000` avec le token
+2. Dans Docker Hub → Account Settings → Security → modifier le token → cocher **Read & Write**
+3. Re-lancer `docker login` avec le nouveau token
+
+---
+
+### Problème 6 — CORS bloqué depuis le frontend AWS S3
+
+**Symptôme :**
+
+```text
+Access to fetch at 'http://137.74.133.131/auth/login' from origin
+'http://ciblorgasport-frontend-prod.s3-website.eu-west-3.amazonaws.com'
+has been blocked by CORS policy
+```
+
+**Cause :** La configuration CORS du gateway (`SecurityConfig.java`) n'autorisait
+que `http://localhost:3000`.
+
+**Solution :** Ajouter l'URL S3 dans `SecurityConfig.java` :
+
+```java
+configuration.addAllowedOrigin("http://ciblorgasport-frontend-prod.s3-website.eu-west-3.amazonaws.com");
+```
+
+Rebuild du gateway, push, redéploiement. Test de vérification :
 
 ```bash
-# 1. Rebuilder et pousser uniquement le service modifié
-docker build -t <DOCKERHUB_USERNAME>/ciblorgasport-auth:latest ./auth-service/
-docker push <DOCKERHUB_USERNAME>/ciblorgasport-auth:latest
+curl -I -X OPTIONS http://137.74.133.131/auth/api/auth/signin \
+  -H "Origin: http://ciblorgasport-frontend-prod.s3-website.eu-west-3.amazonaws.com" \
+  -H "Access-Control-Request-Method: POST"
+# Attendu : Access-Control-Allow-Origin: http://ciblorgasport-...
+```
 
-# 2. Sur la VM, télécharger la nouvelle image et redémarrer le service
-ssh ubuntu@<IP_DE_VOTRE_VM> \
+---
+
+## 11. Mise à jour du déploiement
+
+### Mettre à jour un seul service
+
+Exemple avec `auth-service` après modification du code :
+
+```bash
+# 1. Sur ta machine locale — rebuilder et pousser l'image
+docker build -t salim26072000/ciblorgasport-auth:latest ./auth-service/
+docker push salim26072000/ciblorgasport-auth:latest
+
+# 2. Sur la VM — télécharger la nouvelle image et redémarrer
+ssh ubuntu@137.74.133.131 \
   'docker compose -f docker-compose.prod.services.yml --env-file .env.prod pull auth-service && \
    docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d auth-service'
 ```
 
-### 12.4 Sauvegarder la base de données
+### Mettre à jour tous les services
 
 ```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
+# Rebuild et push de toutes les images
+./deploy/build-and-push.sh
 
-# Créer un dump de la base de données
-docker exec postgres pg_dump -U admin glop > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# Copier le backup sur votre machine locale
-exit
-scp ubuntu@<IP_DE_VOTRE_VM>:~/backup_*.sql ./backups/
+# Sur la VM
+ssh ubuntu@137.74.133.131 \
+  'docker compose -f docker-compose.prod.services.yml --env-file .env.prod pull && \
+   docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d'
 ```
 
-### 12.5 Restaurer la base de données
+### Redémarrer toute la stack sans rebuild
 
 ```bash
-# Copier le backup sur la VM
-scp backup_20240101_120000.sql ubuntu@<IP_DE_VOTRE_VM>:~/
-
-# Restaurer
-ssh ubuntu@<IP_DE_VOTRE_VM>
-docker exec -i postgres psql -U admin glop < backup_20240101_120000.sql
-```
-
-### 12.6 Arrêter et redémarrer toute l'application
-
-```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
-
-# Arrêter (les données PostgreSQL sont conservées dans le volume Docker)
+ssh ubuntu@137.74.133.131
 docker compose -f docker-compose.prod.services.yml --env-file .env.prod down
-
-# Redémarrer
 docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d
 ```
 
-### 12.7 Vérifier l'utilisation des ressources
+### Voir les logs en temps réel
 
 ```bash
-ssh ubuntu@<IP_DE_VOTRE_VM>
+ssh ubuntu@137.74.133.131
 
-# Utilisation CPU et mémoire par conteneur
-docker stats --no-stream
+# Tous les services
+docker compose -f docker-compose.prod.services.yml logs -f --tail=50
 
-# Espace disque utilisé par Docker
-docker system df
+# Un service spécifique
+docker logs gateway -f --tail=100
+docker logs postgres -f --tail=50
+```
+
+### Sauvegarder la base de données
+
+```bash
+ssh ubuntu@137.74.133.131
+
+# Créer un dump
+docker exec postgres pg_dump -U admin glop > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Copier le dump sur ta machine locale
+exit
+scp ubuntu@137.74.133.131:~/backup_*.sql ./backups/
 ```
 
 ---
 
-## 13. Résolution de problèmes
+## Récapitulatif de l'état final
 
-### Un service affiche "Restarting" dans `docker ps`
-
-**Cause probable** : le service n'arrive pas à démarrer.
-
-**Solution** :
-```bash
-docker logs <nom-du-service> --tail=50
-```
-Lisez l'erreur. Les causes les plus fréquentes :
-- `Connection refused` sur PostgreSQL → attendez 30 secondes, PostgreSQL démarre plus lentement
-- `Invalid JWT secret` → vérifiez `JWT_SECRET` dans `.env.prod`
-- `Could not connect to Kafka` → vérifiez que le service `kafka` est `healthy`
-
-### `docker compose up -d` affiche des warnings "variable is not set"
-
-Ces warnings sont normaux lors de la commande `docker compose ps` sans `--env-file`. Lors du démarrage avec `--env-file .env.prod`, toutes les variables sont correctement injectées dans les conteneurs.
-
-### L'API ne répond pas depuis le navigateur (timeout)
-
-Vérifiez dans l'ordre :
-1. Le port 80 est-il ouvert dans les Security Groups OVH ?
-2. Nginx est-il actif ? `sudo systemctl status nginx`
-3. Le gateway est-il démarré ? `docker logs gateway --tail=20`
-
-### Erreur "no main manifest attribute" dans les logs du gateway
-
-Le JAR n'a pas été compilé correctement. Solution :
-```bash
-# Sur votre machine locale, rebuilder le gateway
-docker build -t <DOCKERHUB_USERNAME>/ciblorgasport-gateway:latest ./gateway/
-docker push <DOCKERHUB_USERNAME>/ciblorgasport-gateway:latest
-
-# Sur la VM
-docker compose -f docker-compose.prod.services.yml --env-file .env.prod pull gateway
-docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d gateway
-```
-
-### PostgreSQL ne démarre pas
-
-```bash
-docker logs postgres --tail=30
-```
-Vérifiez que `POSTGRES_PASSWORD` dans `.env.prod` ne contient pas de caractères spéciaux problématiques comme `@`, `#`, `$` sans être entre guillemets.
-
-### Le certificat SSL ne se renouvelle pas automatiquement
-
-```bash
-# Vérifier que le cron Certbot est actif
-sudo systemctl status certbot.timer
-
-# Tester manuellement
-sudo certbot renew --dry-run
-```
-
----
-
-## Récapitulatif des informations importantes
-
-Conservez ces informations en lieu sûr :
-
-| Information | Valeur |
-|-------------|--------|
-| IP de la VM | `<IP_DE_VOTRE_VM>` |
-| URL de l'API | `http://<IP_DE_VOTRE_VM>` ou `https://votre-domaine.fr` |
-| Utilisateur SSH | `ubuntu` |
-| Utilisateur PostgreSQL | `admin` (défini dans .env.prod) |
-| Nom de la base de données | `glop` |
-| Fichier de secrets | `.env.prod` (sur votre machine locale — NE PAS partager) |
-
----
-
-## Support et contact
-
-Pour toute question technique concernant le déploiement, référez-vous à :
-- [PORTS.md](./PORTS.md) — Documentation des ports
-- [DEPLOYMENT_STEPS.md](./DEPLOYMENT_STEPS.md) — Référence rapide pour les développeurs
-- Les logs des conteneurs via `docker logs <service>`
+| Composant | Emplacement | Statut |
+| --------- | ----------- | ------ |
+| Nginx | VM 137.74.133.131, port 80 | Actif (systemd) |
+| Spring Cloud Gateway | Docker, port 8080 (interne) | Up |
+| PostgreSQL 16 | Docker, réseau prod-net | Healthy |
+| Kafka KRaft | Docker, réseau prod-net | Healthy |
+| 13 microservices | Docker, réseau prod-net | Up |
+| Images Docker Hub | salim26072000/ciblorgasport-* | 13 images |
+| Code source | github.com/Salas3108/CiblOrgaSport_Back | Branche deploy/ovh-production |
+| Frontend CORS | SecurityConfig.java | AWS S3 autorisé |
