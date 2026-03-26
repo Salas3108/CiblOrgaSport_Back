@@ -57,6 +57,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/lieux/**").permitAll()
+                // monitoring endpoints for Prometheus scraping
+                .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex

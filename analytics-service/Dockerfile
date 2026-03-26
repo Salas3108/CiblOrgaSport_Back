@@ -5,11 +5,11 @@ COPY pom.xml .
 COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests package
 
-# Runtime stage
-FROM eclipse-temurin:17-jre
+# Runtime stage — Java 21 pour être cohérent avec le build
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
-EXPOSE 8090
+EXPOSE 8092
 
 ENV DB_HOST=postgres \
     DB_PORT=5432 \

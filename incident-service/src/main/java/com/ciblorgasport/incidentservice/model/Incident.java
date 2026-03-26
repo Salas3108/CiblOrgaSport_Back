@@ -1,5 +1,7 @@
 package com.ciblorgasport.incidentservice.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,8 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-import java.time.LocalDateTime;
 
 @Entity(name = "IncidentModel")
 public class Incident {
@@ -28,8 +28,8 @@ public class Incident {
     @Column(nullable = false)
     private IncidentType type;               // SECURITE, TECHNIQUE, METEO, MEDICAL, AUTRE
 
-    @Column(nullable = false)
-    private String location;                 // Lieu de l'incident
+    @Column(name = "lieu_id", nullable = false)
+    private Long lieuId;                     // Reference au lieu-service
 
     private Long competitionId;              // Optionnel: rattachement à une compétition
 
@@ -79,12 +79,12 @@ public class Incident {
         this.type = type;
     }
 
-    public String getLocation() {
-        return location;
+    public Long getLieuId() {
+        return lieuId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLieuId(Long lieuId) {
+        this.lieuId = lieuId;
     }
 
     public Long getCompetitionId() {

@@ -1,17 +1,28 @@
 package com.ciblorgasport.analyticsservice.enums;
 
 public enum EventType {
+    // Connexions
     USER_LOGIN,
     USER_LOGOUT,
-    PAGE_VIEW,
+    USER_REGISTER,
+
+    // Données consultées
+    EVENT_VIEW,
     COMPETITION_VIEW,
+    EPREUVE_VIEW,
     RESULT_VIEW,
+    ATHLETE_PROFILE_VIEW,
+
+    // Notifications
     NOTIFICATION_SENT,
     NOTIFICATION_SUBSCRIBED,
-    FANZONE_VIEW,
-    ATHLETE_PROFILE_VIEW,
-    VOLUNTEER_CHECKIN,
+
+    // Volontaires
+    VOLUNTEER_VALIDATED,
+
+    // Incidents
     INCIDENT_DECLARED,
-    SEARCH_PERFORMED,
-    UNKNOWN
+
+    // Générique
+    PAGE_VIEW
 }

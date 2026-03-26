@@ -28,6 +28,7 @@ public class AthleteMapper {
         dto.setDateNaissance(athlete.getDateNaissance());
         dto.setPays(athlete.getPays());
         dto.setValide(athlete.isValide());
+        dto.setSexe(athlete.getSexe());
         dto.setObservation(athlete.getObservation());
         dto.setMotifRefus(athlete.getMotifRefus());
         if (athlete.getEquipe() != null) {
@@ -42,7 +43,7 @@ public class AthleteMapper {
             AthleteDocs docs = athlete.getDocs();
             String certUrl = null;
             String passportUrl = null;
-            
+
             if (athleteId != null) {
                 if (docs.getCertificatMedical() != null && docs.getCertificatMedical().length > 0) {
                     certUrl = "/athlete/" + athleteId + "/doc/certificatMedical";
@@ -51,8 +52,10 @@ public class AthleteMapper {
                     passportUrl = "/athlete/" + athleteId + "/doc/passport";
                 }
             }
-            
-            dto.setDocs(new AthleteDocsDto(certUrl, passportUrl));
+
+            AthleteDocsDto docsDto = new AthleteDocsDto(certUrl, passportUrl);
+            docsDto.setDocumentGenre(docs.getDocumentGenre());
+            dto.setDocs(docsDto);
         } else {
             dto.setDocs(new AthleteDocsDto(null, null));
         }
@@ -62,6 +65,19 @@ public class AthleteMapper {
 
     public AthleteDocs toEntity(AthleteDocsDto dto) {
         if (dto == null) return null;
-        return new AthleteDocs(null, null);
+        byte[] certBytes = decodeBase64OrNull(dto.getCertificatMedicalUrl());
+        byte[] passportBytes = decodeBase64OrNull(dto.getPassportUrl());
+        return new AthleteDocs(certBytes, passportBytes);
+    }
+
+    private byte[] decodeBase64OrNull(String base64) {
+        if (base64 == null || base64.isBlank()) return null;
+        try {
+            // Supporte le préfixe "data:application/pdf;base64,..."
+            String data = base64.contains(",") ? base64.split(",", 2)[1] : base64;
+            return java.util.Base64.getDecoder().decode(data);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

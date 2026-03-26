@@ -11,7 +11,7 @@ public class IncidentDTO {
     private String description;
     private ImpactLevel impactLevel;
     private IncidentType type;
-    private String location;
+    private Long lieuId;
     private Long competitionId;
     private IncidentStatus status;
     private String reportedBy;
@@ -31,8 +31,8 @@ public class IncidentDTO {
     public IncidentType getType() { return type; }
     public void setType(IncidentType type) { this.type = type; }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public Long getLieuId() { return lieuId; }
+    public void setLieuId(Long lieuId) { this.lieuId = lieuId; }
 
     public Long getCompetitionId() { return competitionId; }
     public void setCompetitionId(Long competitionId) { this.competitionId = competitionId; }

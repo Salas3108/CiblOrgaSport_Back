@@ -58,6 +58,8 @@ public class SecurityConfig {
                 auth
                     // public endpoints
                     .requestMatchers("/auth/login", "/auth/register", "/auth/hello").permitAll()
+                    // monitoring endpoints for Prometheus scraping
+                    .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                     // public read-only endpoints for inter-service validation
                     .requestMatchers("/auth/user/exists/**").permitAll()
                     .requestMatchers("/auth/user/me").authenticated()

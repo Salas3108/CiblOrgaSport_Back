@@ -6,6 +6,7 @@ package com.ciblorgasport.participantsservice.dto;
 public class AthleteDocsDto {
     private String certificatMedicalUrl;
     private String passportUrl;
+    private String documentGenre;
 
     public AthleteDocsDto() {
     }
@@ -29,5 +30,13 @@ public class AthleteDocsDto {
 
     public void setPassportUrl(String passportUrl) {
         this.passportUrl = passportUrl;
+    }
+
+    public String getDocumentGenre() {
+        return documentGenre;
+    }
+
+    public void setDocumentGenre(String documentGenre) {
+        this.documentGenre = documentGenre;
     }
 }

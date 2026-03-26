@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -34,6 +36,10 @@ public class Athlete {
     private String pays;
 
     private boolean valide;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sexe")
+    private Sexe sexe;
 
     @Embedded
     private AthleteDocs docs;
@@ -144,6 +150,14 @@ public class Athlete {
 
     public void setEquipe(Equipe equipe) {
         this.equipe = equipe;
+    }
+
+    public Sexe getSexe() {
+        return sexe;
+    }
+
+    public void setSexe(Sexe sexe) {
+        this.sexe = sexe;
     }
 
     public String getMotifRefus() {

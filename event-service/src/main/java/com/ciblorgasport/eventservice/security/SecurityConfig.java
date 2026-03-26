@@ -62,6 +62,8 @@ public class SecurityConfig {
                 // allow public READ endpoints only
                 .requestMatchers(HttpMethod.GET, "/epreuves/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/events/**").permitAll()
+                // monitoring endpoints for Prometheus scraping
+                .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                 // if a context path or gateway prefixes with /api
                 .requestMatchers(HttpMethod.GET, "/api/epreuves/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()

@@ -1,0 +1,2 @@
+CREATE DATABASE metabase_db;
+GRANT ALL PRIVILEGES ON DATABASE metabase_db TO admin;

@@ -193,7 +193,10 @@ Remarques:
 - Healthcheck: /api/health
 
 ## CI/CD & Déploiement
-- CI: [GitHub Actions/GitLab CI] (lint, test, build)
+- CI: GitHub Actions
+  - Workflow: `.github/workflows/ci.yml`
+  - Déclenchement: push sur `main` et pull request
+  - Scope actuel: build + tests unitaires Maven par microservice
 - Déploiement: [Docker/K8s/VM/PAAS]
 - Stratégie: [blue-green/rolling]
 

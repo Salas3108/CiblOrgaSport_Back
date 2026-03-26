@@ -8,8 +8,9 @@ services:
       POSTGRES_DB: glop
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql  # ← AJOUT
     ports:
-      - "5400:5432"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d glop"]
       interval: 5s
@@ -18,12 +19,11 @@ services:
       start_period: 20s
     networks:
       - appnet
- 
+
   kafka:
     image: confluentinc/cp-kafka:7.7.0
     container_name: kafka
     environment:
-      # KRaft mode – no Zookeeper needed
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -60,33 +60,17 @@ services:
       PGADMIN_DEFAULT_PASSWORD: password
     ports:
       - "8082:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || curl -fsS http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost/misc/ping"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
-    restart: unless-stopped
-    networks:
-      - appnet
-
-  analytics-service:
-    build: ./analytics-service
-    container_name: analytics-service
-    ports:
-      - "8090:8090"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: glop
-      DB_USER: admin
-      DB_PASSWORD: password
     restart: unless-stopped
     networks:
       - appnet
@@ -98,11 +82,11 @@ services:
       - "3001:3000"
     environment:
       MB_DB_TYPE: postgres
-      MB_DB_DBNAME: glop
+      MB_DB_HOST: postgres
       MB_DB_PORT: 5432
+      MB_DB_DBNAME: metabase_db   
       MB_DB_USER: admin
       MB_DB_PASS: password
-      MB_DB_HOST: postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -110,12 +94,56 @@ services:
     networks:
       - appnet
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.enable-remote-write-receiver
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - appnet
+
 volumes:
   postgres_data:
-    #external: true
     name: ciblorgasport_back_postgres_data
   kafka_data:
     name: ciblorgasport_back_kafka_data
+  pgadmin_data:
+    name: ciblorgasport_back_pgadmin_data
+  prometheus_data:
+    name: ciblorgasport_back_prometheus_data
+  grafana_data:
+    name: ciblorgasport_back_grafana_data
 
 networks:
   appnet:

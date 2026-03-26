@@ -2,24 +2,20 @@ package com.ciblorgasport.participantsservice.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Basic;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
 
 /**
  * Documents d'un athlète. Stockés en binaire (BYTEA PostgreSQL).
  */
 @Embeddable
 public class AthleteDocs {
-     @Lob
-     @Basic(fetch = FetchType.LAZY)
      @Column(name = "certificat_medical", columnDefinition = "bytea")
      private byte[] certificatMedical;
 
-     @Lob
-     @Basic(fetch = FetchType.LAZY)
      @Column(name = "passport", columnDefinition = "bytea")
      private byte[] passport;
+
+    @Column(name = "document_genre")
+    private String documentGenre;
 
     public AthleteDocs() {
     }
@@ -43,5 +39,13 @@ public class AthleteDocs {
 
     public void setPassport(byte[] passport) {
         this.passport = passport;
+    }
+
+    public String getDocumentGenre() {
+        return documentGenre;
+    }
+
+    public void setDocumentGenre(String documentGenre) {
+        this.documentGenre = documentGenre;
     }
 }

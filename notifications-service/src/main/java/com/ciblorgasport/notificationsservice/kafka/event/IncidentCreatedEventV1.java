@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class IncidentCreatedEventV1 {
 
     public static final String EVENT_TYPE_VALUE = "incident.created";
-    public static final int EVENT_VERSION = 1;
+    public static final int EVENT_VERSION = 2;
 
     private String eventId;
     private String eventType;
@@ -21,7 +21,7 @@ public class IncidentCreatedEventV1 {
     private String status;
 
     private String description;
-    private String location;
+    private Long lieuId;
     private String reportedBy;
 
     private Long competitionId;
@@ -98,12 +98,12 @@ public class IncidentCreatedEventV1 {
         this.description = description;
     }
 
-    public String getLocation() {
-        return location;
+    public Long getLieuId() {
+        return lieuId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLieuId(Long lieuId) {
+        this.lieuId = lieuId;
     }
 
     public String getReportedBy() {

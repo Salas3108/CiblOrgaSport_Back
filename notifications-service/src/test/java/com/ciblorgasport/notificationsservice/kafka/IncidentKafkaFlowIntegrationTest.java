@@ -53,11 +53,16 @@ import static org.mockito.Mockito.when;
         "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
         "spring.kafka.consumer.auto-offset-reset=earliest",
         "spring.kafka.listener.concurrency=1",
+        "spring.kafka.listener.missing-topics-fatal=false",
         "abonnement-service.url=http://localhost:8085"
 })
 @EmbeddedKafka(partitions = 1, topics = {
         KafkaTopics.INCIDENT_TOPIC,
-        KafkaTopics.INCIDENT_DLQ_TOPIC
+        KafkaTopics.INCIDENT_DLQ_TOPIC,
+        KafkaTopics.EPREUVE_RAPPEL_TOPIC,
+        KafkaTopics.EPREUVE_RAPPEL_DLQ_TOPIC,
+        KafkaTopics.RESULTAT_FINAL_TOPIC,
+        KafkaTopics.RESULTAT_FINAL_DLQ_TOPIC
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class IncidentKafkaFlowIntegrationTest {
@@ -192,7 +197,7 @@ class IncidentKafkaFlowIntegrationTest {
         event.setImpactLevel("MOYEN");
         event.setStatus("ACTIF");
         event.setDescription("Incident test");
-        event.setLocation("Tribune A");
+        event.setLieuId(101L);
         event.setReportedBy("system");
         event.setCompetitionId(competitionId);
         return event;

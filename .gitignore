@@ -44,4 +44,8 @@ Thumbs.db
 claude/
 
 # Postman import artifacts
-postman/postman/
+#postman/postman/
+
+# Eco-benchmark logs
+eco-benchmark/
+logs/k6-benchmark/

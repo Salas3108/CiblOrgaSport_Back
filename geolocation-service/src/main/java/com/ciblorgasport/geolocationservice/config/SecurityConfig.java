@@ -35,6 +35,8 @@ public class SecurityConfig {
                 // Fan zones publiques
                 .requestMatchers(HttpMethod.GET, "/api/geo/fanzones").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/geo/fanzones/nearby").permitAll()
+                // monitoring endpoints for Prometheus scraping
+                .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                 // Tout le reste nécessite une authentification (les rôles fins sont gérés par @PreAuthorize)
                 .anyRequest().authenticated()
             )
