@@ -136,6 +136,16 @@ DROP TABLE IF EXISTS workspace_output CASCADE;
 DROP TABLE IF EXISTS workspace_output_external CASCADE;
 DROP TABLE IF EXISTS workspace_transform CASCADE;
 
+DROP TABLE IF EXISTS comment CASCADE;
+DROP TABLE IF EXISTS comment_reaction CASCADE;
+DROP TABLE IF EXISTS document CASCADE;
+DROP TABLE IF EXISTS document_bookmark CASCADE;
+
+-- to check 
+SELECT tablename FROM pg_tables 
+WHERE schemaname = 'public'
+ORDER BY tablename;
+
 -- Index de recherche Metabase
 DROP TABLE IF EXISTS "search_index__3hfzkkqflxfrs1vf5xbiw" CASCADE;
 DROP TABLE IF EXISTS "search_index___duygwpu0azgsxilbjovw" CASCADE;
