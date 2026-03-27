@@ -42,6 +42,31 @@ npm run dev
 npm run build && npm run start
 ```
 
+## Analytics & Metabase
+
+### Mode de lancement analytics
+- Le service analytics est lancé en local (pas en conteneur Docker).
+- Port du service analytics: 8092.
+
+```bash
+# 1) Démarrer l'infra Docker (sans analytics-service)
+docker compose up -d postgres metabase pgadmin kafka
+
+# 2) Démarrer analytics-service en local
+cd analytics-service
+mvn spring-boot:run
+```
+
+### Séparation des bases PostgreSQL
+- metabase_db: base interne de Metabase (questions, dashboards, utilisateurs Metabase, configuration).
+- glop: base métier du projet (dont event_log, daily_stats, weekly_stats pour l'analytics).
+
+Metabase utilise metabase_db pour son fonctionnement interne, puis se connecte à glop comme source de données.
+
+### Initialisation automatique de metabase_db
+Le fichier docker-compose monte le script SQL de création de metabase_db dans PostgreSQL:
+- ./sql/init-db.sql -> /docker-entrypoint-initdb.d/init-db.sql
+
 ## 🚀 Démarrage des Services
 
 ### Démarrage automatique de tous les services

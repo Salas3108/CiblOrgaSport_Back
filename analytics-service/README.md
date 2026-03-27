@@ -14,9 +14,9 @@ agrège les données chaque nuit, et expose les stats à Metabase pour les dashb
 [Gateway :8080]
         ↓ → AnalyticsFilter (fire-and-forget, 500ms timeout)
         ↓                  ↓
-[Microservices]    [analytics-service :8090]
+[Microservices]    [analytics-service :8092]
                            ↓
-                   [PostgreSQL :5400 / glop]
+                   [PostgreSQL :5432 / glop]
                            ↑
                    [Metabase :3001]  ← Dashboard Marius
 ```
@@ -27,8 +27,8 @@ agrège les données chaque nuit, et expose les stats à Metabase pour les dashb
 
 | Service           | Port  |
 |-------------------|-------|
-| analytics-service | 8090  |
-| PostgreSQL        | 5400  |
+| analytics-service | 8092  |
+| PostgreSQL        | 5432  |
 | Metabase          | 3001  |
 | pgAdmin           | 8082  |
 
@@ -36,42 +36,41 @@ agrège les données chaque nuit, et expose les stats à Metabase pour les dashb
 
 ## Démarrage
 
-### Option 1 — Docker (recommandé)
+Le service analytics est lancé en local (pas en conteneur Docker).
+
+### 1. Démarrer l'infra Docker (sans analytics-service)
 
 ```bash
 # Depuis la racine du projet CiblOrgaSport_Back
-docker compose up -d postgres analytics-service metabase
-
-# Vérifier que tout tourne
-docker ps
+docker compose up -d postgres metabase pgadmin kafka
 ```
 
-> **Important** : ne pas lancer `mvn spring-boot:run` en même temps que Docker,
-> le port 8090 serait déjà occupé par le conteneur.
-
-### Option 2 — Local (développement)
-
-PostgreSQL doit tourner en Docker avant de lancer le service localement :
+### 2. Démarrer analytics-service en local
 
 ```bash
-docker compose up -d postgres
-
-# Puis dans analytics-service/
+# Dans analytics-service/
 mvn spring-boot:run
 ```
 
-Si le port 8090 est déjà occupé :
+Si le port 8092 est déjà occupé :
 ```bash
-kill -9 $(lsof -t -i:8090)
+kill -9 $(lsof -t -i:8092)
 ```
 
 ---
 
 ## Base de données
 
-- **Host** : `localhost:5400` (local) ou `postgres:5432` (Docker)
+- **Host** : `localhost:5432` (local) ou `postgres:5432` (Docker)
 - **Base** : `glop`
 - **User** : `admin` / **Password** : `password`
+
+### Séparation des bases
+
+- **metabase_db** : base technique de Metabase (utilisateurs Metabase, questions, dashboards, settings).
+- **glop** : base métier du projet (dont `event_log`, `daily_stats`, `weekly_stats`).
+
+Metabase tourne donc avec sa propre base `metabase_db`, puis se connecte à `glop` comme source de données à analyser.
 
 ### Tables créées automatiquement (ddl-auto=update)
 
@@ -171,7 +170,7 @@ Le `POST /events/track` est public (appelé par le gateway).
 ### Exemple — Envoyer un événement test
 
 ```bash
-curl -X POST http://localhost:8090/api/analytics/events/track \
+curl -X POST http://localhost:8092/api/analytics/events/track \
   -H "Content-Type: application/json" \
   -d '{
     "eventType": "USER_LOGIN",
@@ -187,7 +186,7 @@ curl -X POST http://localhost:8090/api/analytics/events/track \
 ### Exemple — Forcer le recalcul du jour
 
 ```bash
-curl -X POST "http://localhost:8090/api/analytics/recalculate?date=2026-07-15" \
+curl -X POST "http://localhost:8092/api/analytics/recalculate?date=2026-07-15" \
   -H "Authorization: Bearer <token-admin>"
 ```
 
@@ -251,6 +250,9 @@ Choisir **PostgreSQL** et remplir :
 | Database name | `glop`    |
 | Username      | `admin`   |
 | Password      | `password` |
+
+> Note : Metabase stocke déjà sa configuration dans `metabase_db` (définie dans `docker-compose.yml`).
+> Ici, on ajoute **glop** comme source de données analytique.
 
 ### 4. Créer les graphiques
 - Cliquer **+ New** → **SQL query**
