@@ -32,7 +32,7 @@ TRUNCATE TABLE user_documents     RESTART IDENTITY CASCADE;
 TRUNCATE TABLE users              RESTART IDENTITY CASCADE;
 TRUNCATE TABLE lieu               RESTART IDENTITY CASCADE;
 
-SET session_replication_role = 'DEFAULT';
+SET session_replication_role = origin;
 
 -- Vérification
 SELECT tablename, 'OK' as status
@@ -42,9 +42,9 @@ WHERE schemaname = 'public'
     'lieu','users','user_documents','equipes','athletes',
     'event','competition','epreuve','epreuve_equipes','epreuve_athletes',
     'epreuve_athlete_assignments','messages','resultats',
-    'volunteers','volunteer_tasks','incident',
+    'volunteers','volunteer_tasks','incident_model',
     'fan_zone','fan_zone_service','athlete_position',
-    'abonnements','ticket','notification',
+    'abonnements','ticket_model','notification',
     'event_log','daily_stats','weekly_stats'
   )
 ORDER BY tablename;

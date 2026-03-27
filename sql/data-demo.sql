@@ -503,8 +503,8 @@ INSERT INTO resultats (classement, medaille, qualification, valeur_principale, u
 (6,  NULL, true,  '54.19', 's', '{}'::jsonb, 'TEMPS', 33, 3, 'VALIDE', true),
 (7,  NULL, true,  '54.38', 's', '{}'::jsonb, 'TEMPS', 9,  3, 'VALIDE', true),
 (8,  NULL, true,  '54.55', 's', '{}'::jsonb, 'TEMPS', 18, 3, 'VALIDE', true),
-(9,  NULL, false, '54.72', 's', '{}'::jsonb, 'TEMPS', 7,  3, 'VALIDE', true),
-(10, NULL, false, '54.89', 's', '{}'::jsonb, 'TEMPS', 11, 3, 'VALIDE', true),
+(9,  NULL, false, '54.72', 's', '{}'::jsonb, 'TEMPS', 11, 3, 'VALIDE', true),
+(10, NULL, false, '54.89', 's', '{}'::jsonb, 'TEMPS', 5,  3, 'VALIDE', true),
 (11, NULL, false, '55.01', 's', '{}'::jsonb, 'TEMPS', 15, 3, 'VALIDE', true),
 (12, NULL, false, '55.18', 's', '{}'::jsonb, 'TEMPS', 20, 3, 'VALIDE', true),
 (13, NULL, false, '55.34', 's', '{}'::jsonb, 'TEMPS', 26, 3, 'VALIDE', true),
@@ -798,7 +798,7 @@ INSERT INTO volunteer_tasks (id, title, description, task_date, start_time, end_
 -- ══════════════════════════════
 -- 11. INCIDENTS
 -- ══════════════════════════════
-INSERT INTO incident (description, impact_level, type, lieu_id, competition_id, status, reported_by, reported_at, updated_at, resolved_at) VALUES
+INSERT INTO incident_model (description, impact_level, type, lieu_id, competition_id, status, reported_by, reported_at, updated_at, resolved_at) VALUES
 ('Défaillance du système de chronométrage du bassin 2 — arrêt momentané pendant 15 minutes',
  'MOYEN', 'TECHNIQUE', 1, 5, 'RESOLU', 'comm.natation',
  '2026-08-02 10:15:00', '2026-08-02 10:45:00', '2026-08-02 10:45:00'),
@@ -948,7 +948,7 @@ INSERT INTO notification (type, contenu, date_envoi, id_event, id_spectateur, so
 -- ══════════════════════════════
 -- 15. TICKETS
 -- ══════════════════════════════
-INSERT INTO ticket (category, base_price, spectator_id, epreuve_id) VALUES
+INSERT INTO ticket_model (category, base_price, spectator_id, epreuve_id) VALUES
 -- Spectateurs 59-80 achètent des billets
 ('VIP',     150.0, 59, 2),  -- 100m NL H Finale
 ('TRIBUNE',  75.0, 59, 4),  -- 100m NL F Finale
