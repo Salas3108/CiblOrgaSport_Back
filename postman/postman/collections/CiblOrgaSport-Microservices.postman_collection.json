@@ -156,7 +156,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"commissaire2\",\n  \"password\": \"commissaire2\"\n}"
+              "raw": "{\n  \"username\": \"comm.natation\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{auth_base}}/auth/login",
@@ -193,6 +193,18 @@
                 "packages": {},
                 "requests": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "f0a3536e-2e42-475d-805b-17ed8fde8bf8",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
             }
           ],
           "id": "b4c59135-d276-4c86-8b8a-13e1e296428d",
@@ -206,7 +218,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"admin3\",\n  \"password\": \"admin3\"\n}"
+              "raw": "{\n  \"username\": \"marius.admin\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{auth_base}}/auth/login",
@@ -268,7 +280,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"athlete2\",\n  \"password\": \"athlete\"\n}"
+              "raw": "{\n  \"username\": \"leon.marc\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{auth_base}}/auth/login",
@@ -330,7 +342,69 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"volontaire1\",\n  \"password\": \"volontaire1\"\n}"
+              "raw": "{\n  \"username\": \"vol.sophie.martin\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_base}}/auth/login",
+              "host": [
+                "{{auth_base}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-spect",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d2521549-adc7-472c-aeba-83b3615fbc04",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "dee627cd-49a3-4e51-b2c1-fea748086ed9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "5fabb37e-4274-4739-a181-770360239698",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice.dupont\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{auth_base}}/auth/login",
@@ -429,24 +503,57 @@
           "response": []
         },
         {
-          "name": "Validate Volunteer (ADMIN)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Response confirms volunteer validation\", function () {",
-                  "    pm.expect(pm.response.text()).to.include(\"Volontaire\");",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "Athlete - Upload Doc PDF",
           "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "certificatMedical",
+                  "type": "file",
+                  "description": "PDF du certificat médical",
+                  "src": [
+                    "/C:/Users/MASSIVE/Downloads/Motiv-DCI.pdf"
+                  ]
+                },
+                {
+                  "key": "passport",
+                  "type": "file",
+                  "description": "PDF du passeport",
+                  "src": [
+                    "/C:/Users/MASSIVE/Downloads/Motiv-ILSD.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "athlete",
+                "{{athleteId}}",
+                "doc",
+                "upload"
+              ]
+            },
+            "description": "Upload de vrais fichiers PDF (multipart/form-data). Token JWT de l'athlète requis. Les deux fichiers sont optionnels mais au moins un est obligatoire."
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Athlete (ADMIN) Copy",
+          "id": "7ce810f4-c266-4146-8e4d-fe5b720e36d9",
           "request": {
             "method": "POST",
             "header": [

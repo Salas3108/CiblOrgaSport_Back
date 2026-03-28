@@ -16,113 +16,113 @@ INSERT INTO lieu (nom, adresse, ville, code_postal, pays, capacite_spectateurs) 
 -- 2. USERS & AUTH
 -- ══════════════════════════════
 -- Hash BCrypt de "password123"
--- $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.
+-- $2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK
 
 -- 1 ADMIN (id=1)
 INSERT INTO users (id, username, email, password, role, created_at, updated_at, validated) VALUES
-(1, 'marius.admin', 'marius.admin@ciblorgasport.fr', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ADMIN', '2026-01-10 08:00:00', '2026-01-10 08:00:00', true);
+(1, 'marius.admin', 'marius.admin@ciblorgasport.fr', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ADMIN', '2026-01-10 08:00:00', '2026-01-10 08:00:00', true);
 
 -- 40 ATHLETES (ids 2-41)
 INSERT INTO users (id, username, email, password, role, created_at, updated_at, validated) VALUES
 -- France (ids 2-6)
-(2,  'leon.marc',      'leon.marc@equipe-france.fr',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-01 09:00:00', '2026-02-01 09:00:00', true),
-(3,  'marie.claire',   'marie.claire@equipe-france.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-01 09:05:00', '2026-02-01 09:05:00', true),
-(4,  'florent.manaud', 'florent.manaud@equipe-france.fr','$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-01 09:10:00', '2026-02-01 09:10:00', true),
-(5,  'pauline.duval',  'pauline.duval@equipe-france.fr', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-01 09:15:00', '2026-02-01 09:15:00', true),
-(6,  'hugo.bernard',   'hugo.bernard@equipe-france.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-01 09:20:00', '2026-02-01 09:20:00', true),
+(2,  'leon.marc',      'leon.marc@equipe-france.fr',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-01 09:00:00', '2026-02-01 09:00:00', true),
+(3,  'marie.claire',   'marie.claire@equipe-france.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-01 09:05:00', '2026-02-01 09:05:00', true),
+(4,  'florent.manaud', 'florent.manaud@equipe-france.fr','$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-01 09:10:00', '2026-02-01 09:10:00', true),
+(5,  'pauline.duval',  'pauline.duval@equipe-france.fr', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-01 09:15:00', '2026-02-01 09:15:00', true),
+(6,  'hugo.bernard',   'hugo.bernard@equipe-france.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-01 09:20:00', '2026-02-01 09:20:00', true),
 -- Italie (ids 7-11)
-(7,  'fede.pellegrini',   'fede.pellegrini@teamitalia.it',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-02 09:00:00', '2026-02-02 09:00:00', true),
-(8,  'marco.orsi',        'marco.orsi@teamitalia.it',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-02 09:05:00', '2026-02-02 09:05:00', true),
-(9,  'simona.quadarella', 'simona.quad@teamitalia.it',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-02 09:10:00', '2026-02-02 09:10:00', true),
-(10, 'luca.dotto',        'luca.dotto@teamitalia.it',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-02 09:15:00', '2026-02-02 09:15:00', true),
-(11, 'ilaria.bianchi',    'ilaria.bianchi@teamitalia.it',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-02 09:20:00', '2026-02-02 09:20:00', true),
+(7,  'fede.pellegrini',   'fede.pellegrini@teamitalia.it',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-02 09:00:00', '2026-02-02 09:00:00', true),
+(8,  'marco.orsi',        'marco.orsi@teamitalia.it',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-02 09:05:00', '2026-02-02 09:05:00', true),
+(9,  'simona.quadarella', 'simona.quad@teamitalia.it',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-02 09:10:00', '2026-02-02 09:10:00', true),
+(10, 'luca.dotto',        'luca.dotto@teamitalia.it',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-02 09:15:00', '2026-02-02 09:15:00', true),
+(11, 'ilaria.bianchi',    'ilaria.bianchi@teamitalia.it',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-02 09:20:00', '2026-02-02 09:20:00', true),
 -- Hongrie (ids 12-16)
-(12, 'kristof.milak',  'kristof.milak@teamhungary.hu',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-03 09:00:00', '2026-02-03 09:00:00', true),
-(13, 'katinka.hosszu', 'katinka.hosszu@teamhungary.hu',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-03 09:05:00', '2026-02-03 09:05:00', true),
-(14, 'dominik.kozma',  'dominik.kozma@teamhungary.hu',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-03 09:10:00', '2026-02-03 09:10:00', true),
-(15, 'boglarka.kapas', 'boglarka.kapas@teamhungary.hu',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-03 09:15:00', '2026-02-03 09:15:00', true),
-(16, 'david.nemeth',   'david.nemeth@teamhungary.hu',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-03 09:20:00', '2026-02-03 09:20:00', true),
+(12, 'kristof.milak',  'kristof.milak@teamhungary.hu',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-03 09:00:00', '2026-02-03 09:00:00', true),
+(13, 'katinka.hosszu', 'katinka.hosszu@teamhungary.hu',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-03 09:05:00', '2026-02-03 09:05:00', true),
+(14, 'dominik.kozma',  'dominik.kozma@teamhungary.hu',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-03 09:10:00', '2026-02-03 09:10:00', true),
+(15, 'boglarka.kapas', 'boglarka.kapas@teamhungary.hu',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-03 09:15:00', '2026-02-03 09:15:00', true),
+(16, 'david.nemeth',   'david.nemeth@teamhungary.hu',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-03 09:20:00', '2026-02-03 09:20:00', true),
 -- Allemagne (ids 17-21)
-(17, 'florian.wellbrock', 'florian.wellbrock@teamgermany.de', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-04 09:00:00', '2026-02-04 09:00:00', true),
-(18, 'sarah.kohler',      'sarah.kohler@teamgermany.de',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-04 09:05:00', '2026-02-04 09:05:00', true),
-(19, 'marco.fischer',     'marco.fischer@teamgermany.de',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-04 09:10:00', '2026-02-04 09:10:00', true),
-(20, 'anna.egorova',      'anna.egorova@teamgermany.de',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-04 09:15:00', '2026-02-04 09:15:00', true),
-(21, 'lukas.martens',     'lukas.martens@teamgermany.de',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-04 09:20:00', '2026-02-04 09:20:00', true),
+(17, 'florian.wellbrock', 'florian.wellbrock@teamgermany.de', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-04 09:00:00', '2026-02-04 09:00:00', true),
+(18, 'sarah.kohler',      'sarah.kohler@teamgermany.de',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-04 09:05:00', '2026-02-04 09:05:00', true),
+(19, 'marco.fischer',     'marco.fischer@teamgermany.de',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-04 09:10:00', '2026-02-04 09:10:00', true),
+(20, 'anna.egorova',      'anna.egorova@teamgermany.de',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-04 09:15:00', '2026-02-04 09:15:00', true),
+(21, 'lukas.martens',     'lukas.martens@teamgermany.de',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-04 09:20:00', '2026-02-04 09:20:00', true),
 -- Pays-Bas (ids 22-26)
-(22, 'kyle.chalmers.nl',  'kyle.vanderburg@teamnl.nl',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-05 09:00:00', '2026-02-05 09:00:00', true),
-(23, 'ranomi.krom',       'ranomi.krom@teamnl.nl',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-05 09:05:00', '2026-02-05 09:05:00', true),
-(24, 'ferry.weertman',    'ferry.weertman@teamnl.nl',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-05 09:10:00', '2026-02-05 09:10:00', true),
-(25, 'arno.kamminga',     'arno.kamminga@teamnl.nl',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-05 09:15:00', '2026-02-05 09:15:00', true),
-(26, 'shayna.jack.nl',    'shayna.vanderberg@teamnl.nl', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-05 09:20:00', '2026-02-05 09:20:00', true),
+(22, 'kyle.chalmers.nl',  'kyle.vanderburg@teamnl.nl',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-05 09:00:00', '2026-02-05 09:00:00', true),
+(23, 'ranomi.krom',       'ranomi.krom@teamnl.nl',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-05 09:05:00', '2026-02-05 09:05:00', true),
+(24, 'ferry.weertman',    'ferry.weertman@teamnl.nl',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-05 09:10:00', '2026-02-05 09:10:00', true),
+(25, 'arno.kamminga',     'arno.kamminga@teamnl.nl',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-05 09:15:00', '2026-02-05 09:15:00', true),
+(26, 'shayna.jack.nl',    'shayna.vanderberg@teamnl.nl', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-05 09:20:00', '2026-02-05 09:20:00', true),
 -- Espagne (ids 27-31)
-(27, 'miguel.duran',     'miguel.duran@teamspain.es',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-06 09:00:00', '2026-02-06 09:00:00', true),
-(28, 'jessica.vall',     'jessica.vall@teamspain.es',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-06 09:05:00', '2026-02-06 09:05:00', true),
-(29, 'david.castro',     'david.castro@teamspain.es',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-06 09:10:00', '2026-02-06 09:10:00', true),
-(30, 'alba.vazquez',     'alba.vazquez@teamspain.es',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-06 09:15:00', '2026-02-06 09:15:00', true),
-(31, 'fernando.olmedo',  'fernando.olmedo@teamspain.es', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-06 09:20:00', '2026-02-06 09:20:00', true),
+(27, 'miguel.duran',     'miguel.duran@teamspain.es',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-06 09:00:00', '2026-02-06 09:00:00', true),
+(28, 'jessica.vall',     'jessica.vall@teamspain.es',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-06 09:05:00', '2026-02-06 09:05:00', true),
+(29, 'david.castro',     'david.castro@teamspain.es',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-06 09:10:00', '2026-02-06 09:10:00', true),
+(30, 'alba.vazquez',     'alba.vazquez@teamspain.es',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-06 09:15:00', '2026-02-06 09:15:00', true),
+(31, 'fernando.olmedo',  'fernando.olmedo@teamspain.es', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-06 09:20:00', '2026-02-06 09:20:00', true),
 -- Grande-Bretagne (ids 32-36)
-(32, 'adam.peaty',       'adam.peaty@teamgb.co.uk',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-07 09:00:00', '2026-02-07 09:00:00', true),
-(33, 'anna.ekins',       'anna.ekins@teamgb.co.uk',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-07 09:05:00', '2026-02-07 09:05:00', true),
-(34, 'james.wilby',      'james.wilby@teamgb.co.uk',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-07 09:10:00', '2026-02-07 09:10:00', true),
-(35, 'freya.anderson',   'freya.anderson@teamgb.co.uk',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-07 09:15:00', '2026-02-07 09:15:00', true),
-(36, 'tom.dean',         'tom.dean@teamgb.co.uk',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-07 09:20:00', '2026-02-07 09:20:00', true),
+(32, 'adam.peaty',       'adam.peaty@teamgb.co.uk',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-07 09:00:00', '2026-02-07 09:00:00', true),
+(33, 'anna.ekins',       'anna.ekins@teamgb.co.uk',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-07 09:05:00', '2026-02-07 09:05:00', true),
+(34, 'james.wilby',      'james.wilby@teamgb.co.uk',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-07 09:10:00', '2026-02-07 09:10:00', true),
+(35, 'freya.anderson',   'freya.anderson@teamgb.co.uk',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-07 09:15:00', '2026-02-07 09:15:00', true),
+(36, 'tom.dean',         'tom.dean@teamgb.co.uk',        '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-07 09:20:00', '2026-02-07 09:20:00', true),
 -- Suède (ids 37-41)
-(37, 'sarah.sjostrom',   'sarah.sjostrom@teamsweden.se', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-08 09:00:00', '2026-02-08 09:00:00', true),
-(38, 'louise.hansson',   'louise.hansson@teamsweden.se', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-08 09:05:00', '2026-02-08 09:05:00', true),
-(39, 'bjorn.larsson',    'bjorn.larsson@teamsweden.se',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-08 09:10:00', '2026-02-08 09:10:00', true),
-(40, 'erik.persson',     'erik.persson@teamsweden.se',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-08 09:15:00', '2026-02-08 09:15:00', true),
-(41, 'linn.sjoberg',     'linn.sjoberg@teamsweden.se',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'ATHLETE', '2026-02-08 09:20:00', '2026-02-08 09:20:00', true);
+(37, 'sarah.sjostrom',   'sarah.sjostrom@teamsweden.se', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-08 09:00:00', '2026-02-08 09:00:00', true),
+(38, 'louise.hansson',   'louise.hansson@teamsweden.se', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-08 09:05:00', '2026-02-08 09:05:00', true),
+(39, 'bjorn.larsson',    'bjorn.larsson@teamsweden.se',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-08 09:10:00', '2026-02-08 09:10:00', true),
+(40, 'erik.persson',     'erik.persson@teamsweden.se',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-08 09:15:00', '2026-02-08 09:15:00', true),
+(41, 'linn.sjoberg',     'linn.sjoberg@teamsweden.se',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'ATHLETE', '2026-02-08 09:20:00', '2026-02-08 09:20:00', true);
 
 -- 5 COMMISSAIRES (ids 42-46, 1 par discipline)
 INSERT INTO users (id, username, email, password, role, created_at, updated_at, validated) VALUES
-(42, 'comm.natation',          'comm.natation@ciblorgasport.fr',          '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'COMMISSAIRE', '2026-01-15 08:00:00', '2026-01-15 08:00:00', true),
-(43, 'comm.waterpolo',         'comm.waterpolo@ciblorgasport.fr',         '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'COMMISSAIRE', '2026-01-15 08:05:00', '2026-01-15 08:05:00', true),
-(44, 'comm.natation.artis',    'comm.natartis@ciblorgasport.fr',          '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'COMMISSAIRE', '2026-01-15 08:10:00', '2026-01-15 08:10:00', true),
-(45, 'comm.plongeon',          'comm.plongeon@ciblorgasport.fr',          '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'COMMISSAIRE', '2026-01-15 08:15:00', '2026-01-15 08:15:00', true),
-(46, 'comm.eau.libre',         'comm.eaulibre@ciblorgasport.fr',          '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'COMMISSAIRE', '2026-01-15 08:20:00', '2026-01-15 08:20:00', true);
+(42, 'comm.natation',          'comm.natation@ciblorgasport.fr',          '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'COMMISSAIRE', '2026-01-15 08:00:00', '2026-01-15 08:00:00', true),
+(43, 'comm.waterpolo',         'comm.waterpolo@ciblorgasport.fr',         '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'COMMISSAIRE', '2026-01-15 08:05:00', '2026-01-15 08:05:00', true),
+(44, 'comm.natation.artis',    'comm.natartis@ciblorgasport.fr',          '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'COMMISSAIRE', '2026-01-15 08:10:00', '2026-01-15 08:10:00', true),
+(45, 'comm.plongeon',          'comm.plongeon@ciblorgasport.fr',          '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'COMMISSAIRE', '2026-01-15 08:15:00', '2026-01-15 08:15:00', true),
+(46, 'comm.eau.libre',         'comm.eaulibre@ciblorgasport.fr',          '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'COMMISSAIRE', '2026-01-15 08:20:00', '2026-01-15 08:20:00', true);
 
 -- 12 VOLONTAIRES (ids 47-58) — étape 1 : validated=false
 INSERT INTO users (id, username, email, password, role, created_at, updated_at, validated) VALUES
-(47, 'vol.sophie.martin',   'sophie.martin@volunteer.fr',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-01 10:00:00', '2026-03-01 10:00:00', false),
-(48, 'vol.thomas.leclerc',  'thomas.leclerc@volunteer.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-01 10:05:00', '2026-03-01 10:05:00', false),
-(49, 'vol.amelia.lambert',  'amelia.lambert@volunteer.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-02 10:00:00', '2026-03-02 10:00:00', false),
-(50, 'vol.nicolas.girard',  'nicolas.girard@volunteer.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-02 10:05:00', '2026-03-02 10:05:00', false),
-(51, 'vol.camille.robert',  'camille.robert@volunteer.fr',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-03 10:00:00', '2026-03-03 10:00:00', false),
-(52, 'vol.julien.petit',    'julien.petit@volunteer.fr',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-03 10:05:00', '2026-03-03 10:05:00', false),
-(53, 'vol.lea.moreau',      'lea.moreau@volunteer.fr',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-04 10:00:00', '2026-03-04 10:00:00', false),
-(54, 'vol.marc.simon',      'marc.simon@volunteer.fr',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-04 10:05:00', '2026-03-04 10:05:00', false),
-(55, 'vol.elena.garcia',    'elena.garcia@volunteer.fr',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-05 10:00:00', '2026-03-05 10:00:00', false),
-(56, 'vol.pierre.henry',    'pierre.henry@volunteer.fr',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-05 10:05:00', '2026-03-05 10:05:00', false),
-(57, 'vol.sarah.david',     'sarah.david@volunteer.fr',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-06 10:00:00', '2026-03-06 10:00:00', false),
-(58, 'vol.antoine.blanc',   'antoine.blanc@volunteer.fr',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'VOLONTAIRE', '2026-03-06 10:05:00', '2026-03-06 10:05:00', false);
+(47, 'vol.sophie.martin',   'sophie.martin@volunteer.fr',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-01 10:00:00', '2026-03-01 10:00:00', false),
+(48, 'vol.thomas.leclerc',  'thomas.leclerc@volunteer.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-01 10:05:00', '2026-03-01 10:05:00', false),
+(49, 'vol.amelia.lambert',  'amelia.lambert@volunteer.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-02 10:00:00', '2026-03-02 10:00:00', false),
+(50, 'vol.nicolas.girard',  'nicolas.girard@volunteer.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-02 10:05:00', '2026-03-02 10:05:00', false),
+(51, 'vol.camille.robert',  'camille.robert@volunteer.fr',  '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-03 10:00:00', '2026-03-03 10:00:00', false),
+(52, 'vol.julien.petit',    'julien.petit@volunteer.fr',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-03 10:05:00', '2026-03-03 10:05:00', false),
+(53, 'vol.lea.moreau',      'lea.moreau@volunteer.fr',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-04 10:00:00', '2026-03-04 10:00:00', false),
+(54, 'vol.marc.simon',      'marc.simon@volunteer.fr',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-04 10:05:00', '2026-03-04 10:05:00', false),
+(55, 'vol.elena.garcia',    'elena.garcia@volunteer.fr',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-05 10:00:00', '2026-03-05 10:00:00', false),
+(56, 'vol.pierre.henry',    'pierre.henry@volunteer.fr',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-05 10:05:00', '2026-03-05 10:05:00', false),
+(57, 'vol.sarah.david',     'sarah.david@volunteer.fr',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-06 10:00:00', '2026-03-06 10:00:00', false),
+(58, 'vol.antoine.blanc',   'antoine.blanc@volunteer.fr',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'VOLONTAIRE', '2026-03-06 10:05:00', '2026-03-06 10:05:00', false);
 
 -- Étape 2 : Validation des volontaires par l'admin Marius
 UPDATE users SET validated = true, updated_at = '2026-03-15 09:00:00' WHERE id BETWEEN 47 AND 58;
 
 -- 22 SPECTATEURS (ids 59-80, role=USER)
 INSERT INTO users (id, username, email, password, role, created_at, updated_at, validated) VALUES
-(59, 'alice.dupont',     'alice.dupont@gmail.com',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-01 10:00:00', '2026-04-01 10:00:00', true),
-(60, 'bob.martin',       'bob.martin@gmail.com',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-01 10:05:00', '2026-04-01 10:05:00', true),
-(61, 'claire.leroy',     'claire.leroy@outlook.com',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-02 10:00:00', '2026-04-02 10:00:00', true),
-(62, 'david.thomas',     'david.thomas@yahoo.fr',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-02 10:05:00', '2026-04-02 10:05:00', true),
-(63, 'emma.garcia',      'emma.garcia@gmail.com',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-03 10:00:00', '2026-04-03 10:00:00', true),
-(64, 'franck.roux',      'franck.roux@gmail.com',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-03 10:05:00', '2026-04-03 10:05:00', true),
-(65, 'grace.lopez',      'grace.lopez@hotmail.com',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-04 10:00:00', '2026-04-04 10:00:00', true),
-(66, 'henri.bertrand',   'henri.bertrand@gmail.com',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-04 10:05:00', '2026-04-04 10:05:00', true),
-(67, 'isabelle.simon',   'isabelle.simon@orange.fr',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-05 10:00:00', '2026-04-05 10:00:00', true),
-(68, 'jean.moulin',      'jean.moulin@gmail.com',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-05 10:05:00', '2026-04-05 10:05:00', true),
-(69, 'karine.michel',    'karine.michel@sfr.fr',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-06 10:00:00', '2026-04-06 10:00:00', true),
-(70, 'laurent.durand',   'laurent.durand@gmail.com',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-06 10:05:00', '2026-04-06 10:05:00', true),
-(71, 'marie.chevalier',  'marie.chevalier@gmail.com',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-07 10:00:00', '2026-04-07 10:00:00', true),
-(72, 'nicolas.faure',    'nicolas.faure@free.fr',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-07 10:05:00', '2026-04-07 10:05:00', true),
-(73, 'olivia.bonnet',    'olivia.bonnet@gmail.com',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-08 10:00:00', '2026-04-08 10:00:00', true),
-(74, 'pascal.giraud',    'pascal.giraud@yahoo.fr',      '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-08 10:05:00', '2026-04-08 10:05:00', true),
-(75, 'quentin.lebrun',   'quentin.lebrun@gmail.com',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-09 10:00:00', '2026-04-09 10:00:00', true),
-(76, 'rachel.vidal',     'rachel.vidal@hotmail.fr',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-09 10:05:00', '2026-04-09 10:05:00', true),
-(77, 'samuel.roy',       'samuel.roy@gmail.com',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-10 10:00:00', '2026-04-10 10:00:00', true),
-(78, 'therese.fernandez','therese.fernandez@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-10 10:05:00', '2026-04-10 10:05:00', true),
-(79, 'ugo.lambert',      'ugo.lambert@orange.fr',       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-11 10:00:00', '2026-04-11 10:00:00', true),
-(80, 'valerie.perrin',   'valerie.perrin@gmail.com',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhu.', 'USER', '2026-04-11 10:05:00', '2026-04-11 10:05:00', true);
+(59, 'alice.dupont',     'alice.dupont@gmail.com',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-01 10:00:00', '2026-04-01 10:00:00', true),
+(60, 'bob.martin',       'bob.martin@gmail.com',        '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-01 10:05:00', '2026-04-01 10:05:00', true),
+(61, 'claire.leroy',     'claire.leroy@outlook.com',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-02 10:00:00', '2026-04-02 10:00:00', true),
+(62, 'david.thomas',     'david.thomas@yahoo.fr',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-02 10:05:00', '2026-04-02 10:05:00', true),
+(63, 'emma.garcia',      'emma.garcia@gmail.com',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-03 10:00:00', '2026-04-03 10:00:00', true),
+(64, 'franck.roux',      'franck.roux@gmail.com',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-03 10:05:00', '2026-04-03 10:05:00', true),
+(65, 'grace.lopez',      'grace.lopez@hotmail.com',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-04 10:00:00', '2026-04-04 10:00:00', true),
+(66, 'henri.bertrand',   'henri.bertrand@gmail.com',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-04 10:05:00', '2026-04-04 10:05:00', true),
+(67, 'isabelle.simon',   'isabelle.simon@orange.fr',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-05 10:00:00', '2026-04-05 10:00:00', true),
+(68, 'jean.moulin',      'jean.moulin@gmail.com',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-05 10:05:00', '2026-04-05 10:05:00', true),
+(69, 'karine.michel',    'karine.michel@sfr.fr',        '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-06 10:00:00', '2026-04-06 10:00:00', true),
+(70, 'laurent.durand',   'laurent.durand@gmail.com',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-06 10:05:00', '2026-04-06 10:05:00', true),
+(71, 'marie.chevalier',  'marie.chevalier@gmail.com',   '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-07 10:00:00', '2026-04-07 10:00:00', true),
+(72, 'nicolas.faure',    'nicolas.faure@free.fr',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-07 10:05:00', '2026-04-07 10:05:00', true),
+(73, 'olivia.bonnet',    'olivia.bonnet@gmail.com',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-08 10:00:00', '2026-04-08 10:00:00', true),
+(74, 'pascal.giraud',    'pascal.giraud@yahoo.fr',      '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-08 10:05:00', '2026-04-08 10:05:00', true),
+(75, 'quentin.lebrun',   'quentin.lebrun@gmail.com',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-09 10:00:00', '2026-04-09 10:00:00', true),
+(76, 'rachel.vidal',     'rachel.vidal@hotmail.fr',     '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-09 10:05:00', '2026-04-09 10:05:00', true),
+(77, 'samuel.roy',       'samuel.roy@gmail.com',        '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-10 10:00:00', '2026-04-10 10:00:00', true),
+(78, 'therese.fernandez','therese.fernandez@gmail.com', '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-10 10:05:00', '2026-04-10 10:05:00', true),
+(79, 'ugo.lambert',      'ugo.lambert@orange.fr',       '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-11 10:00:00', '2026-04-11 10:00:00', true),
+(80, 'valerie.perrin',   'valerie.perrin@gmail.com',    '$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK', 'USER', '2026-04-11 10:05:00', '2026-04-11 10:05:00', true);
 
 -- Réinitialisation de la séquence users après insertions manuelles
 SELECT setval('users_id_seq', 80);

@@ -39,7 +39,19 @@
       "Bash(__NEW_LINE_378f27d9b52e7ffe__ echo:*)",
       "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes/valides -H \"Authorization: Bearer $TOKEN\")",
       "Bash(echo \"=== GET /commissaire/athletes \\(COMMISSAIRE token manquant -> 403 attendu\\) ===\")",
-      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)"
+      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)",
+      "Bash(node -e \"const bcrypt = require\\(''bcryptjs''\\); bcrypt.hash\\(''password123'', 10\\).then\\(h => console.log\\(h\\)\\);\")",
+      "Bash(node -e \"const bcrypt = require\\(''bcrypt''\\); bcrypt.hash\\(''password123'', 10\\).then\\(h => console.log\\(h\\)\\);\")",
+      "Bash(find d:/MIAGE/Glop/CiblOrgaSport_Back/auth-service/target -name *.jar)",
+      "Bash(mvn -f auth-service/pom.xml exec:java -Dexec.mainClass=\"com.ciblorgasport.authservice.AuthServiceApplication\" -Dexec.args=\"--spring.main.web-application-type=none\" -q)",
+      "Read(//tmp/**)",
+      "Bash(javac -cp BOOT-INF/lib/spring-security-crypto-6.2.0.jar:BOOT-INF/lib/slf4j-api-2.0.9.jar /tmp/TestHash.java -d /tmp/)",
+      "Bash(java -cp /tmp:BOOT-INF/lib/spring-security-crypto-6.2.0.jar:BOOT-INF/lib/slf4j-api-2.0.9.jar TestHash)",
+      "Bash(javac -cp \"BOOT-INF/lib/spring-security-crypto-6.2.0.jar;BOOT-INF/lib/slf4j-api-2.0.9.jar\" /tmp/TestHash.java -d /tmp/)",
+      "Bash(java -cp \"/tmp;BOOT-INF/lib/spring-security-crypto-6.2.0.jar;BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash)",
+      "Bash(javac -cp \"/tmp/jarextract/BOOT-INF/lib/spring-security-crypto-6.2.0.jar;/tmp/jarextract/BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash.java)",
+      "Bash(java -cp \".;/tmp/jarextract/BOOT-INF/lib/spring-security-crypto-6.2.0.jar;/tmp/jarextract/BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash)",
+      "Bash(ls /tmp/jarextract/BOOT-INF/lib/spring-security-crypto-*.jar)"
     ]
   }
 }
