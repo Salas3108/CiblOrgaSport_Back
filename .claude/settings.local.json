@@ -39,7 +39,9 @@
       "Bash(__NEW_LINE_378f27d9b52e7ffe__ echo:*)",
       "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes/valides -H \"Authorization: Bearer $TOKEN\")",
       "Bash(echo \"=== GET /commissaire/athletes \\(COMMISSAIRE token manquant -> 403 attendu\\) ===\")",
-      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)"
+      "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
