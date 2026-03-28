@@ -1026,13 +1026,13 @@ SELECT
     WHEN 0  THEN 'USER_LOGIN'
     WHEN 1  THEN 'USER_LOGOUT'
     WHEN 2  THEN 'USER_REGISTER'
-    WHEN 3  THEN 'COMPETITION_VIEW'
-    WHEN 4  THEN 'COMPETITION_VIEW'
-    WHEN 5  THEN 'COMPETITION_VIEW'
+    WHEN 3  THEN 'EPREUVE_VIEW'
+    WHEN 4  THEN 'EPREUVE_VIEW'
+    WHEN 5  THEN 'EPREUVE_VIEW'
     WHEN 6  THEN 'EPREUVE_VIEW'
     WHEN 7  THEN 'EPREUVE_VIEW'
-    WHEN 8  THEN 'EPREUVE_VIEW'
-    WHEN 9  THEN 'EVENT_VIEW'
+    WHEN 8  THEN 'COMPETITION_VIEW'
+    WHEN 9  THEN 'COMPETITION_VIEW'
     WHEN 10 THEN 'EVENT_VIEW'
     WHEN 11 THEN 'ATHLETE_PROFILE_VIEW'
     WHEN 12 THEN 'NOTIFICATION_SUBSCRIBED'
@@ -1097,13 +1097,13 @@ SELECT
   CASE (floor(random() * 25)::int)
     WHEN 0  THEN 'USER_LOGIN'
     WHEN 1  THEN 'USER_LOGOUT'
-    WHEN 2  THEN 'COMPETITION_VIEW'
-    WHEN 3  THEN 'COMPETITION_VIEW'
-    WHEN 4  THEN 'COMPETITION_VIEW'
-    WHEN 5  THEN 'COMPETITION_VIEW'
+    WHEN 2  THEN 'EPREUVE_VIEW'
+    WHEN 3  THEN 'EPREUVE_VIEW'
+    WHEN 4  THEN 'EPREUVE_VIEW'
+    WHEN 5  THEN 'EPREUVE_VIEW'
     WHEN 6  THEN 'EPREUVE_VIEW'
-    WHEN 7  THEN 'EPREUVE_VIEW'
-    WHEN 8  THEN 'EPREUVE_VIEW'
+    WHEN 7  THEN 'COMPETITION_VIEW'
+    WHEN 8  THEN 'COMPETITION_VIEW'
     WHEN 9  THEN 'RESULT_VIEW'
     WHEN 10 THEN 'RESULT_VIEW'
     WHEN 11 THEN 'RESULT_VIEW'
@@ -1119,7 +1119,7 @@ SELECT
     WHEN 21 THEN 'INCIDENT_DECLARED'
     WHEN 22 THEN 'NOTIFICATION_SUBSCRIBED'
     WHEN 23 THEN 'RESULT_VIEW'
-    ELSE         'PAGE_VIEW'
+    ELSE         'EPREUVE_VIEW'
   END AS event_type,
   CASE (floor(random() * 8)::int)
     WHEN 0 THEN '/api/competitions'
@@ -1338,6 +1338,28 @@ SELECT
 FROM week_summary ws
 JOIN peak_days pd ON ws.week_start = pd.week_start
 ORDER BY ws.week_start;
+
+-- ══════════════════════════════════════════════════════════════
+-- REJETS COMMISSAIRES + MESSAGES
+-- ══════════════════════════════════════════════════════════════
+-- Athlète 20 (anna.egorova, Allemagne) : passeport expiré
+-- Athlète 30 (alba.vazquez, Espagne)   : certificat médical non conforme
+
+UPDATE athletes
+SET valide = false,
+    motif_refus = 'Passeport expiré — document non valide pour la compétition internationale'
+WHERE id = 20;
+
+UPDATE athletes
+SET valide = false,
+    motif_refus = 'Certificat médical non conforme : tampon manquant et date antérieure à 6 mois'
+WHERE id = 30;
+
+INSERT INTO messages (athlete_id, contenu, created_at) VALUES
+(20, 'Votre passeport est arrivé à expiration le 2026-01-15. Vous devez fournir un passeport valide sous 48h pour rester en compétition.', '2026-02-20 09:15:00'),
+(20, 'Après vérification, votre dossier reste incomplet. Votre inscription est suspendue dans l''attente d''un nouveau passeport.', '2026-02-22 14:30:00'),
+(30, 'Votre certificat médical ne porte pas le tampon du médecin fédéral et date de plus de 6 mois. Un nouveau certificat est requis.', '2026-02-21 10:00:00'),
+(30, 'Délai dépassé — aucun document reçu depuis notre dernier message. Votre dossier a été rejeté.', '2026-02-25 16:45:00');
 
 -- ══════════════════════════════════════════════════════════════
 -- REQUÊTE DE VÉRIFICATION FINALE

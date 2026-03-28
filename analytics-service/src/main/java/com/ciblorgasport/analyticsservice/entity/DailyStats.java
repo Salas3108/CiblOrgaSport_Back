@@ -57,8 +57,17 @@ public class DailyStats {
     @Column(name = "total_competition_views")
     private Integer totalCompetitionViews = 0;
 
+    @Column(name = "total_epreuve_views")
+    private Integer totalEpreuveViews = 0;
+
     @Column(name = "total_result_views")
     private Integer totalResultViews = 0;
+
+    @Column(name = "total_event_views")
+    private Integer totalEventViews = 0;
+
+    @Column(name = "total_athlete_profile_views")
+    private Integer totalAthleteProfileViews = 0;
 
     @Column(name = "avg_session_duration_ms")
     private Long avgSessionDurationMs = 0L;
@@ -105,8 +114,14 @@ public class DailyStats {
     public void setTotalSubscriptions(Integer totalSubscriptions) { this.totalSubscriptions = totalSubscriptions; }
     public Integer getTotalCompetitionViews() { return totalCompetitionViews; }
     public void setTotalCompetitionViews(Integer totalCompetitionViews) { this.totalCompetitionViews = totalCompetitionViews; }
+    public Integer getTotalEpreuveViews() { return totalEpreuveViews; }
+    public void setTotalEpreuveViews(Integer totalEpreuveViews) { this.totalEpreuveViews = totalEpreuveViews; }
     public Integer getTotalResultViews() { return totalResultViews; }
     public void setTotalResultViews(Integer totalResultViews) { this.totalResultViews = totalResultViews; }
+    public Integer getTotalEventViews() { return totalEventViews; }
+    public void setTotalEventViews(Integer totalEventViews) { this.totalEventViews = totalEventViews; }
+    public Integer getTotalAthleteProfileViews() { return totalAthleteProfileViews; }
+    public void setTotalAthleteProfileViews(Integer totalAthleteProfileViews) { this.totalAthleteProfileViews = totalAthleteProfileViews; }
     public Long getAvgSessionDurationMs() { return avgSessionDurationMs; }
     public void setAvgSessionDurationMs(Long avgSessionDurationMs) { this.avgSessionDurationMs = avgSessionDurationMs; }
     public Long getAvgResponseTimeMs() { return avgResponseTimeMs; }

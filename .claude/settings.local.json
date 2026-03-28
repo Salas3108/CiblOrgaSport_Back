@@ -51,7 +51,9 @@
       "Bash(java -cp \"/tmp;BOOT-INF/lib/spring-security-crypto-6.2.0.jar;BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash)",
       "Bash(javac -cp \"/tmp/jarextract/BOOT-INF/lib/spring-security-crypto-6.2.0.jar;/tmp/jarextract/BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash.java)",
       "Bash(java -cp \".;/tmp/jarextract/BOOT-INF/lib/spring-security-crypto-6.2.0.jar;/tmp/jarextract/BOOT-INF/lib/slf4j-api-2.0.9.jar\" TestHash)",
-      "Bash(ls /tmp/jarextract/BOOT-INF/lib/spring-security-crypto-*.jar)"
+      "Bash(ls /tmp/jarextract/BOOT-INF/lib/spring-security-crypto-*.jar)",
+      "Bash(grep -n \"SELECT ''lieu''\" d:/MIAGE/Glop/CiblOrgaSport_Back/sql/data-demo.sql)",
+      "Bash(grep -n \"UNION ALL SELECT ''event''\" d:/MIAGE/Glop/CiblOrgaSport_Back/sql/data-demo.sql)"
     ]
   }
 }

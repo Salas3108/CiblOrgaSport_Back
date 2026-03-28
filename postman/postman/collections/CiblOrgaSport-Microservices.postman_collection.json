@@ -280,7 +280,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"leon.marc\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"username\": \"marie.claire\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{auth_base}}/auth/login",
@@ -521,7 +521,7 @@
                   "type": "file",
                   "description": "PDF du certificat médical",
                   "src": [
-                    "/C:/Users/MASSIVE/Downloads/Motiv-DCI.pdf"
+                    "/C:/Users/MASSIVE/Downloads/certificat_medical.pdf"
                   ]
                 },
                 {
@@ -529,7 +529,7 @@
                   "type": "file",
                   "description": "PDF du passeport",
                   "src": [
-                    "/C:/Users/MASSIVE/Downloads/Motiv-ILSD.pdf"
+                    "/C:/Users/MASSIVE/Downloads/passeport.pdf"
                   ]
                 }
               ]
@@ -552,7 +552,7 @@
           "response": []
         },
         {
-          "name": "Validate Athlete (ADMIN) Copy",
+          "name": "Validate Volontaire",
           "id": "7ce810f4-c266-4146-8e4d-fe5b720e36d9",
           "request": {
             "method": "POST",

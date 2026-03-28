@@ -336,6 +336,55 @@
       "response": []
     },
     {
+      "name": "Athlete - Upload Doc PDF",
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "certificatMedical",
+              "type": "file",
+              "description": "PDF du certificat médical",
+              "src": [
+                "/C:/Users/MASSIVE/Downloads/certificat_medical.pdf"
+              ]
+            },
+            {
+              "key": "passport",
+              "type": "file",
+              "description": "PDF du passeport",
+              "src": [
+                "/C:/Users/MASSIVE/Downloads/passeport.pdf"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc/upload",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "doc",
+            "upload"
+          ]
+        },
+        "description": "Upload de vrais fichiers PDF (multipart/form-data). Token JWT de l'athlète requis. Les deux fichiers sont optionnels mais au moins un est obligatoire."
+      },
+      "response": []
+    },
+    {
       "name": "Athlete - Post Doc",
       "id": "6f6f8939-7b57-4389-a9c7-7884fcb8f3d3",
       "request": {
@@ -370,55 +419,6 @@
       "response": []
     },
     {
-      "name": "Athlete - Upload Doc PDF",
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token}}"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "certificatMedical",
-              "type": "file",
-              "description": "PDF du certificat médical",
-              "src": [
-                "/C:/Users/MASSIVE/Downloads/Motiv-DCI.pdf"
-              ]
-            },
-            {
-              "key": "passport",
-              "type": "file",
-              "description": "PDF du passeport",
-              "src": [
-                "/C:/Users/MASSIVE/Downloads/Motiv-ILSD.pdf"
-              ]
-            }
-          ]
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc/upload",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "athlete",
-            "{{athleteId}}",
-            "doc",
-            "upload"
-          ]
-        },
-        "description": "Upload de vrais fichiers PDF (multipart/form-data). Token JWT de l'athlète requis. Les deux fichiers sont optionnels mais au moins un est obligatoire."
-      },
-      "response": []
-    },
-    {
       "name": "Athlete - Download Certificat Medical",
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "request": {
@@ -431,8 +431,16 @@
         ],
         "url": {
           "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc/certificatMedical",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "athlete", "{{athleteId}}", "doc", "certificatMedical"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "doc",
+            "certificatMedical"
+          ]
         },
         "description": "Télécharge le certificat médical PDF de l'athlète. Token JWT de l'athlète ou d'un commissaire/admin requis."
       },
@@ -451,8 +459,16 @@
         ],
         "url": {
           "raw": "{{baseUrl}}/api/athlete/{{athleteId}}/doc/passport",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "athlete", "{{athleteId}}", "doc", "passport"]
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "athlete",
+            "{{athleteId}}",
+            "doc",
+            "passport"
+          ]
         },
         "description": "Télécharge le passeport PDF de l'athlète. Token JWT de l'athlète ou d'un commissaire/admin requis."
       },
