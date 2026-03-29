@@ -17,6 +17,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 import io.jsonwebtoken.Claims;
+import org.springframework.http.HttpMethod;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -31,6 +32,11 @@ public class JwtAuthenticationFilter implements WebFilter {
         
         System.out.println("🌐 Gateway Filter - Path: " + path);
         
+        // Laisser passer les preflight CORS sans vérification JWT
+        if (request.getMethod() == HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+
         // Laisser passer les routes publiques sans vérification JWT
         if (path.startsWith("/auth/") || path.startsWith("/actuator") || path.startsWith("/ws/") || path.startsWith("/ws-")) {
             System.out.println("✅ Public path - allowing without JWT");
