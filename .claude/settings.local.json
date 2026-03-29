@@ -41,7 +41,15 @@
       "Bash(echo \"=== GET /commissaire/athletes \\(COMMISSAIRE token manquant -> 403 attendu\\) ===\")",
       "Bash(curl -s -w \"\\\\nHTTP: %{http_code}\\\\n\" http://localhost:8087/commissaire/athletes)",
       "Bash(git checkout:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node -e \"const bcrypt = require\\(''bcrypt''\\); bcrypt.compare\\(''password123'', ''$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK''\\).then\\(r => console.log\\(r\\)\\)\")",
+      "Bash(python3 -c \"import bcrypt; print\\(bcrypt.checkpw\\(b''password123'', b''$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK''\\)\\)\")",
+      "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"docker exec postgres psql -U admin -d glop -c \"\"SELECT username FROM users WHERE password = ''$2a$10$yX7X6FgYc2twQasrPjvYg.swpmrhe1oElU.wI8Nbs8F2v.8e/o1ZK''\"\" 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"curl -s -X POST http://localhost:8080/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}'' 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8080/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
+      "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8081/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
+      "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"docker exec auth-service curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8081/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
+      "Bash(ssh -o:*)"
     ]
   }
 }
