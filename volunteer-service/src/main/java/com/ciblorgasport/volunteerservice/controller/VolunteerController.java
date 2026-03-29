@@ -23,6 +23,7 @@ public class VolunteerController {
         this.service = service;
     }
 
+    /** Completes or creates the volunteer profile for the authenticated user. */
     @PostMapping("/profile/complete")
     public ResponseEntity<VolunteerProfileDTO> completeProfile(
             @RequestHeader("Authorization") String authHeader,
@@ -32,6 +33,7 @@ public class VolunteerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(completed);
     }
 
+    /** Returns the volunteer profile of the authenticated user. */
     @GetMapping("/profile")
     public ResponseEntity<VolunteerProfileDTO> getMyProfile(
             @RequestHeader("Authorization") String authHeader) {
@@ -41,6 +43,7 @@ public class VolunteerController {
     }
 
 
+    /** Returns today's task schedule for the authenticated volunteer. */
     @GetMapping("/schedule/today")
     public ResponseEntity<List<VolunteerTask>> getTodaySchedule(
             @RequestHeader("Authorization") String authHeader) {
@@ -49,6 +52,7 @@ public class VolunteerController {
         return ResponseEntity.ok(tasks);
     }
 
+    /** Returns the task schedule for the authenticated volunteer, optionally filtered by date. */
     @GetMapping("/schedule")
     public ResponseEntity<List<VolunteerTask>> getSchedule(
             @RequestHeader("Authorization") String authHeader,
