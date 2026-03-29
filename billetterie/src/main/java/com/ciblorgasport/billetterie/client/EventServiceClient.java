@@ -11,7 +11,7 @@ public class EventServiceClient {
     private String eventServiceUrl;
 
     public boolean existsById(Long id) {
-        if (id == null) return true; // no reference to check
+        if (id == null) return false;
         RestTemplate restTemplate = new RestTemplate();
         // Validate Epreuve existence (tickets reference epreuveId)
         // Use /api prefix to match event-service routing when present

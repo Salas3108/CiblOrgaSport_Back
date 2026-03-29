@@ -36,7 +36,7 @@ public class AuthServiceClient {
     }
 
     public boolean existsById(Long id) {
-        if (id == null) return true;
+        if (id == null) return false;
         RestTemplate restTemplate = new RestTemplate();
         String url = authServiceUrl + "/auth/user/exists/" + id;
         try {

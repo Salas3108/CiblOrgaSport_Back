@@ -5,6 +5,7 @@ import com.ciblorgasport.billetterie.client.EventServiceClient;
 import com.ciblorgasport.billetterie.dto.TicketResponse;
 import com.ciblorgasport.billetterie.model.Ticket;
 import com.ciblorgasport.billetterie.service.TicketService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class TicketController {
 	public ResponseEntity<?> create(@RequestBody Ticket ticket) {
 		try {
 			Ticket saved = ticketService.create(ticket);
-			return ResponseEntity.ok(toResponse(saved));
+			return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
