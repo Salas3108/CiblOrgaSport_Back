@@ -172,7 +172,7 @@ public class AuthController {
         return ResponseEntity.ok(map);
     }
 
-    @PostMapping("/login")
+    @PostMapping({"/login", "/signin"})
     public JwtResponse login(@RequestBody LoginRequest loginRequest) {
         return authService.authenticateUser(loginRequest);
     }
