@@ -18,6 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.support.serializer.DeserializationException;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
@@ -36,7 +37,8 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, IncidentCreatedEventV1.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ciblorgasport.notificationsservice.kafka.event");
 
-        JsonDeserializer<IncidentCreatedEventV1> valueDeserializer = new JsonDeserializer<>();
+        JsonDeserializer<IncidentCreatedEventV1> jsonDeserializer = new JsonDeserializer<>();
+        ErrorHandlingDeserializer<IncidentCreatedEventV1> valueDeserializer = new ErrorHandlingDeserializer<>(jsonDeserializer);
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
     }
 
@@ -63,7 +65,8 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, EpreuveRappelEventV1.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ciblorgasport.notificationsservice.kafka.event");
 
-        JsonDeserializer<EpreuveRappelEventV1> valueDeserializer = new JsonDeserializer<>();
+        JsonDeserializer<EpreuveRappelEventV1> jsonDeserializer = new JsonDeserializer<>();
+        ErrorHandlingDeserializer<EpreuveRappelEventV1> valueDeserializer = new ErrorHandlingDeserializer<>(jsonDeserializer);
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
     }
 
@@ -90,7 +93,8 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, ResultatFinalizedEventV1.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.ciblorgasport.notificationsservice.kafka.event");
 
-        JsonDeserializer<ResultatFinalizedEventV1> valueDeserializer = new JsonDeserializer<>();
+        JsonDeserializer<ResultatFinalizedEventV1> jsonDeserializer = new JsonDeserializer<>();
+        ErrorHandlingDeserializer<ResultatFinalizedEventV1> valueDeserializer = new ErrorHandlingDeserializer<>(jsonDeserializer);
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer);
     }
 

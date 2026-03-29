@@ -48,17 +48,16 @@ public class AbonnementController {
             return ResponseEntity.badRequest().body(Map.of("message", "Déjà abonné à cette compétition"));
         }
         Abonnement abonnement = new Abonnement(userId, competitionId);
-        Abonnement saved = abonnementRepo.save(abonnement);
-        return ResponseEntity.ok(abonnementMapper.toDto(saved));
+        abonnementRepo.save(abonnement);
+        return ResponseEntity.ok(Map.of("message", "Abonnement réussi", "competitionId", competitionId));
     }
 
     @DeleteMapping("/unsubscribe")
     public ResponseEntity<?> desabonnerCompetition(@RequestParam Long userId, @RequestParam Long competitionId) {
         Abonnement abonnement = abonnementRepo.findByUserIdAndCompetitionId(userId, competitionId)
             .orElseThrow(() -> new RuntimeException("Non abonné à cette compétition"));
-        AbonnementDTO dto = abonnementMapper.toDto(abonnement);
         abonnementRepo.delete(abonnement);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(Map.of("message", "Désabonnement réussi", "competitionId", competitionId));
     }
 
     /**

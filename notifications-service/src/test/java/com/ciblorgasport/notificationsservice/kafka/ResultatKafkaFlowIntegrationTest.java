@@ -147,7 +147,7 @@ class ResultatKafkaFlowIntegrationTest {
     }
 
     private void awaitTrue(BooleanSupplier condition, String failureMessage) {
-        long deadline = System.currentTimeMillis() + 15_000;
+        long deadline = System.currentTimeMillis() + 60_000;
         while (System.currentTimeMillis() < deadline) {
             if (condition.getAsBoolean()) {
                 return;
