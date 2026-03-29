@@ -49,3 +49,6 @@ claude/
 # Eco-benchmark logs
 eco-benchmark/
 logs/k6-benchmark/
+
+# Production secrets — ne jamais commiter
+.env.prod

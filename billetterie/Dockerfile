@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests package
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
-EXPOSE 8080
+EXPOSE 8083
 ENV JAVA_OPTS=""
 # Use environment variables for DB config (matches application.properties)
 ENV DB_HOST=postgres \
@@ -19,7 +19,7 @@ ENV DB_HOST=postgres \
     DB_PASSWORD=password
 
 # Ensure curl is available for healthcheck and wait-for script (Debian/Alpine differ; adapt if needed)
-RUN apt-get update && apt-get install -y curl netcat && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Copy wait-for script
 COPY wait-for.sh /usr/local/bin/wait-for.sh

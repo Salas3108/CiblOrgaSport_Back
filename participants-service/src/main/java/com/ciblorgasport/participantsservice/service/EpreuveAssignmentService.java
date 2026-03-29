@@ -120,6 +120,20 @@ public class EpreuveAssignmentService {
         return response;
     }
 
+    public Map<String, Object> getAthleteStatut(Long epreuveId, Long athleteId) {
+        EpreuveAthleteAssignment assignment = assignmentRepository
+                .findByAthleteIdAndEpreuveId(athleteId, epreuveId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Participation introuvable pour epreuveId=" + epreuveId + " et athleteId=" + athleteId));
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("epreuveId", epreuveId);
+        response.put("athleteId", athleteId);
+        response.put("statutParticipation", assignment.getStatutParticipation().name());
+        response.put("dateForfait", assignment.getDateForfait());
+        return response;
+    }
+
     public Map<Long, List<Long>> listAllAssignments() {
         Map<Long, List<Long>> result = new LinkedHashMap<>();
         List<EpreuveAthleteAssignment> all = assignmentRepository.findAll();

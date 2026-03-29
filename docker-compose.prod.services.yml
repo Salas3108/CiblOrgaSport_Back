@@ -1,0 +1,350 @@
+# docker-compose.prod.services.yml — à déployer sur vm-services
+# Usage: docker compose -f docker-compose.prod.services.yml --env-file .env.prod up -d
+#
+# PostgreSQL tourne sur le même hôte dans le réseau Docker prod-net.
+# DB_HOST doit valoir "postgres" (nom du service Docker) dans .env.prod.
+
+services:
+
+  # ─── Infrastructure ───────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - prod-net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    restart: always
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
+      MB_DB_DBNAME: metabase_db
+      MB_DB_USER: ${POSTGRES_USER}
+      MB_DB_PASS: ${POSTGRES_PASSWORD}
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: kafka
+    restart: always
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID}
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - prod-net
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ─── Microservices ────────────────────────────────────────────────────────────
+
+  gateway:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-gateway:latest
+    container_name: gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  auth-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-auth:latest
+    container_name: auth-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      # Override hardcoded localhost URLs via Spring relaxed binding
+      SPRING_APPLICATION_JSON: >-
+        {
+          "participants-service.url": "http://participants-service:8087",
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    networks:
+      - prod-net
+
+  billetterie:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-billetterie:latest
+    container_name: billetterie
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      BILL_DB_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      BILL_DB_USER: ${POSTGRES_USER}
+      BILL_DB_PASS: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      SPRING_APPLICATION_JSON: >-
+        {
+          "auth-service.url": "http://auth-service:8081",
+          "event-service.url": "http://event-service:8084",
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    networks:
+      - prod-net
+
+  event-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-event:latest
+    container_name: event-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      PARTICIPANTS_SERVICE_URL: http://participants-service:8087
+      LIEU_SERVICE_URL: http://lieu-service:8090
+      SPRING_APPLICATION_JSON: >-
+        {
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  abonnement-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-abonnement:latest
+    container_name: abonnement-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      SPRING_APPLICATION_JSON: >-
+        {
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    networks:
+      - prod-net
+
+  incident-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-incident:latest
+    container_name: incident-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_APPLICATION_JSON: >-
+        {
+          "lieu-service.url": "http://lieu-service:8090",
+          "auth-service.url": "http://auth-service:8081",
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  participants-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-participants:latest
+    container_name: participants-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      SPRING_APPLICATION_JSON: >-
+        {
+          "auth-service.url": "http://auth-service:8081",
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    networks:
+      - prod-net
+
+  resultats-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-resultats:latest
+    container_name: resultats-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EVENT_SERVICE_URL: http://event-service:8084
+      PARTICIPANTS_SERVICE_URL: http://participants-service:8087
+      SPRING_APPLICATION_JSON: >-
+        {
+          "analytics.service.url": "http://analytics-service:8092"
+        }
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  notifications-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-notifications:latest
+    container_name: notifications-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP: notifications-service
+      ABONNEMENT_SERVICE_URL: http://abonnement-service:8085
+      ANALYTICS_SERVICE_URL: http://analytics-service:8092
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - prod-net
+
+  lieu-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-lieu:latest
+    container_name: lieu-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+      SPRING_APPLICATION_JSON: >-
+        {
+          "auth-service.url": "http://auth-service:8081"
+        }
+    networks:
+      - prod-net
+
+  geolocation-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-geolocation:latest
+    container_name: geolocation-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+    networks:
+      - prod-net
+
+  analytics-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-analytics:latest
+    container_name: analytics-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+    networks:
+      - prod-net
+
+  volunteer-service:
+    image: ${DOCKERHUB_USERNAME}/ciblorgasport-volunteer:latest
+    container_name: volunteer-service
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      AUTH_SERVICE_URL: http://auth-service:8081
+      CIBLORGASPORT_APP_JWTSECRET: ${JWT_SECRET}
+    networks:
+      - prod-net
+
+networks:
+  prod-net:
+    name: prod-net
+    driver: bridge
+
+volumes:
+  kafka_data:
+    name: ciblorgasport_kafka_data
+  postgres_data:
+    name: ciblorgasport_postgres_data

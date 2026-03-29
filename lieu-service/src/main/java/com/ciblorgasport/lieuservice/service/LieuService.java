@@ -2,6 +2,7 @@ package com.ciblorgasport.lieuservice.service;
 
 import com.ciblorgasport.lieuservice.model.Lieu;
 import com.ciblorgasport.lieuservice.repository.LieuRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,8 @@ public class LieuService {
     }
 
     public Lieu getLieuById(Long id) {
-        return lieuRepository.findById(id).orElse(null);
+        return lieuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Lieu not found: " + id));
     }
 
     public Lieu createLieu(Lieu lieu) {
@@ -27,10 +29,8 @@ public class LieuService {
     }
 
     public Lieu updateLieu(Long id, Lieu lieuDetails) {
-        Lieu lieu = lieuRepository.findById(id).orElse(null);
-        if (lieu == null) {
-            return null;
-        }
+        Lieu lieu = lieuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Lieu not found: " + id));
 
         lieu.setNom(lieuDetails.getNom());
         lieu.setAdresse(lieuDetails.getAdresse());

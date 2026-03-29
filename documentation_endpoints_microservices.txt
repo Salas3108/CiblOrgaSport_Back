@@ -13,74 +13,347 @@ incident-service
 - /lieux (GET, POST)
 - /lieux/{id} (GET, PUT, DELETE)
 - /events (GET, POST)
-- /events/{id} (GET, PUT, DELETE)
-- /epreuves/{id} (GET, PUT, DELETE)
-- /competitions (GET, POST)
-- /competitions/{id} (GET, PUT, DELETE)
-- /admin/events (GET, POST, DELETE)
-- /admin/events/{id} (DELETE)
+  - GET : public ou authentifié.
+- /auth/login, /auth/register (POST)
+Liste des endpoints par microservice
 
+Format de réponse standard
+- Succès (200/201):
+  {
+    "status": "success",
+    "data": <object|array>,
+    "message": null
+  }
+- Erreur (4xx/5xx):
+  {
+    "status": "error",
+    "data": null,
+    "message": "Description lisible de l'erreur",
+    "errors": [
+      { "field": "nomChamp", "message": "détail" }
+    ]
+  }
+- Headers recommandés (global): `Authorization: Bearer <token>` (sauf `/auth/login` et `/auth/register` qui sont publics), `Content-Type: application/json` pour les JSON.
 
-============================================
+========================================================================
+
+abonnement-service
+-------------------
+- GET /api/abonnements/user/{userId}
+  - Headers: Authorization
+  - Path: `userId` (UUID/string)
+  - Query (optionnel): `page`, `size`
+  - Response 200:
+    {
+      "status": "success",
+      "data": [
+        { "id": "...", "userId": "...", "eventId": "...", "type": "...", "startedAt": "ISO8601", "endedAt": "ISO8601|null", "active": true }
+      ],
+      "message": null
+    }
+
+- POST /api/abonnements/subscribe
+  - Headers: Authorization, Content-Type: application/json
+  - Body:
+    { "userId": "string", "eventId": "string", "type": "string" }
+  - Response 201:
+    {
+      "status": "success",
+      "data": { "id": "...", "userId": "...", "eventId": "...", "type": "...", "startedAt": "ISO8601", "active": true },
+      "message": "Abonnement créé"
+    }
+
+- DELETE /api/abonnements/unsubscribe
+  - Headers: Authorization, Content-Type: application/json
+  - Body (ou query): { "userId": "string", "eventId": "string" }
+  - Response 200:
+    { "status": "success", "data": { "success": true }, "message": "Désabonnement effectué" }
+
+========================================================================
+
+incident-service
 ----------------
-- /api/incidents (GET, POST)
-  - Authentification JWT obligatoire (header Authorization: Bearer).
-  - GET : liste des incidents (souvent paginée).
-  - POST : création d’un incident (body JSON requis).
-- /api/incidents/{id} (GET, PUT, DELETE)
-  - Authentification JWT obligatoire.
-  - PUT/DELETE : modification/suppression, souvent réservé à l’auteur ou à un rôle admin.
+- GET /api/incidents
+  - Headers: Authorization
+  - Query: `page`, `size`, `filter`, `severity`
+  - Response 200 (paginated):
+    { "status":"success", "data": { "items": [ { /* incident */ } ], "page":0, "size":10, "total": 123 }, "message": null }
 
+- POST /api/incidents
+  - Headers: Authorization, Content-Type: application/json
+  - Body:
+    {
+      "title": "string",
+      "description": "string",
+      "reportedBy": "userId",
+      "locationId": "id",
+      "severity": "LOW|MEDIUM|HIGH"
+    }
+  - Response 201: created incident object
+
+- GET /api/incidents/{id}
+  - Headers: Authorization
+  - Response 200: incident object
+
+- PUT /api/incidents/{id}
+  - Headers: Authorization, Content-Type: application/json
+  - Body: same schema que POST (champs modifiables)
+  - Response 200: updated incident
+
+- DELETE /api/incidents/{id}
+  - Headers: Authorization
+  - Response 204 No Content (ou 200 avec message)
+
+Ressources détaillées
+
+- `/lieux` (CRUD)
+  - GET /lieux
+    - Headers: Authorization (ou public selon configuration)
+    - Query: `page`, `size`, `search`
+    - Response 200: paginated list of lieux
+  - POST /lieux
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "name": "string", "address": "string", "capacity": number }
+    - Response 201: created lieu object
+  - GET /lieux/{id}
+    - Headers: Authorization (ou public)
+    - Path: `id`
+    - Response 200: lieu object
+  - PUT /lieux/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields (name, address, capacity)
+    - Response 200: updated lieu object
+  - DELETE /lieux/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content (ou 200 with message)
+
+- `/events` (CRUD)
+  - GET /events
+    - Headers: Authorization (optional/public depending on config)
+    - Query: `page`, `size`, `locationId`, `startDate`, `endDate`
+    - Response 200: paginated list of events
+  - POST /events
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "title": "string", "description": "string", "locationId": "string", "startDate": "ISO8601", "endDate": "ISO8601", "organizerId": "string" }
+    - Response 201: created event object
+  - GET /events/{id}
+    - Headers: Authorization (optional)
+    - Response 200: event object
+  - PUT /events/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields (title, description, dates, locationId)
+    - Response 200: updated event object
+  - DELETE /events/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content (ou 200 with message)
+
+- `/epreuves` (CRUD)
+  - GET /epreuves
+    - Headers: Authorization (optional)
+    - Query: `competitionId`, `eventId`, `page`, `size`
+    - Response 200: paginated list of epreuves
+  - POST /epreuves
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "competitionId": "string", "name": "string", "order": number, "discipline": "string" }
+    - Response 201: created epreuve object
+  - GET /epreuves/{id}
+    - Headers: Authorization (optional)
+    - Response 200: epreuve object
+  - PUT /epreuves/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields
+    - Response 200: updated epreuve object
+  - DELETE /epreuves/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content
+
+- `/competitions` (CRUD)
+  - GET /competitions
+    - Headers: Authorization (optional)
+    - Query: `eventId`, `page`, `size`
+    - Response 200: paginated list of competitions
+  - POST /competitions
+    - Headers: Authorization (ROLE_ADMIN), Content-Type: application/json
+    - Body: { "name": "string", "eventId": "string", "startDate": "ISO8601", "endDate": "ISO8601" }
+    - Response 201: created competition object
+  - GET /competitions/{id}
+    - Headers: Authorization (optional)
+    - Response 200: competition object
+  - PUT /competitions/{id}
+    - Headers: Authorization (ROLE_ADMIN), Content-Type: application/json
+    - Body: modifiable fields
+    - Response 200: updated competition object
+  - DELETE /competitions/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content
+
+
+Exemples de bodies:
+- Lieu (POST /lieux): { "name": "Stade A", "address": "...", "capacity": 5000 }
+- Event (POST /events): { "title": "Meeting", "startDate": "2026-06-01T09:00:00Z", "endDate": "2026-06-01T18:00:00Z", "locationId": "...", "description": "..." }
+
+Admin endpoints:
+- /admin/events (GET, POST, DELETE) et /admin/events/{id} (DELETE) — Header Authorization + ROLE_ADMIN requis
+
+========================================================================
 
 event-service
 -------------
-- /lieux, /lieux/{id} (GET, POST, PUT, DELETE)
-  - Authentification JWT obligatoire.
-  - POST/PUT/DELETE : accès réservé aux rôles admin/gestionnaire.
-  - Paramètres : body JSON pour création/modification, path pour l’id.
-- /events, /events/{id}
-  - GET : public ou authentifié selon config.
-  - POST/PUT/DELETE : réservé admin/gestionnaire.
-  - Paramètres : body JSON, path id.
-- /epreuves, /epreuves/{id}
-  - Même logique que events.
-- /competitions, /competitions/{id}
-  - GET : public ou authentifié.
-  - POST/PUT/DELETE : admin uniquement (annotation @PreAuthorize("hasRole('ADMIN')")).
-- /admin/events, /admin/events/{id}, /admin/events/{eventId}/competitions, /admin/events/competitions/{competitionId}/epreuves
-  - Accès strictement réservé aux admins.
-  - Paramètres : body JSON, path id.
+Les endpoints sont organisés autour des ressources `lieux`, `events`, `epreuves`, `competitions`.
 
+- `/lieux` (CRUD)
+  - GET /lieux
+    - Public selon configuration ou Header Authorization
+    - Query: `page`, `size`, `search`
+    - Response 200: paginated list of lieux
+  - POST /lieux
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "name": "string", "address": "string", "capacity": number }
+    - Response 201: created lieu object
+  - GET /lieux/{id}
+    - Headers: Authorization (ou public)
+    - Path: `id`
+    - Response 200: lieu object
+  - PUT /lieux/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields (name, address, capacity)
+    - Response 200: updated lieu object
+  - DELETE /lieux/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content (ou 200 with message)
+
+- `/events` (CRUD)
+  - GET /events
+    - Headers: Authorization (optional/public depending on config)
+    - Query: `page`, `size`, `locationId`, `startDate`, `endDate`
+    - Response 200: paginated list of events
+  - POST /events
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "title": "string", "description": "string", "locationId": "string", "startDate": "ISO8601", "endDate": "ISO8601", "organizerId": "string" }
+    - Response 201: created event object
+  - GET /events/{id}
+    - Headers: Authorization (optional)
+    - Response 200: event object
+  - PUT /events/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields (title, description, dates, locationId)
+    - Response 200: updated event object
+  - DELETE /events/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content (ou 200 with message)
+
+- `/epreuves` (CRUD)
+  - GET /epreuves
+    - Headers: Authorization (optional)
+    - Query: `competitionId`, `eventId`, `page`, `size`
+    - Response 200: paginated list of epreuves
+  - POST /epreuves
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: { "competitionId": "string", "name": "string", "order": number, "discipline": "string" }
+    - Response 201: created epreuve object
+  - GET /epreuves/{id}
+    - Headers: Authorization (optional)
+    - Response 200: epreuve object
+  - PUT /epreuves/{id}
+    - Headers: Authorization (ROLE_ADMIN/ROLE_MANAGER), Content-Type: application/json
+    - Body: modifiable fields
+    - Response 200: updated epreuve object
+  - DELETE /epreuves/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content
+
+- `/competitions` (CRUD)
+  - GET /competitions
+    - Headers: Authorization (optional)
+    - Query: `eventId`, `page`, `size`
+    - Response 200: paginated list of competitions
+  - POST /competitions
+    - Headers: Authorization (ROLE_ADMIN), Content-Type: application/json
+    - Body: { "name": "string", "eventId": "string", "startDate": "ISO8601", "endDate": "ISO8601" }
+    - Response 201: created competition object
+  - GET /competitions/{id}
+    - Headers: Authorization (optional)
+    - Response 200: competition object
+  - PUT /competitions/{id}
+    - Headers: Authorization (ROLE_ADMIN), Content-Type: application/json
+    - Body: modifiable fields
+    - Response 200: updated competition object
+  - DELETE /competitions/{id}
+    - Headers: Authorization (ROLE_ADMIN)
+    - Response 204 No Content
+
+========================================================================
 
 auth-service
 ------------
-- /auth/user/upload-documents (POST)
-  - Authentification JWT obligatoire.
-  - Body : fichiers/document à uploader (multipart/form-data).
-- /auth/admin/validate-athlete (POST)
-  - Accès réservé au rôle admin.
-  - Body : infos de validation.
-- /auth/user/username/{username} (GET)
-  - Authentification requise.
-  - Path : username.
-- /auth/hello (GET)
-  - Test d’authentification (JWT).
-- /auth/login, /auth/register (POST)
-  - Public.
-  - Body : JSON avec identifiants ou infos d’inscription.
+- POST /auth/login
+  - Public
+  - Body: { "username": "string", "password": "string" }
+  - Response 200:
+    { "status":"success", "data": { "token": "ey...", "expiresIn": 3600, "user": { "id","username","roles": ["USER"] } }, "message": null }
 
+- POST /auth/register
+  - Public
+  - Body: { "username":"string", "email":"string", "password":"string", ... }
+  - Response 201: created user (ou token selon impl)
+
+- POST /auth/user/upload-documents
+  - Headers: Authorization, Content-Type: multipart/form-data
+  - Form fields: `files[]` or `document`
+  - Response 201: { "status":"success", "data": { "documents": [ { "id","filename","url" } ] } }
+
+- POST /auth/admin/validate-athlete
+  - Headers: Authorization (ROLE_ADMIN)
+  - Body: { "userId": "string", "validated": true, "notes": "" }
+  - Response 200: { "status":"success", "data": { "userId":"...","validated":true } }
+
+- GET /auth/user/username/{username}
+  - Headers: Authorization
+  - Response 200: user profile (sans champs sensibles)
+
+- GET /auth/hello
+  - Headers: Authorization
+  - Response 200: { "status":"success", "data": { "message":"hello","user": {"id","username"} } }
+
+========================================================================
 
 billetterie
 -----------
-- /api/tickets (GET, POST)
-  - Authentification JWT obligatoire.
-  - POST : création de ticket (body JSON).
-- /api/tickets/{id} (GET, PUT, DELETE)
-  - Authentification JWT obligatoire.
-  - PUT/DELETE : réservé à l’auteur ou admin.
-- /api/tickets/price (GET)
-  - Authentification requise.
-  - Paramètres : query (ex : type, catégorie…).
+- GET /api/tickets
+  - Headers: Authorization
+  - Query: `eventId`, `userId`, `page`, `size`, `category`
+  - Response 200: paginated tickets
 
+- POST /api/tickets
+  - Headers: Authorization, Content-Type: application/json
+  - Body: { "eventId": "string", "userId": "string", "seat": "string|null", "price": number, "category": "string" }
+  - Response 201: created ticket
 
-Tous les endpoints nécessitent en général un header Authorization: Bearer <token>. Les droits précis (admin, user, etc.) sont gérés par les annotations Spring Security (@PreAuthorize, etc.) et la logique dans les filtres JWT. Pour plus de détails endpoint par endpoint, il faut lire chaque contrôleur.
+- GET /api/tickets/{id}
+  - Headers: Authorization
+  - Response 200: ticket object
+
+- PUT /api/tickets/{id}
+  - Headers: Authorization, Content-Type: application/json
+  - Body: modifiable fields (seat, status, etc.)
+  - Response 200: updated ticket
+
+- DELETE /api/tickets/{id}
+  - Headers: Authorization
+  - Response 204 No Content (ou 200 with message)
+
+- GET /api/tickets/price
+  - Headers: Authorization
+  - Query: `type`, `category`
+  - Response 200: { "status":"success", "data": { "price": 12.5, "currency":"EUR", "details": {} } }
+
+========================================================================
+
+Remarques générales
+- Validation: pour POST/PUT renvoyer 400 avec `errors` listant les champs invalides.
+- Création: renvoyer 201 Created + Location header pointant vers la ressource créée quand pertinent.
+- Suppression: 204 No Content est acceptable ; sinon 200 avec message structuré.
+- Auth & rôles: documenter pour chaque endpoint les rôles requis (`ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_USER`) dans les fichiers de contrôleurs.
+- Pour une documentation machine-readable, envisager d'exporter en OpenAPI/Swagger à partir des contrôleurs (Springdoc/OpenAPI).
+
+Pour voir le fichier modifié: [documentation_endpoints_microservices.txt](documentation_endpoints_microservices.txt)

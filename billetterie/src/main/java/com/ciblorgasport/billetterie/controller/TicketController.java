@@ -5,6 +5,7 @@ import com.ciblorgasport.billetterie.client.EventServiceClient;
 import com.ciblorgasport.billetterie.dto.TicketResponse;
 import com.ciblorgasport.billetterie.model.Ticket;
 import com.ciblorgasport.billetterie.service.TicketService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ public class TicketController {
 		this.eventServiceClient = eventServiceClient;
 	}
 
+	/** Returns all tickets, optionally filtered by spectator ID. */
 	@GetMapping
 	public ResponseEntity<List<TicketResponse>> findAll(@RequestParam(required = false) Long spectatorId) {
 		List<Ticket> tickets;
@@ -38,6 +40,7 @@ public class TicketController {
 		return ResponseEntity.ok(responses);
 	}
 
+	/** Returns a ticket by its ID. */
 	@GetMapping("/{id}")
 	public ResponseEntity<TicketResponse> findById(@PathVariable Long id) {
 		return ticketService.findById(id)
@@ -46,28 +49,32 @@ public class TicketController {
 			.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
+	/** Creates a new ticket. */
 	@PostMapping
 	public ResponseEntity<?> create(@RequestBody Ticket ticket) {
 		try {
 			Ticket saved = ticketService.create(ticket);
-			return ResponseEntity.ok(toResponse(saved));
+			return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
 
+	/** Updates an existing ticket by its ID. */
 	@PutMapping("/{id}")
 	public ResponseEntity<TicketResponse> update(@PathVariable Long id, @RequestBody Ticket ticket) {
 		Ticket updated = ticketService.update(id, ticket);
 		return ResponseEntity.ok(toResponse(updated));
 	}
 
+	/** Deletes a ticket by its ID. */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		ticketService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 
+	/** Returns the calculated price for a given ticket category. */
 	@GetMapping("/price")
 	public ResponseEntity<Double> priceByCategory(@RequestParam String category) {
 		return ResponseEntity.ok(ticketService.calculatePrice(category));

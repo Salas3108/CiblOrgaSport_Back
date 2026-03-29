@@ -128,7 +128,7 @@ public class CommissaireController {
 
     // COMMISSAIRE : get info
     @GetMapping("/athletes/{id}/info")
-    @PreAuthorize("hasRole('COMMISSAIRE')")
+    @PreAuthorize("hasRole('COMMISSAIRE') or hasRole('ADMIN')")
     public ResponseEntity<AthleteDto> getInfo(@PathVariable Long id) {
         Athlete athlete = athleteService.findByIdOrThrow(id);
         return ResponseEntity.ok(athleteMapper.toDto(athlete));
