@@ -35,6 +35,12 @@ public class EpreuveAssignmentController {
         return ResponseEntity.ok(Map.of("epreuveId", epreuveId, "athleteIds", athleteIds));
     }
 
+    @GetMapping("/{epreuveId}/athletes/{athleteId}/statut")
+    public ResponseEntity<Map<String, Object>> getAthleteStatut(@PathVariable Long epreuveId,
+                                                                @PathVariable Long athleteId) {
+        return ResponseEntity.ok(assignmentService.getAthleteStatut(epreuveId, athleteId));
+    }
+
     @PostMapping("/{epreuveId}/athletes")
     public ResponseEntity<Map<String, Object>> assignAthletes(@PathVariable Long epreuveId,
                                                               @RequestBody AssignAthletesRequest request) {
