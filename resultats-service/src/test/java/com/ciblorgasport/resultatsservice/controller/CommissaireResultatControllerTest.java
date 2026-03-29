@@ -12,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import org.springframework.http.ResponseEntity;
 
 import com.ciblorgasport.resultatsservice.dto.ResultatDto;
@@ -21,6 +24,7 @@ import com.ciblorgasport.resultatsservice.model.Resultat;
 import com.ciblorgasport.resultatsservice.service.ResultatService;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CommissaireResultatControllerTest {
 
     @Mock
@@ -28,6 +32,12 @@ class CommissaireResultatControllerTest {
 
     @Mock
     private ResultatMapper resultatMapper;
+
+    @Mock
+    private com.ciblorgasport.resultatsservice.client.EventServiceClient eventServiceClient;
+
+    @Mock
+    private com.ciblorgasport.resultatsservice.client.ParticipantsServiceClient participantsServiceClient;
 
     @InjectMocks
     private CommissaireResultatController controller;

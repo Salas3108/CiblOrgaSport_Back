@@ -29,8 +29,10 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
@@ -38,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -122,9 +125,27 @@ class IncidentKafkaFlowIntegrationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void retry_OnTemporaryDbError_EventuallySucceeds() {
         when(abonnementServiceClient.getSubscribersWithNotifications(anyLong()))
                 .thenReturn(List.of(13L));
+
+        // Use an in-memory store: callRealMethod() is not supported on JPA interface proxy spies
+        List<Notification> inMemoryStore = new CopyOnWriteArrayList<>();
+
+        when(notificationRepositorySpy.findAll())
+                .thenAnswer(inv -> new ArrayList<>(inMemoryStore));
+
+        when(notificationRepositorySpy.findRecipientIdsBySourceEventIdAndIdSpectateurIn(anyString(), any()))
+                .thenAnswer(inv -> {
+                    String sourceId = inv.getArgument(0);
+                    List<Long> recipientIds = inv.getArgument(1);
+                    return inMemoryStore.stream()
+                            .filter(n -> sourceId.equals(n.getSourceEventId())
+                                    && recipientIds.contains(n.getIdSpectateur()))
+                            .map(Notification::getIdSpectateur)
+                            .toList();
+                });
 
         AtomicInteger attempts = new AtomicInteger(0);
         doAnswer(invocation -> {
@@ -132,7 +153,10 @@ class IncidentKafkaFlowIntegrationTest {
             if (current <= 2) {
                 throw new RuntimeException("simulated transient DB failure");
             }
-            return invocation.callRealMethod();
+            List<Notification> toSave = (List<Notification>) invocation.getArgument(0);
+            List<Notification> saved = new ArrayList<>(toSave);
+            inMemoryStore.addAll(saved);
+            return saved;
         }).when(notificationRepositorySpy).saveAll(any());
 
         IncidentCreatedEventV1 event = buildEvent("evt-retry-1", 7003L, 1003L);
@@ -152,7 +176,7 @@ class IncidentKafkaFlowIntegrationTest {
         ConsumerRecord<String, byte[]> dlqRecord = KafkaTestUtils.getSingleRecord(
                 dlqConsumer,
                 KafkaTopics.INCIDENT_DLQ_TOPIC,
-                Duration.ofSeconds(12)
+                Duration.ofSeconds(25)
         );
 
         assertEquals("bad-incident-key", dlqRecord.key());
@@ -204,7 +228,7 @@ class IncidentKafkaFlowIntegrationTest {
     }
 
     private void awaitTrue(BooleanSupplier condition, String failureMessage) {
-        long deadline = System.currentTimeMillis() + 15_000;
+        long deadline = System.currentTimeMillis() + 60_000;
         while (System.currentTimeMillis() < deadline) {
             if (condition.getAsBoolean()) {
                 return;

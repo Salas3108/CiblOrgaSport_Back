@@ -29,6 +29,9 @@ class AbonnementControllerTest {
     @MockBean
     private RestTemplate restTemplate;
 
+    @MockBean
+    private com.ciblorgasport.dto.AbonnementMapper abonnementMapper;
+
     private Long userId;
     private Long competitionId;
     private Abonnement abonnement;
@@ -43,8 +46,13 @@ class AbonnementControllerTest {
 
     @Test
     void testGetMesAbonnements() throws Exception {
+        com.ciblorgasport.dto.AbonnementDTO dto = new com.ciblorgasport.dto.AbonnementDTO();
+        dto.setUserId(userId);
+        dto.setCompetitionId(competitionId);
+
         List<Abonnement> abonnements = Arrays.asList(abonnement);
         when(abonnementRepository.findByUserId(userId)).thenReturn(abonnements);
+        when(abonnementMapper.toDto(abonnement)).thenReturn(dto);
 
         mockMvc.perform(get("/api/abonnements/user/{userId}", userId))
                 .andExpect(status().isOk())

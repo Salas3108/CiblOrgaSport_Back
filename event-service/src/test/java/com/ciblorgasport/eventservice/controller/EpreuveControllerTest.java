@@ -50,6 +50,9 @@ class EpreuveControllerTest {
     @Mock
     private EpreuveValidator epreuveValidator;
 
+    @Mock
+    private com.ciblorgasport.eventservice.service.GenderEligibilityService genderEligibilityService;
+
     @InjectMocks
     private EpreuveController epreuveController;
 
@@ -110,7 +113,7 @@ class EpreuveControllerTest {
         assertNotNull(result.getBody());
         assertEquals(1L, result.getBody().getId());
         verify(epreuveRepository, times(1)).save(entity);
-        verify(epreuveValidator, times(1)).validate(dto);
+        verify(epreuveValidator, times(1)).validateForCreate(dto);
     }
 
     @Test
