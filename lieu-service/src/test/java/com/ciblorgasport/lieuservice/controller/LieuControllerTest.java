@@ -2,11 +2,14 @@ package com.ciblorgasport.lieuservice.controller;
 
 import com.ciblorgasport.lieuservice.model.Lieu;
 import com.ciblorgasport.lieuservice.service.LieuService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,24 +55,27 @@ class LieuControllerTest {
         when(lieuService.getLieuById(1L)).thenReturn(lieu);
 
         // Act
-        Lieu result = lieuController.getLieuById(1L);
+        ResponseEntity<Lieu> result = lieuController.getLieuById(1L);
 
         // Assert
         assertNotNull(result);
-        assertEquals("Stade de France", result.getNom());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals("Stade de France", result.getBody().getNom());
         verify(lieuService, times(1)).getLieuById(1L);
     }
 
     @Test
-    void getLieuById_WhenNotExists_ShouldReturnNull() {
+    void getLieuById_WhenNotExists_ShouldReturn404() {
         // Arrange
-        when(lieuService.getLieuById(99L)).thenReturn(null);
+        when(lieuService.getLieuById(99L)).thenThrow(new EntityNotFoundException("not found"));
 
         // Act
-        Lieu result = lieuController.getLieuById(99L);
+        ResponseEntity<Lieu> result = lieuController.getLieuById(99L);
 
         // Assert
-        assertNull(result);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        assertNull(result.getBody());
         verify(lieuService, times(1)).getLieuById(99L);
     }
 
@@ -87,11 +93,13 @@ class LieuControllerTest {
         when(lieuService.createLieu(lieu)).thenReturn(savedLieu);
 
         // Act
-        Lieu result = lieuController.createLieu(lieu);
+        ResponseEntity<Lieu> result = lieuController.createLieu(lieu);
 
         // Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(1L, result.getBody().getId());
         verify(lieuService, times(1)).createLieu(lieu);
     }
 
@@ -113,24 +121,28 @@ class LieuControllerTest {
         when(lieuService.updateLieu(1L, updateDetails)).thenReturn(updated);
 
         // Act
-        Lieu result = lieuController.updateLieu(1L, updateDetails);
+        ResponseEntity<Lieu> result = lieuController.updateLieu(1L, updateDetails);
 
         // Assert
         assertNotNull(result);
-        assertEquals(12000, result.getCapaciteSpectateurs());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(12000, result.getBody().getCapaciteSpectateurs());
         verify(lieuService, times(1)).updateLieu(1L, updateDetails);
     }
 
     @Test
-    void updateLieu_WhenNotExists_ShouldReturnNull() {
+    void updateLieu_WhenNotExists_ShouldReturn404() {
         // Arrange
-        when(lieuService.updateLieu(eq(99L), any(Lieu.class))).thenReturn(null);
+        when(lieuService.updateLieu(eq(99L), any(Lieu.class)))
+                .thenThrow(new EntityNotFoundException("not found"));
 
         // Act
-        Lieu result = lieuController.updateLieu(99L, new Lieu());
+        ResponseEntity<Lieu> result = lieuController.updateLieu(99L, new Lieu());
 
         // Assert
-        assertNull(result);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+        assertNull(result.getBody());
         verify(lieuService, times(1)).updateLieu(eq(99L), any(Lieu.class));
     }
 
