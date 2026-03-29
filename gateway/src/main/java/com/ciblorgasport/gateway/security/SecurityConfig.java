@@ -35,6 +35,8 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost:8080");
         // Production frontend AWS S3
         configuration.addAllowedOrigin("http://ciblorgasport-frontend-prod.s3-website.eu-west-3.amazonaws.com");
+        // Production frontend OVH
+        configuration.addAllowedOrigin("http://137.74.133.131");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

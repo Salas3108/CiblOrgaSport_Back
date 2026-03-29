@@ -49,7 +49,15 @@
       "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8080/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
       "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8081/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
       "Bash(ssh -o StrictHostKeyChecking=no ubuntu@137.74.133.131 \"docker exec auth-service curl -s -w ''\\\\n%{http_code}'' -X POST http://localhost:8081/auth/login -H ''Content-Type: application/json'' -d ''{\"\"username\"\":\"\"marius.admin\"\",\"\"password\"\":\"\"password123\"\"}''\")",
-      "Bash(ssh -o:*)"
+      "Bash(ssh -o:*)",
+      "Bash(find /Users/salimtitouche -maxdepth 4 -type d -name *front*)",
+      "Bash(find /Users/salimtitouche -maxdepth 5 -name next.config.*)",
+      "Bash(git -C /Users/salimtitouche/Glop/CiblOrgaSport_Front log --oneline -3)",
+      "Bash(git -C /Users/salimtitouche/CiblOrgaSport_Front log --oneline -3)",
+      "Bash(cat /Users/salimtitouche/Glop/CiblOrgaSport_Front/.github/workflows/*.yml)",
+      "Bash(find /Users/salimtitouche/Glop/CiblOrgaSport_Front -name *.yml -path *github*)",
+      "Bash(docker build:*)",
+      "Bash(docker push:*)"
     ]
   }
 }
