@@ -18,11 +18,13 @@ public class LieuController {
         this.lieuService = lieuService;
     }
 
+    /** Returns all lieux. */
     @GetMapping
     public List<Lieu> getAllLieux() {
         return lieuService.getAllLieux();
     }
 
+    /** Returns a lieu by its ID. */
     @GetMapping("/{id}")
     public ResponseEntity<Lieu> getLieuById(@PathVariable Long id) {
         try {
@@ -32,12 +34,14 @@ public class LieuController {
         }
     }
 
+    /** Creates a new lieu. */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Lieu> createLieu(@RequestBody Lieu lieu) {
         return ResponseEntity.status(201).body(lieuService.createLieu(lieu));
     }
 
+    /** Updates an existing lieu by its ID. */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Lieu> updateLieu(@PathVariable Long id, @RequestBody Lieu lieuDetails) {
@@ -48,6 +52,7 @@ public class LieuController {
         }
     }
 
+    /** Deletes a lieu by its ID. */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMMISSAIRE')")
     public ResponseEntity<Void> deleteLieu(@PathVariable Long id) {

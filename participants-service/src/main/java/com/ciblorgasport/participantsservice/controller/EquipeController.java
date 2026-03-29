@@ -38,6 +38,7 @@ public class EquipeController {
         this.equipeMapper = equipeMapper;
     }
 
+    /** Returns all equipes. */
     @GetMapping("")
     public ResponseEntity<List<EquipeDto>> getAll() {
         List<EquipeDto> equipes = equipeService.findAll().stream()
@@ -46,27 +47,32 @@ public class EquipeController {
         return ResponseEntity.ok(equipes);
     }
 
+    /** Returns an equipe by its ID. */
     @GetMapping("/{id}")
     public ResponseEntity<EquipeDto> getOne(@PathVariable Long id) {
         return ResponseEntity.ok(equipeMapper.toDto(equipeService.findByIdOrThrow(id)));
     }
 
+    /** Creates a new equipe. */
     @PostMapping("")
     public ResponseEntity<EquipeDto> create(@RequestBody CreateEquipeRequest request) {
         return ResponseEntity.ok(equipeMapper.toDto(equipeService.create(request)));
     }
 
+    /** Updates an existing equipe by its ID. */
     @PutMapping("/{id}")
     public ResponseEntity<EquipeDto> update(@PathVariable Long id, @RequestBody UpdateEquipeRequest request) {
         return ResponseEntity.ok(equipeMapper.toDto(equipeService.update(id, request)));
     }
 
+    /** Deletes an equipe by its ID. */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         equipeService.delete(id);
         return ResponseEntity.ok(Map.of("message", "equipe supprime avec succes"));
     }
 
+    /** Assigns athletes to an equipe. */
     @PostMapping("/{id}/athletes")
     public ResponseEntity<EquipeDto> assignAthletes(@PathVariable Long id, @RequestBody AssignAthletesRequest request) {
         return ResponseEntity.ok(equipeMapper.toDto(equipeService.assignAthletes(id, request)));
